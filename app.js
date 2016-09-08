@@ -29,17 +29,23 @@ $(document).ready(function() {
         });
         
         $.post('/list-image-tags', {name: $(this).text()}, function(data, textStatus, event) {
-            data = data.trim().split("\n");
+            data = data.trim().substring(1, data.length - 1).trim().split("\\n");
             for(var i=0,l=data.length;i<l;i++) {
+                if(!data[i].trim()) {
+                    continue;
+                }
                 $('#tb-add-image-list-tags-search').append('<li class="list-group-item"><a href="#">' + data[i] + '</a></li>');
             }
+            // if($('#tb-add-image-list-tags-search li').length == 0) {
+            //     $('#tb-add-image-list-tags-search').append('<li class="list-group-item"><a href="#">latest</a></li>');
+            // }
             wdtLoading.done();
         });
     });
 
     $('#tb-add-image-list-tags-search').on('click', 'a', function () {
         config.version = $(this).text();
-        $('#modal-add-image').modal('hide')
+        $('#modal-add-image').modal('hide');
         
         var n = noty({
             layout: 'top',
@@ -87,12 +93,12 @@ $(document).ready(function() {
         $.post('/search-image', {name: name}, function(data, textStatus, event) {
             $('#btn-image-search').show();
             $('#btn-image-search-loading').hide();
+
+            // @TODO Somente se tiver resultado
             $('#tb-add-image-list-search').show();
             $('#tb-add-image-list-search tbody').html('');
 
-            console.log(data);
-
-            data = data.trim().split("\n");
+            data = data.trim().split("\\n");
             if(data.length > 1) {
                 for (var i = 1, l = data.length; i < l; i++) {
                     var linha = data[i].trim().split(/\s+/);

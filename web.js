@@ -98,10 +98,14 @@ try {
                         _data[data[i].trim().split('=')[0]] = data[i].trim().split('=')[1];
                     }
                     _data.name = decodeURIComponent(_data.name).replace(/\+/, '-');
-                    if(debug) {
-                        console.log('> COMMAND: ', 'docker pull ' + _data.name + ':' + _data.version);
+                    var _repo = _data.name;
+                    if(_data.version != 'latest') {
+                        _repo+= ':' + _data.version;
                     }
-                    var out = nsShell.exec('docker pull ' + _data.name + ':' + _data.version, {silent:silent});
+                    if(debug) {
+                        console.log('> COMMAND: ', 'docker pull ' + _repo);
+                    }
+                    var out = nsShell.exec('docker pull ' + _repo, {silent:silent});
 
                     response.writeHeader(200, {'Content-type': 'text/plain'});
                     response.write(JSON.stringify(out));
@@ -117,9 +121,9 @@ try {
                     imageId = Buffer.concat(imageId).toString().split('=')[1];
                     imageId = decodeURIComponent(imageId).replace(/\+/, '-');
                     if(debug) {
-                        console.log('> COMMAND: ', 'docker rmi ' + imageId);
+                        console.log('> COMMAND: ', 'docker rmi -f ' + imageId);
                     }
-                    var out = nsShell.exec('docker rmi ' + imageId, {silent:silent});
+                    var out = nsShell.exec('docker rmi -f ' + imageId, {silent:silent});
 
                     response.writeHeader(200, {'Content-type': 'text/plain'});
                     response.write(JSON.stringify(out));
@@ -244,15 +248,15 @@ try {
                     }
                     _data.containerId = decodeURIComponent(_data.containerId);
 
-                    if(debug) {
-                        console.log('> COMMAND: ', 'docker stop ' + _data.containerId);
-                    }
-                    var out = nsShell.exec('docker stop ' + _data.containerId, {silent:silent});
+                    // if(debug) {
+                    //     console.log('> COMMAND: ', 'docker stop ' + _data.containerId);
+                    // }
+                    // var out = nsShell.exec('docker stop ' + _data.containerId, {silent:silent});
                     
                     if(debug) {
-                        console.log('> COMMAND: ', './docker-run docker rm ' + _data.containerId);
+                        console.log('> COMMAND: ', 'docker rm -f ' + _data.containerId);
                     }
-                    nsShell.exec('./docker-run docker rm ' + _data.containerId, {silent:silent});
+                    var out = nsShell.exec('docker rm -f ' + _data.containerId, {silent:silent});
 
                     response.writeHeader(200, {'Content-type': 'text/plain'});
                     response.write(JSON.stringify(out));
