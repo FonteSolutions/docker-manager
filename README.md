@@ -7,6 +7,7 @@ Manage your docker images and containers with this app made in nodeJs
 * Enter docker-manager directory
 * Install dependences ```$ npm install```
 * Start DockerManager ```$ ./docker-manager```
+* Open app [http://localhost:31337](http://localhost:31337)
 
 ## Configure Docker Remote API
 * Edit to allow connections ```/etc/default/docker```
