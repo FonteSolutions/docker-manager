@@ -15,6 +15,25 @@ try {
         }
         
         switch(true) {
+            case pathname == '/open-terminal':
+                var containerId = [];
+                request.on('data', function(chunk) {
+                    containerId.push(chunk);
+                }).on('end', function() {
+                    containerId = Buffer.concat(containerId).toString().split('=')[1];
+                    containerId = decodeURIComponent(containerId).replace(/\+/, '-');
+                    if(debug) {
+                        console.log('> COMMAND: ', 'docker-browser-server ' + containerId + ' -p 8081 > /dev/null 2>&1 &');
+                    }
+                    var out = nsShell.exec('docker-browser-server ' + containerId + ' -p 8081 &', {silent:silent});
+                    console.log('out', out);
+
+                    response.writeHeader(200, {'Content-type': 'text/plain'});
+                    response.write(JSON.stringify(out));
+                    response.end();
+                });
+                break;
+
             case pathname == '/list-images':
                 if(debug) {
                     console.log('> COMMAND: ', 'docker images');
@@ -25,7 +44,7 @@ try {
                 response.write(JSON.stringify(out));
                 response.end();
                 break;
-            
+
             case pathname == '/list-containers':
                 if(debug) {
                     // console.log('> COMMAND: ', 'docker ps');
@@ -202,6 +221,7 @@ try {
 
                     var out = '';
                     if(imageId) {
+                        // var cmd = 'docker run -d --privileged -v /var/run/docker.sock:/var/run/docker.sock ';
                         var cmd = 'docker run -d ';
 
                         if (terminal == true) {

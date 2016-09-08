@@ -15,6 +15,9 @@
     "wdt-loading": "latest",
     "noty": "latest",
     "animate.css": "latest",
-    "jquery.terminal": "latest"
+    "jquery.terminal": "latest",
+    "web-terminal": "latest",
+    "socket.io": "latest",
+    "sh.js": "latest"
   }
 }

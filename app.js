@@ -397,21 +397,44 @@ $(document).ready(function() {
 
         if($('#terminal_' + containerId).length == 1) {
             $('#terminal_' + containerId).dockmodal('restore');
-            console.log($('#terminal_' + containerId));
             return;
         }
 
-        var $terminal = $('<div class="terminal-item" id="terminal_' + containerId + '" data-container-id="' + containerId + '">' + containerId + '</div>');
+        var $terminal = $('<div class="terminal-item" id="terminal_' + containerId + '" data-container-id="' + containerId + '" style="height:100%;"></div>');
         $('#terminal-bar').append($terminal);
 
-        $terminal.dockmodal({
-            showPopout: false,
-            title: containerId
-            // initialState: "minimized"
-        });
-        
-        console.log($(this), containerId);
-    });
+        var term = new Terminal();
 
-    
+        $terminal.dockmodal({
+            title: containerId,
+            open: function ($content) {
+                term.open($content[0]);
+
+                var url = 'ws://localhost:2375/containers/' + containerId + '/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1';
+                var socket = new WebSocket(url);
+
+                term.on('data', function (data) {
+                    socket.send(data);
+                });
+
+                socket.onmessage = function (e) {
+                    term.write(e.data);
+                };
+
+                term.sizeToFit();
+                term.focus();
+            },
+            close: function ($term) {
+                $('#terminal_' + containerId).remove();
+            },
+            popout: function ($term) {
+                term.sizeToFit();
+                term.focus();
+            },
+            restore: function ($term) {
+                term.sizeToFit();
+                term.focus();
+            }
+        });
+    });
 });

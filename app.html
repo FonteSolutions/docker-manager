@@ -50,6 +50,19 @@
         .list-ports .port > div, .list-volumes .volume > div {
             padding: 1px;
         }
+
+        .terminal-input {
+            left: -10000px;
+            position: absolute;
+        }
+
+        .dockmodal-body {
+            padding: 0 !important;
+        }
+
+        .terminal-container, .terminal {
+            height: 100%;
+        }
         
         /*#terminal-bar {*/
             /*position: fixed;*/
@@ -181,7 +194,7 @@
                             <th>Created</th>
                             <th>Ports</th>
                             <th>Name</th>
-                            <th></th>
+                            <th style="width: 120px;"></th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -198,6 +211,8 @@
         <pre id="debug">
 
         </pre-->
+
+        <div id="term"></div>
 
     </div>
 
@@ -356,6 +371,8 @@
     <script type="text/javascript" src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
     <script type="text/javascript" src="./node_modules/jquery.terminal/js/jquery.terminal.js"></script>
     <script type="text/javascript" src="./node_modules/jquery.terminal/js/jquery.mousewheel-min.js"></script>
+    <script type="text/javascript" src="./node_modules/sh.js/build/sh.js"></script>
+    <script type="text/javascript" src="./node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
     <script type="text/javascript" src="./jquery.dockmodal.js"></script>
     <script type="text/javascript" src="./app.js"></script>
 </body>
