@@ -423,6 +423,10 @@ $(document).ready(function() {
 
                 term.sizeToFit();
                 term.focus();
+
+                setTimeout(function () {
+                    socket.send('\r');
+                }, 1000);
             },
             close: function ($term) {
                 $('#terminal_' + containerId).remove();
