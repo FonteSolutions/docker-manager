@@ -18,6 +18,138 @@ $(document).ready(function() {
         version: null
     };
 
+    function formatBytes(bytes,decimals) {
+        if(bytes == 0) return '0 Byte';
+        var k = 1000; // or 1024 for binary
+        var dm = decimals + 1 || 3;
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function timestamp2date(timestamp) {
+        var date = new Date(timestamp * 1000);
+        var dateFormatted = (new String(date.getDate()).length == 1 ? '0' + date.getDate() : date.getDate()) + '/' + (new String(date.getMonth()).length == 1 ? '0' + date.getMonth() : date.getMonth()) + '/' + date.getFullYear();
+        dateFormatted+= ' ' + (new String(date.getHours()).length == 1 ? '0' + date.getHours() : date.getHours()) + ':' + (new String(date.getMinutes()).length == 1 ? '0' + date.getMinutes() : date.getMinutes());
+        return dateFormatted;
+    }
+
+    /**
+     * List all images then update list
+     */
+    $('#btn-images-refresh').on('click', function() {
+        $.getJSON('/list-images', function(data, textStatus, event) {
+            initialLoads.loaded();
+            if(event.status == 200) {
+                $('#images-list').html('');
+
+                if(data.result.length == 0) {
+                    $('#images-list').html('<span>You dont have pulled any docker images yet.</span>')
+                    return;
+                }
+
+                for(var i=0,l=data.result.length;i<l;i++) {
+                    var item = data.result[i];
+                    var name = item.RepoTags[0].split(':');
+                    var version = name.pop();
+                    name = name.pop();
+
+                    var html =  '<li class="list-group-item" data-image-id="' + item.RepoTags[0] + '">' +
+                                    '<span class="name">' +
+                                        name +
+                                    '</span> ' +
+                                    '<span class="label label-warning version">v' +
+                                        version +
+                                    '</span> ' +
+                                    '<span class="label label-default">size ' +
+                                        formatBytes(item.VirtualSize) +
+                                    '</span> ' +
+                                    '<span class="label label-info">created ' +
+                                        timestamp2date(item.Created) +
+                                    '</span> ' +
+                                    '<div class="btn-group pull-right" role="group">' +
+                                        '<button type="button" class="btn btn-xs btn-primary btn-run-image">Run</button>' +
+                                        '<button type="button" class="btn btn-xs btn-warning btn-rename-image">Rename</button>' +
+                                        '<button type="button" class="btn btn-xs btn-danger btn-remove-image">Remove</button>' +
+                                    '</div>' +
+                                '</li>';
+                    $('#images-list').append(html);
+                }
+            }
+        });
+    }).trigger('click');
+
+    /**
+     * List all running containers
+     */
+    $('#btn-containers-refresh').on('click', function() {
+        $.getJSON('/list-containers', function(data, textStatus, event) {
+            initialLoads.loaded();
+            if(event.status == 200) {
+                $('#containers-list tbody').html('');
+
+                if(data.result.length == 0) {
+                    $('#containers-list-none').show();
+                    $('#containers-list').hide();
+                    return;
+                }
+
+                $('#containers-list-none').hide();
+                $('#containers-list').show();
+
+                for(var i=0,l=data.result.length;i<l;i++) {
+                    var item = data.result[i];
+                    var ports = '';
+                    for(var j=0,k=item.Ports.length;j<k;j++) {
+                        ports+= '<span class="label label-default">' + item.Ports[j].PrivatePort + ' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ' + item.Ports[j].PublicPort + '</span> ';
+                    }
+
+                    var html =  '<tr class="container-item" data-image-id="' + item.Id + '">' +
+                                    '<td class="text-center"><strong>' + item.Names[0].substr(1) + '</strong></td>' +
+                                    '<td class="truncate" title="' + item.Id + '">' + item.Id + '</td>' +
+                                    '<td>' + item.Image + '</td>' +
+                                    '<td>' + timestamp2date(item.Created) + '</td>' +
+                                    '<td>' + ports + '</td>' +
+                                    '<td>' + item.Command + '</td>' +
+                                    '<td><em>' + item.Status + '</em></td>' +
+                                    '<td class="text-center">' +
+                                        '<div class="btn-group">' +
+                                            '<button class="btn btn-xs btn-danger btn-container-stop"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>' +
+                                            '<button class="btn btn-xs btn-info btn-container-info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>' +
+                                            '<button class="btn btn-xs btn-warning btn-container-history"><span class="glyphicon glyphicon-book" aria-hidden="true"></span></button>' +
+                                            '<button class="btn btn-xs btn-default btn-container-open-terminal"><span class="glyphicon glyphicon-console" aria-hidden="true"></span></button>' +
+                                        '</div>' +
+                                    '</td>' +
+                                '</tr>';
+                    $('#containers-list tbody').append(html);
+                }
+            }
+        });
+    }).trigger('click');
+
+    /**
+     * List server info and show
+     */
+    $('#btn-server-status-refresh').on('click', function () {
+        $.getJSON('/server-status', function(data, textStatus, event) {
+            initialLoads.loaded();
+            if(event.status == 200) {
+                $('#server-status').html('');
+                var html = '<li class="list-group-item">Name <span class="badge">' + data.result.Name + '</span></li>';
+                html+= '<li class="list-group-item">OS <span class="badge">' + data.result.OperatingSystem + '</span></li>';
+                html+= '<li class="list-group-item">Kernel <span class="badge">' + data.result.KernelVersion + '</span></li>';
+                html+= '<li class="list-group-item">Images <span class="badge">' + data.result.Images + '</span></li>';
+                html+= '<li class="list-group-item">Containers <span class="badge">' + data.result.Containers + '</span></li>';
+                html+= '<li class="list-group-item">IPv4Forwarding <span class="badge">' + data.result.IPv4Forwarding + '</span></li>';
+                html+= '<li class="list-group-item">MemTotal <span class="badge">' + formatBytes(data.result.MemTotal) + '</span></li>';
+                html+= '<li class="list-group-item">Memory Limit <span class="badge">' + data.result.MemoryLimit + '</span></li>';
+                html+= '<li class="list-group-item">CPUs <span class="badge">' + data.result.NCPU + '</span></li>';
+                html+= '<li class="list-group-item">Docker Root Dir <span class="badge">' + data.result.DockerRootDir + '</span></li>';
+                $('#server-status').append(html);
+            }
+        });
+    }).trigger('click');
+
     $('#tb-add-image-list-search').on('click', 'tbody tr td a', function () {
         config.image = $(this).text();
         
@@ -115,57 +247,6 @@ $(document).ready(function() {
             wdtLoading.done();
         });
     });
-
-    /**
-     * List server info and show
-     */
-    $('#btn-server-status-refresh').on('click', function () {
-        $('#server-status').html('');
-        $.getJSON('/server-status', function(data, textStatus, event) {
-            initialLoads.loaded();
-            data = data.split("\n");
-            for(var i=0,l=data.length;i<l;i++) {
-                var item = data[i].split(':', 2);
-                if(item[1]) {
-                    var html = '<li class="list-group-item">' + item[0].trim() + ' <span class="badge">' + item[1].trim() + '</span></li>';
-                    $('#server-status').append(html);
-                }
-            }
-        });
-    }).trigger('click');
-
-    /**
-     * List all images then update list
-     */
-    $('.list-images').on('click', function() {
-        $.getJSON('/list-images', function(data, textStatus, event) {
-            initialLoads.loaded();
-            if(event.status == 200) {
-                $('#debug').text(data);
-                data = data.trim().split('\n');
-
-                $('#images-list').html('');
-                if(data.length > 1) {
-                    for(var i=1,l=data.length;i<l;i++) {
-                        var linha = data[i].split(/\s+/);
-                        if(linha.length > 1) {
-                            var name = linha.shift();
-                            var version = linha.shift();
-                            var imageId = linha.shift();
-
-                            var size1 = linha.pop();
-                            var size2 = linha.pop();
-                            var size = size2 + ' ' + size1;
-
-                            $('#images-list').append('<li class="list-group-item" data-image-id="' + imageId + '"><span class="name">' + name + '</span> <span class="label label-warning version">' + version + '</span> <span class="label label-default">' + size + '</span> <span class="label label-info">' + linha.join(' ') + '</span><div class="btn-group pull-right" role="group"><button type="button" class="btn btn-xs btn-primary btn-run-image">Run</button><button type="button" class="btn btn-xs btn-warning btn-rename-image">Rename</button><button type="button" class="btn btn-xs btn-danger btn-remove-image">Remove</button></div></li>');
-                        }
-                    }
-                } else {
-                    $('#images-list').html('<span>You dont have pulled any docker images yet.</span>')
-                }
-            }
-        });
-    }).trigger('click');
 
     /**
      * Port
@@ -318,50 +399,6 @@ $(document).ready(function() {
             }
         });
     });
-
-    /**
-     * List all running containers
-     */
-    $('.list-containers').on('click', function() {
-        $.getJSON('/list-containers', function(data, textStatus, event) {
-            initialLoads.loaded();
-            $('#containers-list tbody').html('');
-            data = data.trim();
-
-            if(event.status == 200) {
-                if(data.length == 0) {
-                    $('#containers-list-none').show();
-                    $('#containers-list').hide();
-                    return;
-                } else {
-                    $('#containers-list-none').hide();
-                    $('#containers-list').show();
-                }
-                
-                var containers = data.split("\n");
-                for(var i=0,l=containers.length;i<l;i++) {
-                    var container = containers[i].trim().split('|');
-
-                    var html = '<tr class="container-item" data-image-id="' + container[0] + '">' +
-                        '<td class="text-center">' + container[0] + '</td>' +
-                        '<td class="text-center">' + container[1] + '</td>' +
-                        '<td>' + container[2] + '</td>' +
-                        '<td>' + container[3] + '</td>' +
-                        '<td class="text-center">' + container[4] + '</td>' +
-                        '<td class="text-center">' +
-                            '<div class="btn-group">' +
-                                '<button class="btn btn-xs btn-danger btn-container-stop"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>' +
-                                '<button class="btn btn-xs btn-info btn-container-info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>' +
-                                '<button class="btn btn-xs btn-warning btn-container-history"><span class="glyphicon glyphicon-book" aria-hidden="true"></span></button>' +
-                                '<button class="btn btn-xs btn-default btn-container-open-terminal"><span class="glyphicon glyphicon-console" aria-hidden="true"></span></button>' +
-                            '</div>' +
-                        '</td>' +
-                    '</tr>';
-                    $('#containers-list tbody').append(html);
-                }
-            }
-        });
-    }).trigger('click');
 
     /**
      * Container stop

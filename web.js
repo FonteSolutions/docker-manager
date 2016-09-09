@@ -1,12 +1,28 @@
 try {
+    // Includes
 	var nsHttp = require("http");
 	var nsFs = require("fs");
     var nsUrl = require("url");
     var nsShell = require('shelljs');
+    // Debug
     var debug = true;
-    var silent;
-    
-    silent = debug ? false : true;
+    var silent = debug ? false : true;
+    // API
+    var API = {
+        url: 'http://localhost:2375/',
+        cmdApi: 'curl ',
+        init: function () {
+            API.cmdApi+= API.url;
+        },
+        run: function(action) {
+            if(debug) {
+                console.log('> COMMAND: ', API.cmdApi + action);
+            }
+            return {result:JSON.parse(nsShell.exec(API.cmdApi + action, {silent:silent}))};
+        }
+    };
+
+    API.init();
 	
     nsHttp.createServer(function(request, response) {
         var pathname = nsUrl.parse(request.url).pathname;
@@ -15,57 +31,21 @@ try {
         }
         
         switch(true) {
-            case pathname == '/open-terminal':
-                var containerId = [];
-                request.on('data', function(chunk) {
-                    containerId.push(chunk);
-                }).on('end', function() {
-                    containerId = Buffer.concat(containerId).toString().split('=')[1];
-                    containerId = decodeURIComponent(containerId).replace(/\+/, '-');
-                    if(debug) {
-                        console.log('> COMMAND: ', 'docker-browser-server ' + containerId + ' -p 8081 > /dev/null 2>&1 &');
-                    }
-                    var out = nsShell.exec('docker-browser-server ' + containerId + ' -p 8081 &', {silent:silent});
-                    console.log('out', out);
-
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
-                    response.write(JSON.stringify(out));
-                    response.end();
-                });
-                break;
-
             case pathname == '/list-images':
-                if(debug) {
-                    console.log('> COMMAND: ', 'docker images');
-                }
-                var out = nsShell.exec('docker images', {silent:silent});
-
-                response.writeHeader(200, {'Content-type': 'text/plain'});
-                response.write(JSON.stringify(out));
+                response.writeHeader(200, {'Content-type': 'application/json'});
+                response.write(JSON.stringify(API.run('images/json')));
                 response.end();
                 break;
 
             case pathname == '/list-containers':
-                if(debug) {
-                    // console.log('> COMMAND: ', 'docker ps');
-                    console.log('> COMMAND: ', 'docker ps --format "{{.ID}}|{{.Image}}|{{.CreatedAt}}|{{.Ports}}|{{.Names}}"');
-                }
-                // var out = nsShell.exec('docker ps', {silent:silent});
-                var out = nsShell.exec('docker ps --format "{{.ID}}|{{.Image}}|{{.CreatedAt}}|{{.Ports}}|{{.Names}}"', {silent:silent});
-
-                response.writeHeader(200, {'Content-type': 'text/plain'});
-                response.write(JSON.stringify(out));
+                response.writeHeader(200, {'Content-type': 'application/json'});
+                response.write(JSON.stringify(API.run('containers/json')));
                 response.end();
                 break;
 
             case pathname == '/server-status':
-                if(debug) {
-                    console.log('> COMMAND: ', 'docker info');
-                }
-                var out = nsShell.exec('docker info', {silent:silent});
-
-                response.writeHeader(200, {'Content-type': 'text/plain'});
-                response.write(JSON.stringify(out));
+                response.writeHeader(200, {'Content-type': 'application/json'});
+                response.write(JSON.stringify(API.run('info')));
                 response.end();
                 break;
 

@@ -13,8 +13,8 @@
     
     <style>
         body {
-            min-height: 600px;
-            padding-top: 70px;
+            /*min-height: 600px;*/
+            padding-top: 20px;
         }
         #debug {
             display: block;
@@ -70,6 +70,17 @@
 
         .terminal-size-indicator {
             display: none !important;
+        }
+
+        .table {
+            table-layout:fixed;
+        }
+
+        .truncate {
+            width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         /*#terminal-bar {*/
@@ -140,7 +151,7 @@
         }, 0);
     </script>
 
-    <nav class="navbar navbar-default navbar-fixed-top" style="z-index: 150;">
+    <!--nav class="navbar navbar-default navbar-fixed-top" style="z-index: 150;">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-top" aria-expanded="false">
@@ -158,14 +169,17 @@
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav-->
 
     <div class="container-fluid">
         <div class="col-xs-8">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Images
-                    <button class="btn btn-xs pull-right" id="btn-view-add-image" data-toggle="modal" data-target="#modal-add-image">
+                    <button class="btn btn-xs pull-right" id="btn-images-refresh">
+                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                    </button>
+                    <button class="btn btn-xs pull-right" id="btn-view-add-image" data-toggle="modal" data-target="#modal-add-image" style="margin-right: 5px;">
                         <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                     </button>
                 </div>
@@ -186,7 +200,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-xs-8">
+        <div class="col-xs-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Containers
@@ -197,12 +211,14 @@
                 <table class="table table-bordered table-condensed table-hover table-striped" id="containers-list">
                     <thead>
                         <tr>
+                            <th>Name</th>
                             <th>ID</th>
                             <th>Image</th>
                             <th>Created</th>
                             <th>Ports</th>
-                            <th>Name</th>
-                            <th style="width: 120px;"></th>
+                            <th>Command</th>
+                            <th>Status</th>
+                            <th style="width: 120px;" class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
