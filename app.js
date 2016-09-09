@@ -34,6 +34,10 @@ $(document).ready(function() {
         return dateFormatted;
     }
 
+    $('body').tooltip({
+        selector: '[rel=tooltip]'
+    });
+
     /**
      * List all images then update list
      */
@@ -58,13 +62,13 @@ $(document).ready(function() {
                                     '<span class="name">' +
                                         name +
                                     '</span> ' +
-                                    '<span class="label label-warning version">v' +
+                                    '<span class="label label-warning version">' +
                                         version +
                                     '</span> ' +
-                                    '<span class="label label-default">size ' +
+                                    '<span class="label label-default"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> ' +
                                         formatBytes(item.VirtualSize) +
                                     '</span> ' +
-                                    '<span class="label label-info">created ' +
+                                    '<span class="label label-info"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> ' +
                                         timestamp2date(item.Created) +
                                     '</span> ' +
                                     '<div class="btn-group pull-right" role="group">' +
@@ -104,9 +108,8 @@ $(document).ready(function() {
                         ports+= '<span class="label label-default">' + item.Ports[j].PrivatePort + ' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ' + item.Ports[j].PublicPort + '</span> ';
                     }
 
-                    var html =  '<tr class="container-item" data-image-id="' + item.Id + '">' +
+                    var html =  '<tr class="container-item" data-image-id="' + item.Id + '"  title="' + item.Id + '" rel="tooltip">' +
                                     '<td class="text-center"><strong>' + item.Names[0].substr(1) + '</strong></td>' +
-                                    '<td class="truncate" title="' + item.Id + '">' + item.Id + '</td>' +
                                     '<td>' + item.Image + '</td>' +
                                     '<td>' + timestamp2date(item.Created) + '</td>' +
                                     '<td>' + ports + '</td>' +
@@ -150,35 +153,50 @@ $(document).ready(function() {
         });
     }).trigger('click');
 
-    $('#tb-add-image-list-search').on('click', 'tbody tr td a', function () {
-        config.image = $(this).text();
-        
-        $('#tb-add-image-list-search').hide();
-        $('#tb-add-image-list-tags-search').html('').show();
-        
+    /**
+     * Search images
+     */
+    $('#btn-image-search').on('click', function () {
         wdtLoading.start({
             'category': 'pulling-image'
         });
-        
-        $.post('/list-image-tags', {name: $(this).text()}, function(data, textStatus, event) {
-            data = data.trim().substring(1, data.length - 1).trim().split("\\n");
-            for(var i=0,l=data.length;i<l;i++) {
-                if(!data[i].trim()) {
-                    continue;
-                }
-                $('#tb-add-image-list-tags-search').append('<li class="list-group-item"><a href="#">' + data[i] + '</a></li>');
-            }
-            // if($('#tb-add-image-list-tags-search li').length == 0) {
-            //     $('#tb-add-image-list-tags-search').append('<li class="list-group-item"><a href="#">latest</a></li>');
-            // }
+
+        var name = $('#form-image-search').serializeArray()[0].value;
+        $.post('/search-image', {name: name}, function(data, textStatus, event) {
             wdtLoading.done();
+            if(event.status == 200) {
+                $('#tb-add-image-list-search').html('').hide();
+
+                if(data.result.length == 0) {
+                    return;
+                }
+
+                $('#tb-add-image-list-search').show();
+
+                for (var i=0,l=data.result.length;i<l;i++) {
+                    var item = data.result[i];
+                    var html =  '<a class="list-group-item" href="#">' +
+                                    '<span class="badge" title="Downloads" rel="tooltip">' + item.star_count + '</span>' +
+                                    '<h4 class="list-group-item-heading name">' + item.name + (item.is_official ? ' <span class="glyphicon glyphicon-star text-info" aria-hidden="true" style="font-size: 13px; color: gold;"></span>' : '') + '</h4>' +
+                                    '<p class="list-group-item-text description">' + item.description + '</p>' +
+                                '</a>';
+                    $('#tb-add-image-list-search').append(html);
+                }
+            }
         });
     });
 
-    $('#tb-add-image-list-tags-search').on('click', 'a', function () {
-        config.version = $(this).text();
-        $('#modal-add-image').modal('hide');
-        
+    /**
+     * Pulling an image
+     */
+    $('#tb-add-image-list-search').on('click', 'a', function () {
+        console.log(this, $(this).find('.name').text());
+        config.image = $(this).find('.name').text().trim();
+
+        wdtLoading.start({
+            'category': 'pulling-image'
+        });
+
         var n = noty({
             layout: 'top',
             type: 'warning',
@@ -191,60 +209,38 @@ $(document).ready(function() {
                 speed: 500
             }
         });
-        $.post('/pull-image', {name: config.image, version: config.version}, function(data, textStatus, event) {
-            $('.list-images').trigger('click');
-            n.close();
-            
-            noty({
-                layout: 'center',
-                type: 'success',
-                text: data.trim().split("\n").pop().split(":", 2)[1].trim(),
-                animation: {
-                    open: 'animated flipInX',
-                    close: 'animated flipOutX',
-                    easing: 'swing',
-                    speed: 500
-                }
-            });
-        });
-    });
-
-    $('#btn-image-search').on('click', function () {
-        if($('#btn-image-search-loading').is(':visible')) {
-            return;
-        }
-
-        wdtLoading.start({
-            'category': 'pulling-image'
-        });
-
-        $('#btn-image-search').hide();
-        $('#btn-image-search-loading').show();
-        var name = $('#form-image-search').serializeArray()[0].value;
-        
-        $.post('/search-image', {name: name}, function(data, textStatus, event) {
-            $('#btn-image-search').show();
-            $('#btn-image-search-loading').hide();
-
-            // @TODO Somente se tiver resultado
-            $('#tb-add-image-list-search').show();
-            $('#tb-add-image-list-search tbody').html('');
-
-            data = data.trim().split("\\n");
-            if(data.length > 1) {
-                for (var i = 1, l = data.length; i < l; i++) {
-                    var linha = data[i].trim().split(/\s+/);
-                    if (linha.length > 1) {
-                        var repo = linha.shift();
-                        var official = linha.pop();
-                        var stars = linha.pop();
-                        var desc = linha.join(' ');
-                        $('#tb-add-image-list-search').append('<tr class="text-center"><td><a href="#">' + repo + '</a></td><td>' + desc + '</td><td><span class="badge">' + stars + '</span></td></tr>')
-                    }
-                }
-            }
-
+        $.post('/pull-image', {name: config.image}, function(data, textStatus, event) {
             wdtLoading.done();
+            n.close();
+            if(event.status == 200) {
+                console.log(data.result);
+                // $('.list-images').trigger('click');
+                //
+                // noty({
+                //     layout: 'center',
+                //     type: 'success',
+                //     text: data.trim().split("\n").pop().split(":", 2)[1].trim(),
+                //     animation: {
+                //         open: 'animated flipInX',
+                //         close: 'animated flipOutX',
+                //         easing: 'swing',
+                //         speed: 500
+                //     }
+                // });
+            } else {
+                // @TODO noty error on pulling image
+                noty({
+                    layout: 'center',
+                    type: 'error',
+                    text: 'Error on pulling image ' + config.image,
+                    animation: {
+                        open: 'animated flipInX',
+                        close: 'animated flipOutX',
+                        easing: 'swing',
+                        speed: 500
+                    }
+                });
+            }
         });
     });
 

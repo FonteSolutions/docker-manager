@@ -228,16 +228,6 @@
                 </div>
             </div>
         </div>
-
-        <!--ul class="list-group" id="images-list">
-        </ul>
-
-        <pre id="debug">
-
-        </pre-->
-
-        <div id="term"></div>
-
     </div>
 
     <div class="modal fade" tabindex="-1" role="dialog" id="modal-add-image" aria-labelledby="modal-add-imageLabel">
@@ -252,7 +242,7 @@
                         <div class="input-group">
                             <input type="text" class="form-control" name="name" placeholder="Name" />
                             <span class="input-group-btn">
-                                <button type="button" class="btn btn-default" id="btn-image-search">
+                                <button type="submit" class="btn btn-default" id="btn-image-search">
                                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                                 </button>
                                 <button type="button" class="btn btn-default loading" id="btn-image-search-loading" style="display: none;width: 40px;">
@@ -262,22 +252,7 @@
                         </div>
                     </form>
                     <br />
-                    <table class="table table-responsive table-bordered table-condensed table-striped table-hover" id="tb-add-image-list-search" style="display: none;">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Stars</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="no-results" style="display: none;" colspan="3">Cannot found any image with this name. Verify it or try other name.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <ul class="list-group" id="tb-add-image-list-tags-search" style="display: none;">
-                    </ul>
+                    <div id="tb-add-image-list-search" class="list-group" style="display: none;"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -370,22 +345,6 @@
         </div>
     </div>
 
-    <div id="terminal-bar" style="display:none">
-        <!--div id="dialog1" title="Basic modal">
-            <h2>Lorem ipsum dolor</h2>
-    
-            <p>Lorem ipsum dolor sit amet, ut pri voluptua forensibus, usu alii intellegam scribentur an, phaedrum adipiscing nec an. Nec id sonet eloquentiam, ei postea percipit cum. Velit rationibus ex sit, in has possim disputationi concludaturque, mea at vitae noluisse. Amet reformidans an per, alterum albucius pri cu. Ut his amet quas audire. Per quando tation ei.</p>
-            <h4>Sit ei illum errem</h4>
-    
-            <p>Sit ei illum errem maiorum. Eu latine mandamus sea. Te eam dolore partem. Tincidunt democritum appellantur quo te. Eum no veri detracto, ne wisi nemore forensibus est. Te utroque deserunt principes est, id utinam tractatos vim, summo primis discere ei has.</p>
-            <h4>Sea wisi postulant scripserit</h4>
-    
-            <p>Sea wisi postulant scripserit in, invidunt mandamus mea in. Mea evertitur mnesarchum ex. Ne movet mnesarchum his. In vix porro quaestio, sit viderer diceret quaestio no.</p>
-    
-            <p>Eirmod conclusionemque ex pri. Cum cu integre mandamus, quo wisi phaedrum consetetur cu. In scaevola deseruisse mel, esse placerat erroribus vel no, illud postulant conceptam sea an. Omnes corpora democritum mei ea, quo quando lobortis ut. Eam no idque tempor nominati. Vel habemus argumentum ei. Ipsum scribentur in nam, volutpat mnesarchum no quo.</p>
-        </div-->
-    </div>
-    
     <script type="text/javascript" src="./node_modules/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js"></script>
     <script type="text/javascript" src="./node_modules/noty/js/noty/layouts/center.js"></script>

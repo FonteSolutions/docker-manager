@@ -11,19 +11,28 @@ try {
     var API = {
         url: 'http://localhost:2375/',
         cmdApi: 'curl ',
-        init: function () {
-            API.cmdApi+= API.url;
-        },
-        run: function(action) {
-            if(debug) {
-                console.log('> COMMAND: ', API.cmdApi + action);
+        run: function(action, params, post) {
+            var cmd = API.cmdApi;
+            if(post) {
+                cmd+= '-XPOST ';
             }
-            return {result:JSON.parse(nsShell.exec(API.cmdApi + action, {silent:silent}))};
+            cmd+= API.url;
+
+            if(params && params instanceof Object) {
+                action+= '?';
+                for(i in params) {
+                    action+= i + '=' + params[i];
+                    action+= '&';
+                }
+                action = action.substring(0, action.length - 1);
+            }
+            if(debug) {
+                console.log('> COMMAND: ', cmd + action);
+            }
+            return {result:JSON.parse(nsShell.exec(cmd + action, {silent:silent}))};
         }
     };
 
-    API.init();
-	
     nsHttp.createServer(function(request, response) {
         var pathname = nsUrl.parse(request.url).pathname;
         if(debug) {
@@ -56,22 +65,27 @@ try {
                 }).on('end', function() {
                     name = Buffer.concat(name).toString().split('=')[1];
                     name = decodeURIComponent(name).replace(/\+/, '-');
-                    if(debug) {
-                        console.log('> COMMAND: ', 'docker search ' + name);
-                    }
-                    var out = nsShell.exec('docker search ' + name, {silent:silent});
 
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
-                    response.write(JSON.stringify(out));
+                    response.writeHeader(200, {'Content-type': 'application/json'});
+                    response.write(JSON.stringify(API.run('images/search', {term: name})));
                     response.end();
                 });
                 break;
-            
-            case pathname == '/list-image-tags':
+
+            case pathname == '/pull-image':
                 var name = [];
                 request.on('data', function(chunk) {
                     name.push(chunk);
                 }).on('end', function() {
+                    // name = Buffer.concat(name).toString().split('=')[1];
+                    // name = decodeURIComponent(name).replace(/\+/, '-');
+                    //
+                    // console.log(name);
+                    //
+                    // response.writeHeader(200, {'Content-type': 'application/json'});
+                    // response.write(JSON.stringify(API.run('images/create', {fromImage: name, tag: 'latest'}, true)));
+                    // response.end();
+
                     name = Buffer.concat(name).toString().split('=')[1];
                     name = decodeURIComponent(name).replace(/\+/, '-');
                     var cmd = "wget -q https://registry.hub.docker.com/v1/repositories/" + name + "/tags -O -  | sed -e 's/[][]//g' -e 's/\"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}'";
