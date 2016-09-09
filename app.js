@@ -198,7 +198,6 @@ $(document).ready(function() {
 
         $.post('/search-image-tags', {name: config.image}, function(data, textStatus, event) {
             wdtLoading.done();
-            // n.close();
             if(event.status == 200) {
                 $('#tb-add-image-list-search').hide();
                 $('#tb-add-image-tag-list-search').html('').show();
