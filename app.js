@@ -183,15 +183,49 @@ $(document).ready(function() {
                     $('#tb-add-image-list-search').append(html);
                 }
             }
-        });
+        }, 'json');
     });
 
     /**
-     * Pulling an image
+     * Search image
      */
     $('#tb-add-image-list-search').on('click', 'a', function () {
-        console.log(this, $(this).find('.name').text());
         config.image = $(this).find('.name').text().trim();
+
+        wdtLoading.start({
+            'category': 'pulling-image'
+        });
+
+        $.post('/search-image-tags', {name: config.image}, function(data, textStatus, event) {
+            wdtLoading.done();
+            // n.close();
+            if(event.status == 200) {
+                $('#tb-add-image-list-search').hide();
+                $('#tb-add-image-tag-list-search').html('').show();
+
+                if(data.result.length == 0) {
+                    return;
+                }
+
+                data.result.reverse();
+
+                for(var i=0,l=data.result.length;i<l;i++) {
+                    var item = data.result[i];
+
+                    var html =  '<a class="list-group-item" href="#">' +
+                                    item.name +
+                                '</a>';
+                    $('#tb-add-image-tag-list-search').append(html);
+                }
+            }
+        }, 'json');
+    });
+
+    /**
+     * Pull image with tag
+     */
+    $('#tb-add-image-tag-list-search').on('click', 'a', function () {
+        config.version = $(this).text().trim();
 
         wdtLoading.start({
             'category': 'pulling-image'
@@ -201,7 +235,7 @@ $(document).ready(function() {
             layout: 'top',
             type: 'warning',
             closeWith: [],
-            text: 'Pulling image ' + config.image + '...',
+            text: 'Pulling image ' + config.image + ':' + config.version + '...',
             animation: {
                 open: 'animated slideInDown',
                 close: 'animated slideOutUp',
@@ -209,30 +243,30 @@ $(document).ready(function() {
                 speed: 500
             }
         });
-        $.post('/pull-image', {name: config.image}, function(data, textStatus, event) {
+
+        $.post('/pull-image', {name: config.image, version: config.version}, function(data, textStatus, event) {
             wdtLoading.done();
             n.close();
-            if(event.status == 200) {
-                console.log(data.result);
-                // $('.list-images').trigger('click');
-                //
-                // noty({
-                //     layout: 'center',
-                //     type: 'success',
-                //     text: data.trim().split("\n").pop().split(":", 2)[1].trim(),
-                //     animation: {
-                //         open: 'animated flipInX',
-                //         close: 'animated flipOutX',
-                //         easing: 'swing',
-                //         speed: 500
-                //     }
-                // });
+            if (event.status == 200) {
+                $('#btn-images-refresh').trigger('click');
+                $('#modal-add-image').modal('hide');
+
+                noty({
+                    layout: 'center',
+                    type: 'success',
+                    text: 'Image ' + config.image + ':' + config.version + ' pulled with success.',
+                    animation: {
+                        open: 'animated flipInX',
+                        close: 'animated flipOutX',
+                        easing: 'swing',
+                        speed: 500
+                    }
+                });
             } else {
-                // @TODO noty error on pulling image
                 noty({
                     layout: 'center',
                     type: 'error',
-                    text: 'Error on pulling image ' + config.image,
+                    text: 'Error on pulling image ' + config.image + ':' + config.version + '.',
                     animation: {
                         open: 'animated flipInX',
                         close: 'animated flipOutX',
@@ -375,7 +409,7 @@ $(document).ready(function() {
                     onClick: function ($noty) {
                         $noty.close();
                         $.post('/remove-image', {image: imageId}, function(data, textStatus, event) {
-                            $('.list-images').trigger('click');
+                            $('#btn-images-refresh').trigger('click');
                         });
                     }
                 },

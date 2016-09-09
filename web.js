@@ -29,7 +29,35 @@ try {
             if(debug) {
                 console.log('> COMMAND: ', cmd + action);
             }
-            return {result:JSON.parse(nsShell.exec(cmd + action, {silent:silent}))};
+            return JSON.stringify({
+                result:JSON.parse(nsShell.exec(cmd + action, {silent:silent}))
+            });
+        },
+        runShell: function (cmd) {
+            if(debug) {
+                console.log('> COMMAND: ', cmd);
+            }
+            return JSON.stringify({
+                result:JSON.parse(nsShell.exec(cmd, {silent:silent}))
+            });
+        },
+        runPure: function (cmd) {
+            if(debug) {
+                console.log('> COMMAND: ', cmd);
+            }
+            return nsShell.exec(cmd, {silent:silent});
+        },
+        parseResult: function (data) {
+            data = Buffer.concat(data).toString().trim().split('&');
+            var _data = {};
+            for(var i=0,l=data.length;i<l;i++) {
+                var item = data[i].trim().split('=');
+                if(!item[0].trim() || !item[1].trim()) {
+                    continue;
+                }
+                _data[item[0]] = decodeURIComponent(item[1]).replace(/\+/, '-');
+            }
+            return _data;
         }
     };
 
@@ -42,19 +70,19 @@ try {
         switch(true) {
             case pathname == '/list-images':
                 response.writeHeader(200, {'Content-type': 'application/json'});
-                response.write(JSON.stringify(API.run('images/json')));
+                response.write(API.run('images/json'));
                 response.end();
                 break;
 
             case pathname == '/list-containers':
                 response.writeHeader(200, {'Content-type': 'application/json'});
-                response.write(JSON.stringify(API.run('containers/json')));
+                response.write(API.run('containers/json'));
                 response.end();
                 break;
 
             case pathname == '/server-status':
                 response.writeHeader(200, {'Content-type': 'application/json'});
-                response.write(JSON.stringify(API.run('info')));
+                response.write(API.run('info'));
                 response.end();
                 break;
 
@@ -67,35 +95,21 @@ try {
                     name = decodeURIComponent(name).replace(/\+/, '-');
 
                     response.writeHeader(200, {'Content-type': 'application/json'});
-                    response.write(JSON.stringify(API.run('images/search', {term: name})));
+                    response.write(API.run('images/search', {term: name}));
                     response.end();
                 });
                 break;
 
-            case pathname == '/pull-image':
+            case pathname == '/search-image-tags':
                 var name = [];
                 request.on('data', function(chunk) {
                     name.push(chunk);
                 }).on('end', function() {
-                    // name = Buffer.concat(name).toString().split('=')[1];
-                    // name = decodeURIComponent(name).replace(/\+/, '-');
-                    //
-                    // console.log(name);
-                    //
-                    // response.writeHeader(200, {'Content-type': 'application/json'});
-                    // response.write(JSON.stringify(API.run('images/create', {fromImage: name, tag: 'latest'}, true)));
-                    // response.end();
-
                     name = Buffer.concat(name).toString().split('=')[1];
                     name = decodeURIComponent(name).replace(/\+/, '-');
-                    var cmd = "wget -q https://registry.hub.docker.com/v1/repositories/" + name + "/tags -O -  | sed -e 's/[][]//g' -e 's/\"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}'";
-                    if(debug) {
-                        console.log('> COMMAND: ', cmd);
-                    }
-                    var out = nsShell.exec(cmd, {silent:silent});
 
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
-                    response.write(JSON.stringify(out));
+                    response.writeHeader(200, {'Content-type': 'application/plain'});
+                    response.write(API.runShell('curl https://registry.hub.docker.com/v1/repositories/' + name + '/tags'));
                     response.end();
                 });
                 break;
@@ -105,27 +119,16 @@ try {
                 request.on('data', function(chunk) {
                     data.push(chunk);
                 }).on('end', function() {
-                    data = Buffer.concat(data).toString().trim().split('&');
-                    var _data = {};
-                    for(var i=0,l=data.length;i<l;i++) {
-                        _data[data[i].trim().split('=')[0]] = data[i].trim().split('=')[1];
-                    }
-                    _data.name = decodeURIComponent(_data.name).replace(/\+/, '-');
-                    var _repo = _data.name;
-                    if(_data.version != 'latest') {
-                        _repo+= ':' + _data.version;
-                    }
-                    if(debug) {
-                        console.log('> COMMAND: ', 'docker pull ' + _repo);
-                    }
-                    var out = nsShell.exec('docker pull ' + _repo, {silent:silent});
+                    data = API.parseResult(data);
+
+                    API.runPure('docker pull ' + data.name + ':' + data.version);
 
                     response.writeHeader(200, {'Content-type': 'text/plain'});
-                    response.write(JSON.stringify(out));
+                    response.write(JSON.stringify({result: []}));
                     response.end();
                 });
                 break;
-            
+
             case pathname == '/remove-image':
                 var imageId = [];
                 request.on('data', function(chunk) {
