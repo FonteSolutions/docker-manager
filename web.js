@@ -11,35 +11,60 @@ try {
     var API = {
         url: 'http://localhost:2375/',
         cmdApi: 'curl ',
-        run: function(action, params, post) {
-            var cmd = API.cmdApi;
-            if(post) {
-                cmd+= '-XPOST ';
-            }
-            cmd+= API.url;
+        run: function(action, params, isPost, isDelete, parseJsonReturned) {
+            parseJsonReturned = parseJsonReturned == undefined ? true : parseJsonReturned;
 
-            if(params && params instanceof Object) {
-                action+= '?';
-                for(i in params) {
-                    action+= i + '=' + params[i];
-                    action+= '&';
+            var cmd = API.cmdApi;
+            if(isPost || isDelete) {
+                if(isPost) {
+                    cmd += '-X POST ';
                 }
-                action = action.substring(0, action.length - 1);
+                if(isDelete) {
+                    cmd += '-X DELETE ';
+                }
+                cmd+= '-H "Content-Type: application/json" ';
+                if(params && params instanceof Object) {
+                    cmd+= " -d '" + JSON.stringify(params) + "' ";
+                }
+                cmd+= API.url;
+            } else {
+                cmd+= API.url;
+
+                if(params && params instanceof Object) {
+                    action+= '?';
+                    for(i in params) {
+                        action+= i + '=' + params[i];
+                        action+= '&';
+                    }
+                    action = action.substring(0, action.length - 1);
+                }
             }
+
             if(debug) {
-                console.log('> COMMAND: ', cmd + action);
+                console.log('\n\n\t> COMMAND: ', cmd + action + ' (PARSING: ' + parseJsonReturned +')\n');
             }
-            return JSON.stringify({
-                result:JSON.parse(nsShell.exec(cmd + action, {silent:silent}))
-            });
+            var result = nsShell.exec(cmd + action, {silent:silent});
+            if(parseJsonReturned) {
+                result = JSON.parse(result);
+                return JSON.stringify({
+                    result:result
+                });
+            }
+            return '';
         },
-        runShell: function (cmd) {
+        runShell: function (cmd, parseJsonReturned) {
+            parseJsonReturned = parseJsonReturned == undefined ? true : parseJsonReturned;
             if(debug) {
-                console.log('> COMMAND: ', cmd);
+                console.log('> COMMAND: ', cmd + ' (PARSING: ' + parseJsonReturned +')\n');
             }
-            return JSON.stringify({
-                result:JSON.parse(nsShell.exec(cmd, {silent:silent}))
-            });
+            var result = nsShell.exec(cmd, {silent:silent});
+            if(parseJsonReturned) {
+                result = JSON.parse(result);
+                return JSON.stringify({
+                    result:result
+                });
+            }
+            return '';
         },
         runPure: function (cmd) {
             if(debug) {
@@ -108,7 +133,7 @@ try {
                     name = Buffer.concat(name).toString().split('=')[1];
                     name = decodeURIComponent(name).replace(/\+/, '-');
 
-                    response.writeHeader(200, {'Content-type': 'application/plain'});
+                    response.writeHeader(200, {'Content-type': 'text/plain'});
                     response.write(API.runShell('curl https://registry.hub.docker.com/v1/repositories/' + name + '/tags'));
                     response.end();
                 });
@@ -216,7 +241,7 @@ try {
                         }
                     }
 
-                    var out = '';
+                    var out = ' ';
                     if(imageId) {
                         // var cmd = 'docker run -d --privileged -v /var/run/docker.sock:/var/run/docker.sock ';
                         var cmd = 'docker run -d ';
@@ -240,16 +265,30 @@ try {
                         }
 
                         cmd+= imageId + ' ' + initialCommand;
-                        
-                        if(debug) {
-                            console.log('> COMMAND: ', cmd);
-                        }
-                        out = nsShell.exec(cmd, {silent:silent});
+
+                        API.run('containers/' + name + '?force=1', null, false, true, false);
+                        out = API.runShell(cmd, false);
                     }
 
                     response.writeHeader(200, {'Content-type': 'text/plain'});
                     response.write(JSON.stringify(out));
                     response.end();
+                    /*
+                        // cmd+= imageId + ' ' + initialCommand;
+
+                        API.run('containers/' + name + '?force=1', null, false, true, false);
+                        var created = API.run('containers/create?name=' + name, {
+                            Cmd: initialCommand,
+                            Image: imageId
+                        }, true);
+
+                        var containerId = JSON.parse(created).result.Id;
+                        out = API.run('containers/' + containerId + '/start?name=' + name, {RestartPolicy: {Name: 'always'}}, true, false, false);
+                    }
+
+                    response.writeHeader(200, {'Content-type': 'application/json'});
+                    response.write(created);
+                    response.end();*/
                 });
                 break;
 
@@ -265,18 +304,8 @@ try {
                     }
                     _data.containerId = decodeURIComponent(_data.containerId);
 
-                    // if(debug) {
-                    //     console.log('> COMMAND: ', 'docker stop ' + _data.containerId);
-                    // }
-                    // var out = nsShell.exec('docker stop ' + _data.containerId, {silent:silent});
-                    
-                    if(debug) {
-                        console.log('> COMMAND: ', 'docker rm -f ' + _data.containerId);
-                    }
-                    var out = nsShell.exec('docker rm -f ' + _data.containerId, {silent:silent});
-
                     response.writeHeader(200, {'Content-type': 'text/plain'});
-                    response.write(JSON.stringify(out));
+                    response.write(API.run('containers/' + _data.containerId + '/stop', {}, true, false, false));
                     response.end();
                 });
                 break;

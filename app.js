@@ -230,22 +230,8 @@ $(document).ready(function() {
             'category': 'pulling-image'
         });
 
-        var n = noty({
-            layout: 'top',
-            type: 'warning',
-            closeWith: [],
-            text: 'Pulling image ' + config.image + ':' + config.version + '...',
-            animation: {
-                open: 'animated slideInDown',
-                close: 'animated slideOutUp',
-                easing: 'swing',
-                speed: 500
-            }
-        });
-
         $.post('/pull-image', {name: config.image, version: config.version}, function(data, textStatus, event) {
             wdtLoading.done();
-            n.close();
             if (event.status == 200) {
                 $('#btn-images-refresh').trigger('click');
                 $('#modal-add-image').modal('hide');
@@ -328,12 +314,11 @@ $(document).ready(function() {
     });
 
     /**
-     * Run image click
+     * Open modal Run Image
      */
     $('#images-list').on('click', '.btn-run-image', function () {
         var $parent = $(this).closest('.list-group-item');
         var imageId = $parent.data('image-id');
-
 
         $('#modal-run-image').modal('show');
         $('#form-image-run .list-ports .port').remove();
@@ -343,24 +328,33 @@ $(document).ready(function() {
         $('#form-image-run .name').text($parent.find('.name').text());
         $('#form-image-run .version').text($parent.find('.version').text());
         $('#form-image-run .initial-command').val('bash');
-        $('#form-image-run .btn-add-port').trigger('click');
-        $('#form-image-run .btn-add-port').trigger('click');
-        $('#form-image-run .btn-add-volume').trigger('click');
+        // $('#form-image-run .btn-add-port').trigger('click');
+        // $('#form-image-run .btn-add-port').trigger('click');
+        // $('#form-image-run .btn-add-volume').trigger('click');
 
         var $ports = $('#form-image-run .list-ports .port');
-        $($ports.get(0)).find('.local').val('80');
-        $($ports.get(0)).find('.docker').val('80');
-        $($ports.get(1)).find('.local').val('443');
-        $($ports.get(1)).find('.docker').val('443');
+        // @TODO make presets for that
+        // $($ports.get(0)).find('.local').val('80');
+        // $($ports.get(0)).find('.docker').val('80');
+        // $($ports.get(1)).find('.local').val('443');
+        // $($ports.get(1)).find('.docker').val('443');
 
         var $volumes = $('#form-image-run .list-volumes .volume');
-        $($volumes.get(0)).find('.local').val('/var/www/html/');
-        $($volumes.get(0)).find('.docker').val('/var/www/html/');
+        // $($volumes.get(0)).find('.local').val('/var/www/html/');
+        // $($volumes.get(0)).find('.docker').val('/var/www/html/');
     });
 
     $('#modal-run-image .btn-run').on('click', function () {
+        wdtLoading.start({
+            'category': 'pulling-image'
+        });
+
         $.post('/run-image', $('#form-image-run').serializeArray(), function(data, textStatus, event) {
-            $('.list-containers').trigger('click');
+            wdtLoading.done();
+            if (event.status == 200) {
+                $('#btn-containers-refresh').trigger('click');
+
+            }
         });
     });
 
@@ -435,7 +429,7 @@ $(document).ready(function() {
     $('#containers-list tbody').on('click', '.btn-container-stop', function () {
         var containerId = $(this).closest('.container-item').data('image-id');
         $.post('/stop-container', {containerId: containerId}, function(data, textStatus, event) {
-            $('.list-containers').trigger('click');
+            $('#btn-containers-refresh').trigger('click');
         });
     });
 
