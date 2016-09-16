@@ -93,24 +93,25 @@ try {
         }
         
         switch(true) {
+            // List images
             case pathname == '/list-images':
                 response.writeHeader(200, {'Content-type': 'application/json'});
                 response.write(API.run('images/json'));
                 response.end();
                 break;
-
+            // List containers
             case pathname == '/list-containers':
                 response.writeHeader(200, {'Content-type': 'application/json'});
                 response.write(API.run('containers/json'));
                 response.end();
                 break;
-
+            // Get server status
             case pathname == '/server-status':
                 response.writeHeader(200, {'Content-type': 'application/json'});
                 response.write(API.run('info'));
                 response.end();
                 break;
-
+            // Search images
             case pathname == '/search-image':
                 var name = [];
                 request.on('data', function(chunk) {
@@ -124,7 +125,7 @@ try {
                     response.end();
                 });
                 break;
-
+            // Search images tags
             case pathname == '/search-image-tags':
                 var name = [];
                 request.on('data', function(chunk) {
@@ -138,7 +139,7 @@ try {
                     response.end();
                 });
                 break;
-
+            // Pull image
             case pathname == '/pull-image':
                 var data = [];
                 request.on('data', function(chunk) {

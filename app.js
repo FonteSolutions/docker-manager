@@ -307,10 +307,35 @@ $(document).ready(function() {
                 '<button class="btn btn-sm btn-danger btn-remove-volume"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>' +
             '</div>';
         $('#form-image-run .list-volumes').append(html);
+        if($('#form-image-run .list-volumes').next()[0].tagName == 'HR') {
+            $('#form-image-run .list-volumes').after('<br clear="both" />');
+        }
     });
 
     $('#form-image-run .list-volumes').on('click', '.btn-remove-volume', function () {
         $(this).closest('.volume').remove();
+    });
+
+    /**
+     * Link
+     */
+    $('#form-image-run .btn-add-link').on('click', function () {
+        var html = '<div class="link">' +
+            '<div class="col-xs-5 text-center">' +
+                '<input type="text" class="form-control local" placeholder="local" name="link-local[]" />' +
+            '</div>' +
+            '<div class="col-xs-1 text-center divisor"><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span></div>' +
+            '<div class="col-xs-5 text-center">' +
+                '<input type="text" class="form-control docker" placeholder="docker" name="link-docker[]" />' +
+            '</div>' +
+            '<div class="col-xs-1 text-center">' +
+                '<button class="btn btn-sm btn-danger btn-remove-link"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>' +
+            '</div>';
+        $('#form-image-run .list-links').append(html);
+    });
+
+    $('#form-image-run .list-link').on('click', '.btn-remove-link', function () {
+        $(this).closest('.link').remove();
     });
 
     /**
