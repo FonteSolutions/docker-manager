@@ -334,7 +334,7 @@ $(document).ready(function() {
         $('#form-image-run .list-links').append(html);
     });
 
-    $('#form-image-run .list-link').on('click', '.btn-remove-link', function () {
+    $('#form-image-run .list-links').on('click', '.btn-remove-link', function () {
         $(this).closest('.link').remove();
     });
 
@@ -348,6 +348,7 @@ $(document).ready(function() {
         $('#modal-run-image').modal('show');
         $('#form-image-run .list-ports .port').remove();
         $('#form-image-run .list-volumes .volume').remove();
+        $('#form-image-run .list-links .link').remove();
 
         $('#form-image-run .image-id').val(imageId);
         $('#form-image-run .name').text($parent.find('.name').text());

@@ -207,7 +207,7 @@ try {
                     data = Buffer.concat(data).toString().trim();
                     data = decodeURIComponent(data).split('&');
 
-                    var imageId, name = '', initialCommand = '', ports = [], volumes = [], interactive = false, terminal = false;
+                    var imageId, name = '', initialCommand = '', ports = [], volumes = [], links = [], interactive = false, terminal = false;
 
                     for(var i=0,l=data.length;i<l;i++) {
                         var param = data[i].split('=', 2);
@@ -239,6 +239,12 @@ try {
                             case 'volume-docker[]':
                                 volumes[volumes.length - 1].out = param[1];
                                 break;
+                            case 'link-local[]':
+                                links.push({'in':param[1], 'out': null});
+                                break;
+                            case 'link-docker[]':
+                                links[links.length - 1].out = param[1];
+                                break;
                         }
                     }
 
@@ -263,6 +269,10 @@ try {
 
                         for(var i=0,l=volumes.length;i<l;i++) {
                             cmd+= '-v ' + volumes[i].in + ':' + volumes[i].out + ' ';
+                        }
+
+                        for(var i=0,l=links.length;i<l;i++) {
+                            cmd+= '--link ' + links[i].in + ':' + links[i].out + ' ';
                         }
 
                         cmd+= imageId + ' ' + initialCommand;
