@@ -1,6 +1,9 @@
 #!/bin/bash
 #Author Guilherme Fontenele
 
+dir=`dirname $0`
+cd $dir
+
 has_nodejs=`which nodejs`
 
 if [[ -z "$has_nodejs" ]]; then
@@ -8,17 +11,19 @@ if [[ -z "$has_nodejs" ]]; then
     exit 1
 fi
 
-has_forever=`which forever`
+has_pm2=`which pm2`
 
-if [[ -z "$has_forever" ]]; then
-    echo "ERROR: Please install forever: sudo npm install -g forever"
+if [[ -z "$has_pm2" ]]; then
+    echo "ERROR: Please install pm2: sudo npm install -g pm2"
     exit 1
 fi
 
-echo "$has_nodejs e $has_forever"
+if [ ! -d "./node_modules" ]; then
+    npm install
+fi
 
-#echo "$has_forever"
-#if [ ! -f "/usr/bin/forever" ]; then
-#    echo "NAO TEMM"
-#fi
+pm2 list
 
+pm2 start -f web.js --name "docker-manager"
+#echo "$PWD"
+#echo `dirname $0`
