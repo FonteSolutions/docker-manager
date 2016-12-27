@@ -22,4 +22,5 @@ if [ ! -d "./node_modules" ]; then
     npm install
 fi
 
+pm2 delete "docker-manager"
 pm2 start -f web.js --name "docker-manager"
