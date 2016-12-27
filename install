@@ -1,0 +1,24 @@
+#!/bin/bash
+#Author Guilherme Fontenele
+
+has_nodejs=`which nodejs`
+
+if [[ -z "$has_nodejs" ]]; then
+    echo "ERROR: Please install nodejs: sudo apt-get install nodejs or sudo yum install nodejs"
+    exit 1
+fi
+
+has_forever=`which forever`
+
+if [[ -z "$has_forever" ]]; then
+    echo "ERROR: Please install forever: sudo npm install -g forever"
+    exit 1
+fi
+
+echo "$has_nodejs e $has_forever"
+
+#echo "$has_forever"
+#if [ ! -f "/usr/bin/forever" ]; then
+#    echo "NAO TEMM"
+#fi
+

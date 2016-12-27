@@ -4,8 +4,9 @@ try {
 	var nsFs = require("fs");
     var nsUrl = require("url");
     var nsShell = require('shelljs');
+    var nsUtil = require('util');
     // Debug
-    var debug = true;
+    var debug = false;
     var silent = debug ? false : true;
     // API
     var API = {
@@ -388,10 +389,9 @@ try {
                 break;
         }
     }).listen(31337);
-    
-    // @TODO TERMINAL - $ docker  exec -ti ed009594aaeb bash
-    console.info('Running at http://127.0.0.1:31337/');
 
+    // Running with success
+    console.info('Running at http://127.0.0.1:31337/');
 } catch(err) {
 	console.log('Error:', err);
 }
