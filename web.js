@@ -275,7 +275,7 @@ try {
                             cmd+= '--link ' + links[i].in + ':' + links[i].out + ' ';
                         }
 
-                        cmd+= imageId + ' ' + initialCommand;
+                        cmd+= imageId + ' ' + initialCommand.split('+').join(' ');
 
                         API.run('containers/' + name + '?force=1', null, false, true, false);
                         out = API.runShell(cmd, false);
