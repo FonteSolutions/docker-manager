@@ -22,8 +22,4 @@ if [ ! -d "./node_modules" ]; then
     npm install
 fi
 
-pm2 list
-
 pm2 start -f web.js --name "docker-manager"
-#echo "$PWD"
-#echo `dirname $0`
