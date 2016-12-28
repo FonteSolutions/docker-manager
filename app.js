@@ -341,33 +341,122 @@ $(document).ready(function() {
     /**
      * Open modal Run Image
      */
+    var containerPresets = [];
     $('#images-list').on('click', '.btn-run-image', function () {
         var $parent = $(this).closest('.list-group-item');
         var imageId = $parent.data('image-id');
 
         $('#modal-run-image').modal('show');
         $('#form-image-run .list-ports .port').remove();
+        $('#form-image-run .list-ports').next()[0].tagName == 'BR' ? $('#form-image-run .list-ports').next().remove() : '';
         $('#form-image-run .list-volumes .volume').remove();
+        $('#form-image-run .list-volumes').next()[0].tagName == 'BR' ? $('#form-image-run .list-volumes').next().remove() : '';
         $('#form-image-run .list-links .link').remove();
+        $('#form-image-run .list-links').next() && [0].tagName == 'BR' ? $('#form-image-run .list-links').next().remove() : '';
 
         $('#form-image-run .image-id').val(imageId);
         $('#form-image-run .name').text($parent.find('.name').text());
         $('#form-image-run .version').text($parent.find('.version').text());
         $('#form-image-run .initial-command').val('bash');
-        // $('#form-image-run .btn-add-port').trigger('click');
-        // $('#form-image-run .btn-add-port').trigger('click');
-        // $('#form-image-run .btn-add-volume').trigger('click');
 
-        var $ports = $('#form-image-run .list-ports .port');
-        // @TODO make presets for that
-        // $($ports.get(0)).find('.local').val('80');
-        // $($ports.get(0)).find('.docker').val('80');
-        // $($ports.get(1)).find('.local').val('443');
-        // $($ports.get(1)).find('.docker').val('443');
+        $.getJSON('/container-presets', function(data, textStatus, event) {
+            containerPresets = data;
+            var total = 0;
+            for(i in containerPresets) {
+                total++;
+                var $li = $('<li class="container-preset-item"></li>');
+                $li.data('container-preset-data', containerPresets[i]);
+                $li.data('container-preset-name', i);
+                $('#container-preset-list').append($li.append($('<a href="javascript:void(0)">' + i + '</a>')));
+            }
+            if(total > 0) {
+                // $('#container-preset-list .divider').show();
+            }
+        });
+    });
 
-        var $volumes = $('#form-image-run .list-volumes .volume');
-        // $($volumes.get(0)).find('.local').val('/var/www/html/');
-        // $($volumes.get(0)).find('.docker').val('/var/www/html/');
+    /**
+     * Add new container preset
+     */
+    $('#container-preset-list .container-preset-add').on('click', function () {
+        // console.log("aeee", this);
+    });
+    /**
+     * Select container preset
+     */
+    $('#container-preset-list').on('click', '.container-preset-item', function () {
+        if($(this).hasClass('bg-success')) {
+            $(this).removeClass('bg-success');
+            var name = $(this).data('container-preset-name');
+            var preset = $(this).data('container-preset-data');
+
+            $('#form-image-run .list-ports .port[data-preset-name="' + name + '"]').remove();
+            $('#form-image-run .list-volumes .volume[data-preset-name="' + name + '"]').remove();
+            $('#form-image-run .list-links .link[data-preset-name="' + name + '"]').remove();
+
+            if($('#form-image-run .list-ports .port').length == 0) {
+                $('#form-image-run .list-ports').next()[0].tagName == 'BR' ? $('#form-image-run .list-ports').next().remove() : '';
+            }
+            if($('#form-image-run .list-volumes .volume').length == 0) {
+                $('#form-image-run .list-volumes').next()[0].tagName == 'BR' ? $('#form-image-run .list-volumes').next().remove() : '';
+            }
+            if($('#form-image-run .list-links .link').length == 0) {
+                $('#form-image-run .list-links').next()[0].tagName == 'BR' ? $('#form-image-run .list-links').next().remove() : '';
+            }
+        } else {
+            $(this).addClass('bg-success');
+            var name = $(this).data('container-preset-name');
+            var preset = $(this).data('container-preset-data');
+
+            if(preset.command) {
+                $('#form-image-run .initial-command').val(preset.command);
+            }
+            if(preset.terminal === true) {
+                $('#terminal').prop('checked', true);
+            }
+            if(preset.terminal === false) {
+                $('#terminal').prop('checked', false);
+            }
+            if(preset.interactive === true) {
+                $('#interactive').prop('checked', true);
+            }
+            if(preset.interactive === false) {
+                $('#interactive').prop('checked', false);
+            }
+            for(ports in preset.ports) {
+                for(port in preset.ports[ports]) {
+                    var _port = preset.ports[ports][port].split(':');
+                    if($.trim(_port[0]).length > 0 && $.trim(_port[1]).length > 0) {
+                        $('#form-image-run .btn-add-port').trigger('click');
+                        $('#form-image-run .list-ports .port:last').attr('data-preset-name', name);
+                        $('#form-image-run .list-ports .port:last .local').val(_port[0]).attr('readonly', true);
+                        $('#form-image-run .list-ports .port:last .docker').val(_port[1]).attr('readonly', true);
+                    }
+                }
+            }
+            for(volumes in preset.volumes) {
+                for(volume in preset.volumes[volumes]) {
+                    var _volume = preset.volumes[volumes][volume].split(':');
+                    if($.trim(_volume[0]).length > 0 && $.trim(_volume[1]).length > 0) {
+                        $('#form-image-run .btn-add-volume').trigger('click');
+                        $('#form-image-run .list-volumes .volume:last').attr('data-preset-name', name);
+                        $('#form-image-run .list-volumes .volume:last .local').val(_volume[0]).attr('readonly', true);
+                        $('#form-image-run .list-volumes .volume:last .docker').val(_volume[1]).attr('readonly', true);
+                    }
+                }
+            }
+            for(links in preset.links) {
+                for(link in preset.links[links]) {
+                    var _link = preset.links[links][link].split(':');
+                    if($.trim(_link[0]).length > 0 && $.trim(_link[1]).length > 0) {
+                        $('#form-image-run .btn-add-link').trigger('click');
+                        $('#form-image-run .list-links .link:last').attr('data-preset-name', name);
+                        $('#form-image-run .list-links .link:last .local').val(_link[0]).attr('readonly', true);
+                        $('#form-image-run .list-links .link:last .docker').val(_link[1]).attr('readonly', true);
+                    }
+                }
+            }
+        }
     });
 
     $('#modal-run-image .btn-run').on('click', function () {

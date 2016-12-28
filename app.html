@@ -179,9 +179,9 @@
                     <button class="btn btn-xs pull-right" id="btn-images-refresh">
                         <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                     </button>
-                    <button class="btn btn-xs pull-right" id="btn-view-add-image" data-toggle="modal" data-target="#modal-add-image" style="margin-right: 5px;">
+                    <!--button class="btn btn-xs pull-right" id="btn-view-add-image" data-toggle="modal" data-target="#modal-add-image" style="margin-right: 5px;">
                         <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                    </button>
+                    </button-->
                 </div>
                 <div class="panel-body" style="height: 156px;overflow: auto">
                     <div id="images-list"></div>
@@ -288,6 +288,15 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <div class="dropdown pull-right">
+                        <button type="button" class="btn btn-xd pull-right" style="padding-top: 2px;padding-bottom: 0" id="dLabel" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dLabel" id="container-preset-list">
+                            <!--li class="container-preset-add"><a href="javascript:void(0)">New</a></li>
+                            <li role="separator" class="divider" style="display: none;"></li-->
+                        </ul>
+                    </div>
                     <h4 class="modal-title">Run image</h4>
                 </div>
                 <div class="modal-body">
@@ -304,7 +313,7 @@
                             <div class="form-group">
                                 <label class="col-xs-2">Name</label>
                                 <div class="col-xs-10">
-                                    <input type="text" class="form-control input-sm name" name="name" />
+                                    <input type="text" class="form-control input-sm input-name" name="name" />
                                 </div>
                             </div>
 

@@ -18,6 +18,7 @@
     "jquery.terminal": "latest",
     "web-terminal": "latest",
     "socket.io": "latest",
-    "sh.js": "latest"
+    "sh.js": "latest",
+    "ini": "latest"
   }
 }

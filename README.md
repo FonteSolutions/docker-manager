@@ -2,17 +2,6 @@
 
 Manage your docker images and containers
 
-## Install
-
-* Create /Applications directory: `mkdir /Applications`
-* Enter directory: `cd /Applications`
-* Clone repository: `git clone https://github.com/fontenele/docker-manager.git`
-* Execute install script: `/Applications/docker-manager/install`
-* Remember to set Docker to starts when boot: `systemctl enable docker.service`
-* Enable DockerManager to starts when system boot: `systemctl enable docker-manager.service`
-* Start service: `service docker start` then `service docker-manager start`
-* Open app [http://localhost:31337](http://localhost:31337)
-
 ## Requirements
 
 ### Configure Docker Remote API
@@ -23,6 +12,18 @@ Manage your docker images and containers
 
 ### NodeJS
 * Install nodejs: `apt-get install npm` or `yum install npm` or see here [https://nodejs.org/](https://nodejs.org/en/)
+
+
+## Install
+
+* Create /Applications directory: `mkdir /Applications`
+* Enter directory: `cd /Applications`
+* Clone repository: `git clone https://github.com/fontenele/docker-manager.git`
+* Execute install script: `/Applications/docker-manager/install`
+* Remember to set Docker to starts when boot: `systemctl enable docker.service`
+* Enable DockerManager to starts when system boot: `systemctl enable docker-manager.service`
+* Start service: `service docker start` then `service docker-manager start`
+* Open app [http://localhost:31337](http://localhost:31337)
 
 
 ## Thanks

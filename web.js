@@ -5,6 +5,7 @@ try {
     var nsUrl = require("url");
     var nsShell = require('shelljs');
     var nsUtil = require('util');
+    var nsIni = require('ini');
     // Debug
     var debug = false;
     var silent = debug ? false : true;
@@ -320,6 +321,13 @@ try {
                     response.write(API.run('containers/' + _data.containerId + '/stop', {}, true, false, false));
                     response.end();
                 });
+                break;
+
+            case pathname == '/container-presets':
+                var presets = nsIni.parse(nsFs.readFileSync('./container-presets.ini', 'utf-8'));
+                response.writeHeader(200, {'Content-type': 'text/plain'});
+                response.write(JSON.stringify(presets));
+                response.end();
                 break;
 
             case request.url.indexOf('.js') != -1:
