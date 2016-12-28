@@ -10,7 +10,7 @@ Manage your docker images and containers
 * Execute install script: `/Applications/docker-manager/install`
 * Remember to set Docker to starts when boot: `systemctl enable docker.service`
 * Enable DockerManager to starts when system boot: `systemctl enable docker-manager.service`
-* Start service: `service docker-manager start`
+* Start service: `service docker start` then `service docker-manager start`
 * Open app [http://localhost:31337](http://localhost:31337)
 
 ## Requirements
