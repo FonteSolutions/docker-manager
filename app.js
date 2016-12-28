@@ -355,6 +355,7 @@ $(document).ready(function() {
         $('#form-image-run .list-links').next() && [0].tagName == 'BR' ? $('#form-image-run .list-links').next().remove() : '';
 
         $('#form-image-run .image-id').val(imageId);
+        $('#form-image-run .input-name').val('');
         $('#form-image-run .name').text($parent.find('.name').text());
         $('#form-image-run .version').text($parent.find('.version').text());
         $('#form-image-run .initial-command').val('bash');
@@ -362,6 +363,7 @@ $(document).ready(function() {
         $.getJSON('/container-presets', function(data, textStatus, event) {
             containerPresets = data;
             var total = 0;
+            $('#container-preset-list').html('');
             for(i in containerPresets) {
                 total++;
                 var $li = $('<li class="container-preset-item"></li>');
@@ -408,6 +410,9 @@ $(document).ready(function() {
             var name = $(this).data('container-preset-name');
             var preset = $(this).data('container-preset-data');
 
+            if(preset.name) {
+                $('#form-image-run .input-name').val(preset.name);
+            }
             if(preset.command) {
                 $('#form-image-run .initial-command').val(preset.command);
             }
