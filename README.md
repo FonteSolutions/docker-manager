@@ -26,5 +26,5 @@ Manage your docker images and containers
 
 
 ## Thanks
-* [BrScan](https://www.brscan.com.br/)
+* [BrScan](http://www.brscan.com.br/)
 * [Felix Garcia Borrego](https://github.com/felixgborrego) for [Docker UI Chrome App](https://github.com/felixgborrego/docker-ui-chrome-app)
