@@ -29,3 +29,5 @@ build/Release
 node_modules
 
 .idea
+
+container-presets.ini

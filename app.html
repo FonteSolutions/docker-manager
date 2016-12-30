@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="./node_modules/wdt-loading/wdtLoading.css" />
     <link rel="stylesheet" type="text/css" href="./node_modules/animate.css/animate.css" />
     <link rel="stylesheet" type="text/css" href="./node_modules/jquery.terminal/css/jquery.terminal.css" />
-    <link rel="stylesheet" type="text/css" href="./jquery.dockmodal.css" />
+    <link rel="stylesheet" type="text/css" href="./css/jquery.dockmodal.css" />
     
     <style>
         body {
@@ -24,7 +24,7 @@
             padding: 7px 14px;
         }
         .loading {
-            background-image: url("loading.gif");
+            background-image: url("img/loading.gif");
             background-repeat: no-repeat;
             background-size: 32px;
             background-position: center;
@@ -81,6 +81,12 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .label-right {
+            float: right;
+            padding: 6px 14px;
+            margin-left: 3px;
         }
         
         /*#terminal-bar {*/
@@ -151,7 +157,7 @@
         }, 0);
     </script>
 
-    <!--nav class="navbar navbar-default navbar-fixed-top" style="z-index: 150;">
+    <nav class="navbar navbar-default navbar-fixed-top" style="z-index: 150;">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-top" aria-expanded="false">
@@ -164,42 +170,17 @@
             </div>
             <div class="collapse navbar-collapse" id="navbar-top">
                 <ul class="nav navbar-nav">
-                    <li class="list-images"><a href="#">Images</a></li>
-                    <li class="list-containers"><a href="#">Containers</a></li>
+                    <li class="btn-view-containers active"><a href="javascript:void(0)">Containers</a></li>
+                    <li class="btn-view-images"><a href="javascript:void(0)">Images</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="btn-open-server-info"><a href="javascript:void(0)" data-toggle="modal" data-target="#modal-server-info">Server Info</a></li>
                 </ul>
             </div>
         </div>
-    </nav-->
+    </nav>
 
-    <div class="container-fluid">
-        <div class="col-xs-8">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Images
-                    <button class="btn btn-xs pull-right" id="btn-images-refresh">
-                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-                    </button>
-                    <!--button class="btn btn-xs pull-right" id="btn-view-add-image" data-toggle="modal" data-target="#modal-add-image" style="margin-right: 5px;">
-                        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                    </button-->
-                </div>
-                <div class="panel-body" style="height: 156px;overflow: auto">
-                    <div id="images-list"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Server
-                    <button class="btn btn-xs pull-right" id="btn-server-status-refresh">
-                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-                    </button>
-                </div>
-                <ul class="list-group" id="server-status" style="height: 156px;overflow: auto">
-                </ul>
-            </div>
-        </div>
+    <div class="container-fluid" style="margin-top: 50px;" id="view-containers">
         <div class="col-xs-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -211,9 +192,10 @@
                 <table class="table table-bordered table-condensed table-hover table-striped" id="containers-list">
                     <thead>
                         <tr>
+                            <th width="120" class="text-center">ID</th>
                             <th class="text-center">Name</th>
                             <th>Image</th>
-                            <th>Created</th>
+                            <th class="text-center" width="140">Created</th>
                             <th>Ports</th>
                             <th>Command</th>
                             <th>Status</th>
@@ -224,6 +206,25 @@
                 </table>
                 <div class="container-fluid text-center" id="containers-list-none" style="display: none;">
                     <div class="col-xs-12">You dont have any container running now.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid" style="margin-top: 50px;display: none;" id="view-images">
+        <div class="col-xs-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Images
+                    <button class="btn btn-xs pull-right" id="btn-images-refresh">
+                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                    </button>
+                    <!--button class="btn btn-xs pull-right" id="btn-view-add-image" data-toggle="modal" data-target="#modal-add-image" style="margin-right: 5px;">
+                        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                    </button-->
+                </div>
+                <div class="panel-body">
+                    <div id="images-list"></div>
                 </div>
             </div>
         </div>
@@ -359,6 +360,23 @@
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal-server-info">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Server info</h4>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
     <script type="text/javascript" src="./node_modules/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js"></script>
     <script type="text/javascript" src="./node_modules/noty/js/noty/layouts/center.js"></script>
@@ -370,7 +388,7 @@
     <script type="text/javascript" src="./node_modules/jquery.terminal/js/jquery.mousewheel-min.js"></script>
     <script type="text/javascript" src="./node_modules/sh.js/build/sh.js"></script>
     <script type="text/javascript" src="./node_modules/socket.io-client/dist/socket.io.js"></script>
-    <script type="text/javascript" src="./jquery.dockmodal.js"></script>
-    <script type="text/javascript" src="./app.js"></script>
+    <script type="text/javascript" src="./js/jquery.dockmodal.js"></script>
+    <script type="text/javascript" src="./js/app.js"></script>
 </body>
 </html>

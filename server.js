@@ -7,7 +7,7 @@ try {
     var nsUtil = require('util');
     var nsIni = require('ini');
     // Debug
-    var debug = false;
+    var debug = true;
     var silent = debug ? false : true;
     // API
     var API = {
@@ -104,7 +104,7 @@ try {
             // List containers
             case pathname == '/list-containers':
                 response.writeHeader(200, {'Content-type': 'application/json'});
-                response.write(API.run('containers/json'));
+                response.write(API.run('containers/json', {'all': 1}));
                 response.end();
                 break;
             // Get server status

@@ -36,5 +36,5 @@ if [ ! -d "./node_modules" ]; then
 fi
 
 echo -e "${orange}Starting DockerManager..."
-$has_nodejs web.js
+$has_nodejs server.js
 echo -e "${orange}DockerManager${nc} started successfully!"

@@ -3,7 +3,7 @@ $(document).ready(function() {
     $.noty.defaults.theme = 'relax';
     
     var initialLoads = {
-        maxLoads: 3, // change with max loads you have
+        maxLoads: 2, // change with max loads you have
         loads: 0,
         loaded: function () {
             initialLoads.loads++;
@@ -36,6 +36,40 @@ $(document).ready(function() {
 
     $('body').tooltip({
         selector: '[rel=tooltip]'
+    });
+
+    $('.btn-open-server-info').on('click', function() {
+        $.getJSON('/server-status', function(data, textStatus, event) {
+            initialLoads.loaded();
+            if(event.status == 200) {
+                $('#modal-server-info .modal-body ul').html('');
+                var html = '<li class="list-group-item">Name <span class="label label-right label-default">' + data.result.Name + '</span></li>';
+                html+= '<li class="list-group-item">OS <span class="label label-right label-default">' + data.result.OperatingSystem + ' / ' + data.result.Architecture + '</span></li>';
+                html+= '<li class="list-group-item">MemTotal <span class="label label-right label-default">' + formatBytes(data.result.MemTotal) + '</span></li>';
+                html+= '<li class="list-group-item">CPUs <span class="label label-right label-default">' + data.result.NCPU + '</span></li>';
+                html+= '<li class="list-group-item">Kernel <span class="label label-right label-default">' + data.result.KernelVersion + '</span></li>';
+                html+= '<li class="list-group-item">Images <span class="label label-right label-default">' + data.result.Images + '</span></li>';
+                html+= '<li class="list-group-item">Containers <span rel="tooltip" title="Containers Stopped" class="label label-right label-danger">' + data.result.ContainersStopped + '</span> <span rel="tooltip" title="Containers Paused" class="label label-right label-warning">' + data.result.ContainersPaused + '</span> <span rel="tooltip" title="Containers Running" class="label label-right label-success">' + data.result.ContainersRunning + '</span> <span rel="tooltip" title="Total Containers" class="label label-default label-right">' + data.result.Containers + '</span></li>';
+                html+= '<li class="list-group-item">IPv4Forwarding <span class="label label-right label-default">' + data.result.IPv4Forwarding + '</span></li>';
+                html+= '<li class="list-group-item">Memory Limit <span class="label label-right label-default">' + data.result.MemoryLimit + '</span></li>';
+                html+= '<li class="list-group-item">Docker Root Dir <span class="label label-right label-default">' + data.result.DockerRootDir + '</span></li>';
+                $('#modal-server-info .modal-body ul').append(html);
+            }
+        });
+    });
+
+    $('.btn-view-containers').on('click', function() {
+        $('#view-images').hide();
+        $('#view-containers').show();
+        $('#navbar-top li').removeClass('active');
+        $('#navbar-top li.btn-view-containers').addClass('active');
+    });
+
+    $('.btn-view-images').on('click', function() {
+        $('#view-containers').hide();
+        $('#view-images').show();
+        $('#navbar-top li').removeClass('active');
+        $('#navbar-top li.btn-view-images').addClass('active');
     });
 
     /**
@@ -71,10 +105,10 @@ $(document).ready(function() {
                                     '<span class="label label-info"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> ' +
                                         timestamp2date(item.Created) +
                                     '</span> ' +
-                                    '<div class="btn-group pull-right" role="group">' +
-                                        '<button type="button" class="btn btn-xs btn-primary btn-run-image">Run</button>' +
-                                        '<button type="button" class="btn btn-xs btn-warning btn-rename-image">Rename</button>' +
-                                        '<button type="button" class="btn btn-xs btn-danger btn-remove-image">Remove</button>' +
+                                    '<div class="btn-group pull-right" role="group" style="margin-top: -7px;margin-right: -12px">' +
+                                        '<button type="button" class="btn btn-primary btn-run-image">Run</button>' +
+                                        '<button type="button" class="btn btn-warning btn-rename-image">Rename</button>' +
+                                        '<button type="button" class="btn btn-danger btn-remove-image">Remove</button>' +
                                     '</div>' +
                                 '</li>';
                     $('#images-list').append(html);
@@ -109,9 +143,10 @@ $(document).ready(function() {
                     }
 
                     var html =  '<tr class="container-item" data-image-id="' + item.Id + '"  title="' + item.Id + '" rel="tooltip">' +
+                                    '<td class="text-center"><strong>' + item.Id.substr(0, 12) + '</strong></td>' +
                                     '<td class="text-center"><strong>' + item.Names[0].substr(1) + '</strong></td>' +
                                     '<td>' + item.Image + '</td>' +
-                                    '<td>' + timestamp2date(item.Created) + '</td>' +
+                                    '<td class="text-center">' + timestamp2date(item.Created) + '</td>' +
                                     '<td>' + ports + '</td>' +
                                     '<td>' + item.Command + '</td>' +
                                     '<td><em>' + item.Status + '</em></td>' +
@@ -133,25 +168,25 @@ $(document).ready(function() {
     /**
      * List server info and show
      */
-    $('#btn-server-status-refresh').on('click', function () {
-        $.getJSON('/server-status', function(data, textStatus, event) {
-            initialLoads.loaded();
-            if(event.status == 200) {
-                $('#server-status').html('');
-                var html = '<li class="list-group-item">Name <span class="badge">' + data.result.Name + '</span></li>';
-                html+= '<li class="list-group-item">OS <span class="badge">' + data.result.OperatingSystem + '</span></li>';
-                html+= '<li class="list-group-item">Kernel <span class="badge">' + data.result.KernelVersion + '</span></li>';
-                html+= '<li class="list-group-item">Images <span class="badge">' + data.result.Images + '</span></li>';
-                html+= '<li class="list-group-item">Containers <span class="badge">' + data.result.Containers + '</span></li>';
-                html+= '<li class="list-group-item">IPv4Forwarding <span class="badge">' + data.result.IPv4Forwarding + '</span></li>';
-                html+= '<li class="list-group-item">MemTotal <span class="badge">' + formatBytes(data.result.MemTotal) + '</span></li>';
-                html+= '<li class="list-group-item">Memory Limit <span class="badge">' + data.result.MemoryLimit + '</span></li>';
-                html+= '<li class="list-group-item">CPUs <span class="badge">' + data.result.NCPU + '</span></li>';
-                html+= '<li class="list-group-item">Docker Root Dir <span class="badge">' + data.result.DockerRootDir + '</span></li>';
-                $('#server-status').append(html);
-            }
-        });
-    }).trigger('click');
+    // $('#btn-server-status-refresh').on('click', function () {
+    //     $.getJSON('/server-status', function(data, textStatus, event) {
+    //         initialLoads.loaded();
+    //         if(event.status == 200) {
+    //             $('#server-status').html('');
+    //             var html = '<li class="list-group-item">Name <span class="badge">' + data.result.Name + '</span></li>';
+    //             html+= '<li class="list-group-item">OS <span class="badge">' + data.result.OperatingSystem + '</span></li>';
+    //             html+= '<li class="list-group-item">Kernel <span class="badge">' + data.result.KernelVersion + '</span></li>';
+    //             html+= '<li class="list-group-item">Images <span class="badge">' + data.result.Images + '</span></li>';
+    //             html+= '<li class="list-group-item">Containers <span class="badge">' + data.result.Containers + '</span></li>';
+    //             html+= '<li class="list-group-item">IPv4Forwarding <span class="badge">' + data.result.IPv4Forwarding + '</span></li>';
+    //             html+= '<li class="list-group-item">MemTotal <span class="badge">' + formatBytes(data.result.MemTotal) + '</span></li>';
+    //             html+= '<li class="list-group-item">Memory Limit <span class="badge">' + data.result.MemoryLimit + '</span></li>';
+    //             html+= '<li class="list-group-item">CPUs <span class="badge">' + data.result.NCPU + '</span></li>';
+    //             html+= '<li class="list-group-item">Docker Root Dir <span class="badge">' + data.result.DockerRootDir + '</span></li>';
+    //             $('#server-status').append(html);
+    //         }
+    //     });
+    // }).trigger('click');
 
     /**
      * Search images
