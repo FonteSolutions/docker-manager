@@ -161,8 +161,8 @@ $(document).ready(function() {
                             statusBgClass = 'success';
                             statusString = 'Running';
                             // @TODO List processes running inside a container /containers/(id or name)/top  -  GET /containers/4fa6e0f0c678/top HTTP/1.1
-                            // @TODO Get container logs /containers/(id or name)/logs  -  GET /containers/4fa6e0f0c678/logs?stderr=1&stdout=1&timestamps=1&follow=1&tail=10&since=1428990821 HTTP/1.1
                             // @TODO Get container stats based on resource usage /containers/(id or name)/stats  -  GET /containers/redis1/stats HTTP/1.1
+
                             break;
                     }
 
@@ -179,7 +179,7 @@ $(document).ready(function() {
                                             (showBtnPlay ? '<button rel="tooltip" title="Start" class="btn btn-xs btn-success btn-container-play"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>' : '') +
                                             (showBtnStop ? '<button rel="tooltip" title="Stop" class="btn btn-xs btn-default btn-container-stop"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>' : '') +
                                             '<button rel="tooltip" title="Remove" class="btn btn-xs btn-danger btn-container-remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>' +
-                                            '<button rel="tooltip" title="Log" class="btn btn-xs btn-warning btn-container-history"><span class="glyphicon glyphicon-book" aria-hidden="true"></span></button>' +
+                                            '<button rel="tooltip" title="Logs" class="btn btn-xs btn-warning btn-container-history"><span class="glyphicon glyphicon-book" aria-hidden="true"></span></button>' +
                                             '<button rel="tooltip" title="Terminal" class="btn btn-xs btn-default btn-container-open-terminal"><span class="glyphicon glyphicon-console" aria-hidden="true"></span></button>' +
                                         '</div>' +
                                     '</td>' +
@@ -673,7 +673,7 @@ $(document).ready(function() {
                     .removeClass('label-success')
                     .addClass(statusClass);
 
-                $('#modal-container-info .modal-header')
+                $('#modal-container-info .modal-header, #modal-container-info .modal-footer')
                     .removeClass('bg-warning')
                     .removeClass('bg-info')
                     .removeClass('bg-success')
@@ -692,7 +692,7 @@ $(document).ready(function() {
                 html+= '<tr><td>Created on</td><td>' + created.join(' ') + '</td></tr>';
                 html+= '<tr><td>Volumes</td><td>' + volumesString + '</td></tr>';
                 html+= '<tr><td>Links</td><td>' + linksString + '</td></tr>';
-                $('#modal-container-info .modal-body table tbody').append(html);
+                $('#modal-container-info .modal-body table tbody').html(html);
                 $('#modal-container-info').modal('show');
             }
         });
@@ -715,7 +715,39 @@ $(document).ready(function() {
      */
     $('#containers-list tbody').on('click', '.btn-container-history', function () {
         var containerId = $(this).closest('.container-item').data('image-id');
-        console.log($(this), containerId);
+        $.post('/container-logs',{'containerId':containerId}, function(data, textStatus, event) {
+            if (event.status == 200) {
+
+                $('#modal-container-log .modal-body table tbody').html('');
+                // ('#modal-container-info .container-name').html(data.result.Name.substr(1));
+
+                var html = '';
+                for(var i in data.result) {
+                    var item = data.result[i];
+                    var statusString = '';
+                    var statusClass = '';
+                    switch(item.Kind) {
+                        case 0:
+                            statusString = 'Modified';
+                            statusClass = 'label-warning';
+                            break;
+                        case 1:
+                            statusString = 'Added';
+                            statusClass = 'label-success';
+                            break;
+                        case 2:
+                            statusString = 'Deleted';
+                            statusClass = 'label-danger';
+                            break;
+                    }
+                    console.log(statusString);
+                    html+= '<tr><td>' + item.Path + '<span class="label label-right ' + statusClass + '">' + statusString + '</span></td></tr>';
+                }
+
+                $('#modal-container-log .modal-body table tbody').html(html);
+                $('#modal-container-log').modal('show');
+            }
+        });
     });
 
     /**
