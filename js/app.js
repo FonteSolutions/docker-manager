@@ -142,7 +142,7 @@ $(document).ready(function() {
                         ports+= '<span class="label label-default">' + item.Ports[j].PrivatePort + ' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ' + item.Ports[j].PublicPort + '</span> ';
                     }
 
-                    var html =  '<tr class="container-item" data-image-id="' + item.Id + '"  title="' + item.Id + '" rel="tooltip">' +
+                    var html =  '<tr class="container-item" data-image-id="' + item.Id + '">' +
                                     '<td class="text-center"><strong>' + item.Id.substr(0, 12) + '</strong></td>' +
                                     '<td class="text-center"><strong>' + item.Names[0].substr(1) + '</strong></td>' +
                                     '<td>' + item.Image + '</td>' +
@@ -593,7 +593,97 @@ $(document).ready(function() {
      */
     $('#containers-list tbody').on('click', '.btn-container-info', function () {
         var containerId = $(this).closest('.container-item').data('image-id');
-        console.log($(this), containerId);
+        $.post('/container-status',{'containerId':containerId}, function(data, textStatus, event) {
+            if(event.status == 200) {
+                $('#modal-container-info .modal-body table tbody').html('');
+
+                var portsString = '';
+                for(var i in data.result.Config.ExposedPorts) {
+                    portsString+= '<span class="label label-default">' + i + '</span> ';
+                }
+
+                // Create Datetime to pt-BR format
+                var created = data.result.Created.replace('T', ' ').substr(0, 19).split(' ');
+                created[0] = created[0].split('-').reverse().join('/');
+
+                // Started Datetime to pt-BR format
+                var started = data.result.State.StartedAt.replace('T', ' ').substr(0, 19).split(' ');
+                started[0] = started[0].split('-').reverse().join('/');
+
+                // Finished Datetime to pt-BR format
+                var finished = data.result.State.FinishedAt.replace('T', ' ').substr(0, 19).split(' ');
+                finished[0] = finished[0].split('-').reverse().join('/');
+                if(finished[0] == '01/01/0001') {
+                    finished = ['Running'];
+                }
+
+                var linksString = '';
+                for(var i in data.result.HostConfig.Links) {
+                    var link = data.result.HostConfig.Links[i].split(':');
+                    link[0] = link[0].substr(1);
+                    link[1] = link[1].replace(data.result.Name, '').substr(1);
+                    linksString+= '<span class="label label-default">' + link[0] + '</span> <span aria-hidden="true" class="glyphicon glyphicon-transfer" style="top: 4px;"></span> <span class="label label-default">' + link[1] + '</span><br />';
+                }
+                if(linksString.length == 0) {
+                    linksString = '-';
+                }
+                var volumesString = '';
+                for(var i in data.result.Mounts) {
+                    var volume = data.result.Mounts[i];
+                    volumesString+= '<span class="label label-default">' + volume.Source + '</span> <span aria-hidden="true" class="glyphicon glyphicon-transfer" style="top: 4px;"></span> <span class="label label-default">' + volume.Destination + '</span><br />';
+                }
+
+                var statusString = '';
+                var statusClass = 'label-default';
+                var statusBgClass = 'label-default';
+                switch(data.result.State.Status) {
+                    case 'exited':
+                        statusClass = 'label-warning';
+                        statusBgClass = 'bg-warning';
+                        statusString = 'Exited';
+                        break;
+                    case 'created':
+                        statusClass = 'label-info';
+                        statusBgClass = 'bg-info';
+                        statusString = 'Created';
+                        break;
+                    case 'running':
+                        statusClass = 'label-success';
+                        statusBgClass = 'bg-success';
+                        statusString = 'Running';
+                        break;
+                }
+
+                $('#modal-container-info .status-info')
+                    .html(statusString)
+                    .removeClass('label-warning')
+                    .removeClass('label-info')
+                    .removeClass('label-success')
+                    .addClass(statusClass);
+
+                $('#modal-container-info .modal-header')
+                    .removeClass('bg-warning')
+                    .removeClass('bg-info')
+                    .removeClass('bg-success')
+                    .addClass(statusBgClass);
+
+                $('#modal-container-info .container-name').html(data.result.Name.substr(1));
+
+                var html = '<tr><td width="130">Image</td><td>' + data.result.Config.Image + '</td></tr>';
+                html+= '<tr><td>Name</td><td>' + data.result.Name.substr(1) + '</td></tr>';
+                html+= '<tr><td>Initial Command</td><td>' + data.result.Config.Cmd.join(', ') + '</td></tr>';
+                html+= '<tr><td>Started at</td><td>' + started.join(' ') + '</td></tr>';
+                html+= '<tr><td>Finished at</td><td>' + finished.join(' ') + '</td></tr>';
+                html+= '<tr><td>Env Params</td><td>' + data.result.Config.Env.join('<br />') + '</td></tr>';
+                html+= '<tr><td>Ports Exposed</td><td>' + portsString + '</td></tr>';
+                html+= '<tr><td>Terminal</td><td>' + data.result.Config.Tty + '</td></tr>';
+                html+= '<tr><td>Created on</td><td>' + created.join(' ') + '</td></tr>';
+                html+= '<tr><td>Volumes</td><td>' + volumesString + '</td></tr>';
+                html+= '<tr><td>Links</td><td>' + linksString + '</td></tr>';
+                $('#modal-container-info .modal-body table tbody').append(html);
+                $('#modal-container-info').modal('show');
+            }
+        });
     });
 
     /**
