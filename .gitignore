@@ -30,4 +30,4 @@ node_modules
 
 .idea
 
-container-presets.ini
+*.ini
