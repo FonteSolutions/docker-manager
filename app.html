@@ -92,6 +92,10 @@
         .table-without-margin-bottom {
             margin-bottom: 0;
         }
+
+        .modal-lg {
+            width: 96%;
+        }
         
         /*#terminal-bar {*/
             /*position: fixed;*/
@@ -388,12 +392,26 @@
                     <h4 class="modal-title"><span class="container-name"></span> <span class="label status-info label-right" style="margin-right: 10px"></span></h4>
                 </div>
                 <div class="modal-body">
-                    <table class="tb-container-info table table-bordered table-condensed table-hover table-striped table-without-margin-bottom">
-                        <tbody></tbody>
-                    </table>
-                    <table class="tb-container-top table table-bordered table-condensed table-hover table-striped table-without-margin-bottom" style="display: none;">
-                        <tbody></tbody>
-                    </table>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Info</div>
+                        <table class="tb-container-info table table-bordered table-condensed table-hover table-striped table-without-margin-bottom">
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Stats</div>
+                        <table class="tb-container-stats table table-bordered table-condensed table-hover table-striped table-without-margin-bottom" style="display: none;">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Top</div>
+                        <table class="tb-container-top table table-bordered table-condensed table-hover table-striped table-without-margin-bottom" style="display: none;">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

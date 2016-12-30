@@ -672,8 +672,23 @@ $(document).ready(function() {
                             $.post('/container-stats',{'containerId':containerId}, function(dataStats, textStatus, event) {
                                 wdtLoading.done();
                                 $('#modal-container-info .modal-body table.tb-container-top').show();
-                                var html = '<tr><td width="130">Image</td><td>teste</td></tr>';
+                                var html = '';
+                                for(var i in dataTop.result.Processes) {
+                                    var item = dataTop.result.Processes[i];
+                                    html+= '<tr>';
+                                    for(var j in item) {
+                                        html+= '<td>' + item[j] + '</td>';
+                                    }
+                                    html+= '</tr>';
+                                }
                                 $('#modal-container-info .modal-body table.tb-container-top tbody').html(html);
+                                var html = '<tr>';
+                                for(var i in dataTop.result.Titles) {
+                                    var item = dataTop.result.Titles[i];
+                                    html+= '<th>' + item + '</th>';
+                                }
+                                html+= '</tr>';
+                                $('#modal-container-info .modal-body table.tb-container-top thead').html(html);
                                 console.log('topp', dataTop);
                                 console.log('stats', dataStats);
                                 // @TODO STATS
@@ -700,7 +715,7 @@ $(document).ready(function() {
                     .removeClass('bg-success')
                     .addClass(statusBgClass);
 
-                $('#modal-container-info .container-name').html(data.result.Name.substr(1));
+                $('#modal-container-info .container-name').html(data.result.Name.substr(1) + ' - Info');
 
                 var html = '<tr><td width="130">Image</td><td>' + data.result.Config.Image + '</td></tr>';
                 html+= '<tr><td>Name</td><td>' + data.result.Name.substr(1) + '</td></tr>';
@@ -746,28 +761,32 @@ $(document).ready(function() {
 
                 $('#modal-container-log .modal-body table tbody').html('');
                 var name = $(that).parents('.container-item').find('.container-name').text();
-                $('#modal-container-log .container-name').text(name);
+                $('#modal-container-log .container-name').text(name + ' - Logs');
 
                 var html = '';
                 for(var i in data.result) {
                     var item = data.result[i];
                     var statusString = '';
                     var statusClass = '';
+                    var statusBgClass = '';
                     switch(item.Kind) {
                         case 0:
                             statusString = 'Modified';
                             statusClass = 'label-warning';
+                            statusBgClass = 'warning';
                             break;
                         case 1:
                             statusString = 'Added';
                             statusClass = 'label-success';
+                            statusBgClass = 'success';
                             break;
                         case 2:
                             statusString = 'Deleted';
                             statusClass = 'label-danger';
+                            statusBgClass = 'danger';
                             break;
                     }
-                    html+= '<tr><td>' + item.Path + '<span class="label label-right ' + statusClass + '">' + statusString + '</span></td></tr>';
+                    html+= '<tr class="' + statusBgClass + '"><td>' + item.Path + '<span class="label label-right ' + statusClass + '">' + statusString + '</span></td></tr>';
                 }
 
                 $('#modal-container-log .modal-body table tbody').html(html);
