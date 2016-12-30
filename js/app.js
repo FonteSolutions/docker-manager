@@ -160,15 +160,12 @@ $(document).ready(function() {
                             showBtnStop = true;
                             statusBgClass = 'success';
                             statusString = 'Running';
-                            // @TODO List processes running inside a container /containers/(id or name)/top  -  GET /containers/4fa6e0f0c678/top HTTP/1.1
-                            // @TODO Get container stats based on resource usage /containers/(id or name)/stats  -  GET /containers/redis1/stats HTTP/1.1
-
                             break;
                     }
 
                     var html =  '<tr class="container-item ' + statusBgClass + '" data-image-id="' + item.Id + '">' +
                                     '<td class="text-center">' + item.Id.substr(0, 12) + '</td>' +
-                                    '<td class="text-center"><strong>' + item.Names[0].substr(1) + '</strong></td>' +
+                                    '<td class="text-center container-name"><strong>' + item.Names[0].substr(1) + '</strong></td>' +
                                     '<td>' + item.Image + '</td>' +
                                     '<td>' + ports + '</td>' +
                                     '<td>' + item.Command + '</td>' +
@@ -605,7 +602,11 @@ $(document).ready(function() {
      */
     $('#containers-list tbody').on('click', '.btn-container-info', function () {
         var containerId = $(this).closest('.container-item').data('image-id');
+        wdtLoading.start({
+            'category': 'pulling-image'
+        });
         $.post('/container-status',{'containerId':containerId}, function(data, textStatus, event) {
+            wdtLoading.done();
             if(event.status == 200) {
                 $('#modal-container-info .modal-body table tbody').html('');
 
@@ -663,6 +664,26 @@ $(document).ready(function() {
                         statusClass = 'label-success';
                         statusBgClass = 'bg-success';
                         statusString = 'Running';
+                        wdtLoading.start({
+                            'category': 'pulling-image'
+                        });
+                        $('#modal-container-info .modal-body table.tb-container-top').hide();
+                        $.post('/container-top',{'containerId':containerId}, function(dataTop, textStatus, event) {
+                            $.post('/container-stats',{'containerId':containerId}, function(dataStats, textStatus, event) {
+                                wdtLoading.done();
+                                $('#modal-container-info .modal-body table.tb-container-top').show();
+                                var html = '<tr><td width="130">Image</td><td>teste</td></tr>';
+                                $('#modal-container-info .modal-body table.tb-container-top tbody').html(html);
+                                console.log('topp', dataTop);
+                                console.log('stats', dataStats);
+                                // @TODO STATS
+                                // cpu_stats.cpu_usage.percpu_usage[]
+                                // cpu_stats.cpu_usage.total_usage
+                                // cpu_stats.system_cpu_usage
+                                // cpu_stats.networks[]
+
+                            });
+                        });
                         break;
                 }
 
@@ -692,7 +713,7 @@ $(document).ready(function() {
                 html+= '<tr><td>Created on</td><td>' + created.join(' ') + '</td></tr>';
                 html+= '<tr><td>Volumes</td><td>' + volumesString + '</td></tr>';
                 html+= '<tr><td>Links</td><td>' + linksString + '</td></tr>';
-                $('#modal-container-info .modal-body table tbody').html(html);
+                $('#modal-container-info .modal-body table.tb-container-info tbody').html(html);
                 $('#modal-container-info').modal('show');
             }
         });
@@ -715,11 +736,17 @@ $(document).ready(function() {
      */
     $('#containers-list tbody').on('click', '.btn-container-history', function () {
         var containerId = $(this).closest('.container-item').data('image-id');
+        var that = this;
+        wdtLoading.start({
+            'category': 'pulling-image'
+        });
         $.post('/container-logs',{'containerId':containerId}, function(data, textStatus, event) {
+            wdtLoading.done();
             if (event.status == 200) {
 
                 $('#modal-container-log .modal-body table tbody').html('');
-                // ('#modal-container-info .container-name').html(data.result.Name.substr(1));
+                var name = $(that).parents('.container-item').find('.container-name').text();
+                $('#modal-container-log .container-name').text(name);
 
                 var html = '';
                 for(var i in data.result) {
@@ -740,7 +767,6 @@ $(document).ready(function() {
                             statusClass = 'label-danger';
                             break;
                     }
-                    console.log(statusString);
                     html+= '<tr><td>' + item.Path + '<span class="label label-right ' + statusClass + '">' + statusString + '</span></td></tr>';
                 }
 

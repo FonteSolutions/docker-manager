@@ -391,6 +391,43 @@ try {
                 });
                 break;
 
+            case pathname == '/container-top':
+                var data = [];
+                request.on('data', function(chunk) {
+                    data.push(chunk);
+                }).on('end', function() {
+                    data = Buffer.concat(data).toString().trim().split('&');
+                    var _data = {};
+                    for(var i=0,l=data.length;i<l;i++) {
+                        _data[data[i].trim().split('=')[0]] = data[i].trim().split('=')[1];
+                    }
+                    _data.containerId = decodeURIComponent(_data.containerId);
+
+                    response.writeHeader(200, HEADER.JSON);
+                    response.write(API.run('containers/' + _data.containerId + '/top', {'ps_args': 'aux'}, false, false, true));
+                    response.end();
+                });
+                break;
+
+            case pathname == '/container-stats':
+                var data = [];
+                request.on('data', function(chunk) {
+                    data.push(chunk);
+                }).on('end', function() {
+                    data = Buffer.concat(data).toString().trim().split('&');
+                    var _data = {};
+                    for(var i=0,l=data.length;i<l;i++) {
+                        _data[data[i].trim().split('=')[0]] = data[i].trim().split('=')[1];
+                    }
+                    _data.containerId = decodeURIComponent(_data.containerId);
+
+                    response.writeHeader(200, HEADER.JSON);
+                    // @TODO stream: true
+                    response.write(API.run('containers/' + _data.containerId + '/stats', {'stream': false}, false, false, true));
+                    response.end();
+                });
+                break;
+
             case pathname == '/container-presets':
                 var presets = nsIni.parse(nsFs.readFileSync('./container-presets.ini', 'utf-8'));
                 response.writeHeader(200, HEADER.TEXT);
