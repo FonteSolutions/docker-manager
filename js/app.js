@@ -141,21 +141,46 @@ $(document).ready(function() {
                     for(var j=0,k=item.Ports.length;j<k;j++) {
                         ports+= '<span class="label label-default">' + item.Ports[j].PrivatePort + ' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ' + item.Ports[j].PublicPort + '</span> ';
                     }
+                    // Beginning all stopped
+                    var showBtnPlay = true;
+                    var showBtnStop = false;
+                    var statusBgClass = '';
+                    var statusString = '';
+                    switch(item.State) {
+                        case 'exited':
+                            statusBgClass = 'warning';
+                            statusString = 'Exited';
+                            break;
+                        case 'created':
+                            statusBgClass = 'info';
+                            statusString = 'Created';
+                            break;
+                        case 'running':
+                            showBtnPlay = false;
+                            showBtnStop = true;
+                            statusBgClass = 'success';
+                            statusString = 'Running';
+                            // @TODO List processes running inside a container /containers/(id or name)/top  -  GET /containers/4fa6e0f0c678/top HTTP/1.1
+                            // @TODO Get container logs /containers/(id or name)/logs  -  GET /containers/4fa6e0f0c678/logs?stderr=1&stdout=1&timestamps=1&follow=1&tail=10&since=1428990821 HTTP/1.1
+                            // @TODO Get container stats based on resource usage /containers/(id or name)/stats  -  GET /containers/redis1/stats HTTP/1.1
+                            break;
+                    }
 
-                    var html =  '<tr class="container-item" data-image-id="' + item.Id + '">' +
-                                    '<td class="text-center"><strong>' + item.Id.substr(0, 12) + '</strong></td>' +
+                    var html =  '<tr class="container-item ' + statusBgClass + '" data-image-id="' + item.Id + '">' +
+                                    '<td class="text-center">' + item.Id.substr(0, 12) + '</td>' +
                                     '<td class="text-center"><strong>' + item.Names[0].substr(1) + '</strong></td>' +
                                     '<td>' + item.Image + '</td>' +
-                                    '<td class="text-center">' + timestamp2date(item.Created) + '</td>' +
                                     '<td>' + ports + '</td>' +
                                     '<td>' + item.Command + '</td>' +
-                                    '<td><em>' + item.Status + '</em></td>' +
+                                    '<td>' + statusString + '</td>' +
                                     '<td class="text-center">' +
                                         '<div class="btn-group">' +
-                                            '<button class="btn btn-xs btn-danger btn-container-stop"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>' +
-                                            '<button class="btn btn-xs btn-info btn-container-info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>' +
-                                            '<button class="btn btn-xs btn-warning btn-container-history"><span class="glyphicon glyphicon-book" aria-hidden="true"></span></button>' +
-                                            '<button class="btn btn-xs btn-default btn-container-open-terminal"><span class="glyphicon glyphicon-console" aria-hidden="true"></span></button>' +
+                                            '<button rel="tooltip" title="Info" class="btn btn-xs btn-info btn-container-info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>' +
+                                            (showBtnPlay ? '<button rel="tooltip" title="Start" class="btn btn-xs btn-success btn-container-play"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>' : '') +
+                                            (showBtnStop ? '<button rel="tooltip" title="Stop" class="btn btn-xs btn-default btn-container-stop"><span class="glyphicon glyphicon-stop" aria-hidden="true"></span></button>' : '') +
+                                            '<button rel="tooltip" title="Remove" class="btn btn-xs btn-danger btn-container-remove"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>' +
+                                            '<button rel="tooltip" title="Log" class="btn btn-xs btn-warning btn-container-history"><span class="glyphicon glyphicon-book" aria-hidden="true"></span></button>' +
+                                            '<button rel="tooltip" title="Terminal" class="btn btn-xs btn-default btn-container-open-terminal"><span class="glyphicon glyphicon-console" aria-hidden="true"></span></button>' +
                                         '</div>' +
                                     '</td>' +
                                 '</tr>';
@@ -164,29 +189,6 @@ $(document).ready(function() {
             }
         });
     }).trigger('click');
-
-    /**
-     * List server info and show
-     */
-    // $('#btn-server-status-refresh').on('click', function () {
-    //     $.getJSON('/server-status', function(data, textStatus, event) {
-    //         initialLoads.loaded();
-    //         if(event.status == 200) {
-    //             $('#server-status').html('');
-    //             var html = '<li class="list-group-item">Name <span class="badge">' + data.result.Name + '</span></li>';
-    //             html+= '<li class="list-group-item">OS <span class="badge">' + data.result.OperatingSystem + '</span></li>';
-    //             html+= '<li class="list-group-item">Kernel <span class="badge">' + data.result.KernelVersion + '</span></li>';
-    //             html+= '<li class="list-group-item">Images <span class="badge">' + data.result.Images + '</span></li>';
-    //             html+= '<li class="list-group-item">Containers <span class="badge">' + data.result.Containers + '</span></li>';
-    //             html+= '<li class="list-group-item">IPv4Forwarding <span class="badge">' + data.result.IPv4Forwarding + '</span></li>';
-    //             html+= '<li class="list-group-item">MemTotal <span class="badge">' + formatBytes(data.result.MemTotal) + '</span></li>';
-    //             html+= '<li class="list-group-item">Memory Limit <span class="badge">' + data.result.MemoryLimit + '</span></li>';
-    //             html+= '<li class="list-group-item">CPUs <span class="badge">' + data.result.NCPU + '</span></li>';
-    //             html+= '<li class="list-group-item">Docker Root Dir <span class="badge">' + data.result.DockerRootDir + '</span></li>';
-    //             $('#server-status').append(html);
-    //         }
-    //     });
-    // }).trigger('click');
 
     /**
      * Search images
@@ -579,6 +581,16 @@ $(document).ready(function() {
     });
 
     /**
+     * Container play
+     */
+    $('#containers-list tbody').on('click', '.btn-container-play', function () {
+        var containerId = $(this).closest('.container-item').data('image-id');
+        $.post('/play-container', {containerId: containerId}, function(data, textStatus, event) {
+            $('#btn-containers-refresh').trigger('click');
+        });
+    });
+
+    /**
      * Container stop
      */
     $('#containers-list tbody').on('click', '.btn-container-stop', function () {
@@ -682,6 +694,18 @@ $(document).ready(function() {
                 html+= '<tr><td>Links</td><td>' + linksString + '</td></tr>';
                 $('#modal-container-info .modal-body table tbody').append(html);
                 $('#modal-container-info').modal('show');
+            }
+        });
+    });
+
+    /**
+     * Container remove
+     */
+    $('#containers-list tbody').on('click', '.btn-container-remove', function () {
+        var containerId = $(this).closest('.container-item').data('image-id');
+        $.post('/container-remove',{'containerId':containerId}, function(data, textStatus, event) {
+            if (event.status == 200) {
+                $('#btn-containers-refresh').trigger('click');
             }
         });
     });

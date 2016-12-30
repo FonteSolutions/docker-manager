@@ -9,6 +9,16 @@ try {
     // Debug
     var debug = true;
     var silent = debug ? false : true;
+    var HEADER = {
+        JSON: {'Content-type': 'application/json'},
+        TEXT: {'Content-type': 'text/plain'},
+        JS: {'Content-type': 'text/javascript'},
+        CSS: {'Content-type': 'text/css'},
+        GIF: {'Content-type': 'image/gif'},
+        PNG: {'Content-type': 'image/png'},
+        HTML: {'Content-type': 'text/html'}
+    };
+
     // API
     var API = {
         url: 'http://localhost:2375/',
@@ -97,19 +107,19 @@ try {
         switch(true) {
             // List images
             case pathname == '/list-images':
-                response.writeHeader(200, {'Content-type': 'application/json'});
+                response.writeHeader(200, HEADER.JSON);
                 response.write(API.run('images/json'));
                 response.end();
                 break;
             // List containers
             case pathname == '/list-containers':
-                response.writeHeader(200, {'Content-type': 'application/json'});
+                response.writeHeader(200, HEADER.JSON);
                 response.write(API.run('containers/json', {'all': 1}));
                 response.end();
                 break;
             // Get server status
             case pathname == '/server-status':
-                response.writeHeader(200, {'Content-type': 'application/json'});
+                response.writeHeader(200, HEADER.JSON);
                 response.write(API.run('info'));
                 response.end();
                 break;
@@ -122,7 +132,7 @@ try {
                     name = Buffer.concat(name).toString().split('=')[1];
                     name = decodeURIComponent(name).replace(/\+/, '-');
 
-                    response.writeHeader(200, {'Content-type': 'application/json'});
+                    response.writeHeader(200, HEADER.JSON);
                     response.write(API.run('images/search', {term: name}));
                     response.end();
                 });
@@ -136,7 +146,7 @@ try {
                     name = Buffer.concat(name).toString().split('=')[1];
                     name = decodeURIComponent(name).replace(/\+/, '-');
 
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
+                    response.writeHeader(200, HEADER.TEXT);
                     response.write(API.runShell('curl https://registry.hub.docker.com/v1/repositories/' + name + '/tags'));
                     response.end();
                 });
@@ -151,7 +161,7 @@ try {
 
                     API.runPure('docker pull ' + data.name + ':' + data.version);
 
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
+                    response.writeHeader(200, HEADER.TEXT);
                     response.write(JSON.stringify({result: []}));
                     response.end();
                 });
@@ -169,7 +179,7 @@ try {
                     }
                     var out = nsShell.exec('docker rmi -f ' + imageId, {silent:silent});
 
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
+                    response.writeHeader(200, HEADER.TEXT);
                     response.write(JSON.stringify(out));
                     response.end();
                 });
@@ -195,7 +205,7 @@ try {
                     var out = nsShell.exec('docker tag ' + _data.imageId + ' ' + _data.name, {silent:silent});
                     var outRemove = nsShell.exec('docker rmi ' + _data.oldName, {silent:silent});
 
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
+                    response.writeHeader(200, HEADER.TEXT);
                     response.write(JSON.stringify(out));
                     response.end();
                 });
@@ -283,25 +293,28 @@ try {
                         out = API.runShell(cmd, false);
                     }
 
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
+                    response.writeHeader(200, HEADER.TEXT);
                     response.write(JSON.stringify(out));
                     response.end();
-                    /*
-                        // cmd+= imageId + ' ' + initialCommand;
+                });
+                break;
 
-                        API.run('containers/' + name + '?force=1', null, false, true, false);
-                        var created = API.run('containers/create?name=' + name, {
-                            Cmd: initialCommand,
-                            Image: imageId
-                        }, true);
-
-                        var containerId = JSON.parse(created).result.Id;
-                        out = API.run('containers/' + containerId + '/start?name=' + name, {RestartPolicy: {Name: 'always'}}, true, false, false);
+            case pathname == '/play-container':
+                var data = [];
+                request.on('data', function(chunk) {
+                    data.push(chunk);
+                }).on('end', function() {
+                    data = Buffer.concat(data).toString().trim().split('&');
+                    var _data = {};
+                    for(var i=0,l=data.length;i<l;i++) {
+                        _data[data[i].trim().split('=')[0]] = data[i].trim().split('=')[1];
                     }
+                    _data.containerId = decodeURIComponent(_data.containerId);
 
-                    response.writeHeader(200, {'Content-type': 'application/json'});
-                    response.write(created);
-                    response.end();*/
+                    response.writeHeader(200, HEADER.TEXT);
+                    // response.write('{result:{}}');
+                    response.write(API.run('containers/' + _data.containerId + '/start', {}, true, false, false));
+                    response.end();
                 });
                 break;
 
@@ -317,8 +330,27 @@ try {
                     }
                     _data.containerId = decodeURIComponent(_data.containerId);
 
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
+                    response.writeHeader(200, HEADER.TEXT);
                     response.write(API.run('containers/' + _data.containerId + '/stop', {}, true, false, false));
+                    response.end();
+                });
+                break;
+
+            case pathname == '/container-remove':
+                var data = [];
+                request.on('data', function(chunk) {
+                    data.push(chunk);
+                }).on('end', function() {
+                    data = Buffer.concat(data).toString().trim().split('&');
+                    var _data = {};
+                    for(var i=0,l=data.length;i<l;i++) {
+                        _data[data[i].trim().split('=')[0]] = data[i].trim().split('=')[1];
+                    }
+                    _data.containerId = decodeURIComponent(_data.containerId);
+                    API.run('containers/' + _data.containerId + '/stop', {}, true, false, false);
+
+                    response.writeHeader(200, HEADER.TEXT);
+                    response.write(API.run('containers/' + _data.containerId, {'force': true, 'v' : true}, false, true, false));
                     response.end();
                 });
                 break;
@@ -335,7 +367,7 @@ try {
                     }
                     _data.containerId = decodeURIComponent(_data.containerId);
 
-                    response.writeHeader(200, {'Content-type': 'application/json'});
+                    response.writeHeader(200, HEADER.JSON);
                     response.write(API.run('containers/' + _data.containerId + '/json', {}, false, false, true));
                     response.end();
                 });
@@ -343,7 +375,7 @@ try {
 
             case pathname == '/container-presets':
                 var presets = nsIni.parse(nsFs.readFileSync('./container-presets.ini', 'utf-8'));
-                response.writeHeader(200, {'Content-type': 'text/plain'});
+                response.writeHeader(200, HEADER.TEXT);
                 response.write(JSON.stringify(presets));
                 response.end();
                 break;
@@ -353,7 +385,7 @@ try {
                     if (err) {
                         throw err;
                     }
-                    response.writeHeader(200, {'Content-type': 'text/javascript'});
+                    response.writeHeader(200, HEADER.JS);
                     response.write(js);
                     response.end();
                 });
@@ -364,7 +396,7 @@ try {
                     if (err) {
                         throw err;
                     }
-                    response.writeHeader(200, {'Content-type': 'text/css'});
+                    response.writeHeader(200, HEADER.CSS);
                     response.write(css);
                     response.end();
                 });
@@ -375,7 +407,7 @@ try {
                     if (err) {
                         throw err;
                     }
-                    response.writeHeader(200, {'Content-type': 'text/plain'});
+                    response.writeHeader(200, HEADER.TEXT);
                     response.write(font);
                     response.end();
                 });
@@ -386,7 +418,7 @@ try {
                     if (err) {
                         throw err;
                     }
-                    response.writeHeader(200, {'Content-type': 'image/gif'});
+                    response.writeHeader(200, HEADER.GIF);
                     response.write(gif);
                     response.end();
                 });
@@ -397,7 +429,7 @@ try {
                     if (err) {
                         throw err;
                     }
-                    response.writeHeader(200, {'Content-type': 'image/png'});
+                    response.writeHeader(200, HEADER.PNG);
                     response.write(png);
                     response.end();
                 });
@@ -408,7 +440,7 @@ try {
                     if (err) {
                         throw err;
                     }
-                    response.writeHeader(200, {'Content-type': 'text/html'});
+                    response.writeHeader(200, HEADER.HTML);
                     response.write(html);
                     response.end();
                 });
