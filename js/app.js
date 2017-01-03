@@ -705,7 +705,7 @@ $(document).ready(function() {
                             '#0039ff',
                             '#0039ff',
                             '#fb00ff',
-                            '#808080'
+                            '#5B7AFF'
                         ];
 
                         K_GLOBAL.TIMER.CONTAINERSTATSCREATED = false;
@@ -735,12 +735,26 @@ $(document).ready(function() {
                                     $('#modal-container-info .modal-body .panel-stats .panel-body #chart').attr('width', $('#modal-container-info .modal-body .panel-stats .panel-body #chart').parent().width());
                                     _indicator = new TimeSeries();
                                     chart = new SmoothieChart({
-                                        millisPerPixel: 20,
-                                        grid: {borderVisible: false},
-                                        labels: {fontSize: 14, precision: 3}
+                                        millisPerPixel: 30,
+                                        grid: {
+                                            millisPerLine: 4000,
+                                            sharpLines:true,
+                                            borderVisible: false,
+                                            strokeStyle:'rgba(119,119,119,0.20)',
+                                            verticalSections: 8,
+                                            lineWidth: 1,
+                                            fillStyle:'#ffffff'
+                                        },
+                                        labels: {
+                                            fontSize: 14,
+                                            precision: 3,
+                                            fillStyle:'#000000'
+                                        },
+                                        timestampFormatter:SmoothieChart.timeFormatter
+                                        // minValue: 0
                                     });
-                                    chart.addTimeSeries(_indicator, {lineWidth:4,strokeStyle: indicatorColors[0], fillStyle:'rgba(0, 255, 0, 0.4)'});
-                                    chart.streamTo($('#modal-container-info .modal-body .panel-stats .panel-body #chart')[0], 5000);
+                                    chart.addTimeSeries(_indicator, {lineWidth:4,strokeStyle: indicatorColors[6], fillStyle:'rgba(91,122,255,0.30)'});
+                                    chart.streamTo($('#modal-container-info .modal-body .panel-stats .panel-body #chart')[0], 4000);
 
                                     // Highcharts.setOptions({
                                     //     global: {
@@ -837,7 +851,7 @@ $(document).ready(function() {
                             });
                         };
                         K_GLOBAL.TIMER.CONTAINERSTATS();
-                        K_GLOBAL.TIMER.CONTAINERSTATSINTERVAL = setInterval(K_GLOBAL.TIMER.CONTAINERSTATS, 5000);
+                        K_GLOBAL.TIMER.CONTAINERSTATSINTERVAL = setInterval(K_GLOBAL.TIMER.CONTAINERSTATS, 4000);
 
                         break;
                 }
