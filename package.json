@@ -19,6 +19,8 @@
     "web-terminal": "latest",
     "socket.io": "latest",
     "sh.js": "latest",
-    "ini": "latest"
+    "ini": "latest",
+    "smoothie": "latest",
+    "highcharts": "latest"
   }
 }

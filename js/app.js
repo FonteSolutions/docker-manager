@@ -18,6 +18,14 @@ $(document).ready(function() {
         version: null
     };
 
+    var K_GLOBAL = {
+        TIMER: {
+            CONTAINERSTATS: false,
+            CONTAINERSTATSINTERVAL: null,
+            CONTAINERSTATSCREATED: false
+        }
+    };
+
     function formatBytes(bytes,decimals) {
         if(bytes == 0) return '0 Byte';
         var k = 1000; // or 1024 for binary
@@ -667,38 +675,170 @@ $(document).ready(function() {
                         wdtLoading.start({
                             'category': 'pulling-image'
                         });
-                        $('#modal-container-info .modal-body table.tb-container-top').hide();
+                        // $('#modal-container-info .modal-body table.tb-container-top').hide();
+
                         $.post('/container-top',{'containerId':containerId}, function(dataTop, textStatus, event) {
-                            $.post('/container-stats',{'containerId':containerId}, function(dataStats, textStatus, event) {
-                                wdtLoading.done();
-                                $('#modal-container-info .modal-body table.tb-container-top').show();
-                                var html = '';
-                                for(var i in dataTop.result.Processes) {
-                                    var item = dataTop.result.Processes[i];
-                                    html+= '<tr>';
-                                    for(var j in item) {
-                                        html+= '<td>' + item[j] + '</td>';
-                                    }
-                                    html+= '</tr>';
-                                }
-                                $('#modal-container-info .modal-body table.tb-container-top tbody').html(html);
-                                var html = '<tr>';
-                                for(var i in dataTop.result.Titles) {
-                                    var item = dataTop.result.Titles[i];
-                                    html+= '<th>' + item + '</th>';
+                            wdtLoading.done();
+                            var html = '';
+                            for(var i in dataTop.result.Processes) {
+                                var item = dataTop.result.Processes[i];
+                                html+= '<tr>';
+                                for(var j in item) {
+                                    html+= '<td>' + item[j] + '</td>';
                                 }
                                 html+= '</tr>';
-                                $('#modal-container-info .modal-body table.tb-container-top thead').html(html);
-                                console.log('topp', dataTop);
-                                console.log('stats', dataStats);
-                                // @TODO STATS
-                                // cpu_stats.cpu_usage.percpu_usage[]
-                                // cpu_stats.cpu_usage.total_usage
-                                // cpu_stats.system_cpu_usage
-                                // cpu_stats.networks[]
+                            }
+                            $('#modal-container-info .modal-body table.tb-container-top tbody').html(html);
+                            var html = '<tr>';
+                            for(var i in dataTop.result.Titles) {
+                                var item = dataTop.result.Titles[i];
+                                html+= '<th>' + item + '</th>';
+                            }
+                            html+= '</tr>';
+                            $('#modal-container-info .modal-body table.tb-container-top thead').html(html);
+                        });
+
+                        var indicatorColors = [
+                            '#00ff00',
+                            '#fffd00',
+                            '#ff000f',
+                            '#0039ff',
+                            '#0039ff',
+                            '#fb00ff',
+                            '#808080'
+                        ];
+
+                        K_GLOBAL.TIMER.CONTAINERSTATSCREATED = false;
+
+                        var calculateCPUPercent = function(_lastCPU, _lastSystem, _cpu, _system, _processors) {
+                            var percent = 0.0;
+                            var cpuDelta = parseFloat(_cpu - _lastCPU);
+                            var systemDelta = parseFloat(_system - _lastSystem);
+
+                            if(cpuDelta > 0 && systemDelta > 0) {
+                                percent = cpuDelta / systemDelta * parseFloat(_processors) * 100.0;
+                            }
+
+                            return percent;
+                        };
+
+                        var lastTotalCPU = 0;
+                        var lastSystemCPU = 0;
+                        var chart;
+                        var _indicator = new TimeSeries();
+                        var series;
+
+                        K_GLOBAL.TIMER.CONTAINERSTATS = function () {
+                            $.post('/container-stats',{'containerId':containerId}, function(dataStats, textStatus, event) {
+                                if(!K_GLOBAL.TIMER.CONTAINERSTATSCREATED) {
+                                    $('#modal-container-info .modal-body .panel-stats .panel-body').html($('<canvas id="chart" width="400" height="160"></canvas>'))
+                                    $('#modal-container-info .modal-body .panel-stats .panel-body #chart').attr('width', $('#modal-container-info .modal-body .panel-stats .panel-body #chart').parent().width());
+                                    _indicator = new TimeSeries();
+                                    chart = new SmoothieChart({
+                                        millisPerPixel: 20,
+                                        grid: {borderVisible: false},
+                                        labels: {fontSize: 14, precision: 3}
+                                    });
+                                    chart.addTimeSeries(_indicator, {lineWidth:4,strokeStyle: indicatorColors[0], fillStyle:'rgba(0, 255, 0, 0.4)'});
+                                    chart.streamTo($('#modal-container-info .modal-body .panel-stats .panel-body #chart')[0], 5000);
+
+                                    // Highcharts.setOptions({
+                                    //     global: {
+                                    //         useUTC: false
+                                    //     }
+                                    // });
+                                    // Highcharts.chart('container', {
+                                    //     chart: {
+                                    //         type: 'spline',
+                                    //         animation: Highcharts.svg,
+                                    //         marginRight: 10,
+                                    //         events: {
+                                    //             load: function() {
+                                    //                 series = this.series[0];
+                                    //                 // setInterval(function () {
+                                    //                 //     var x = (new Date()).getTime();
+                                    //                 //     var y = Math.random();
+                                    //                 //     series.addPoint([x, y], true, true);
+                                    //                 // }, 1000);
+                                    //             }
+                                    //         }
+                                    //     },
+                                    //     title: {
+                                    //         text: 'Test e tals'
+                                    //     },
+                                    //     xAxis: {
+                                    //         type: 'datetime',
+                                    //         tickPixelInterval: 150
+                                    //     },
+                                    //     yAxis: {
+                                    //         title: {
+                                    //             text: 'Value'
+                                    //         },
+                                    //         plotLines: [{
+                                    //             value: 0,
+                                    //             width: 1,
+                                    //             color: '#808080'
+                                    //         }]
+                                    //     },
+                                    //     tooltip: {
+                                    //         formatter: function() {
+                                    //             return '<b>' + this.series.name + '</b><br />' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br />' + Highcharts.numberFormat(this.y, 2);
+                                    //         }
+                                    //     },
+                                    //     legend: {
+                                    //         enabled: false
+                                    //     },
+                                    //     exporting: {
+                                    //         enabled: false
+                                    //     },
+                                    //     series: [{
+                                    //         name: 'Randommm',
+                                    //         data: (function() {
+                                    //             var data = [];
+                                    //             var time = (new Date()).getTime();
+                                    //             var i;
+                                    //             for(i = -50; i<=0; i++) {
+                                    //                 data.push({
+                                    //                     x: time + i * 1000,
+                                    //                     y: 0
+                                    //                 });
+                                    //             }
+                                    //             return data;
+                                    //         }())
+                                    //     }]
+                                    // });
+                                    K_GLOBAL.TIMER.CONTAINERSTATSCREATED = true;
+                                }
+
+                                var totalCPU = dataStats.result.cpu_stats.cpu_usage.total_usage;
+                                var systemCPU = dataStats.result.cpu_stats.system_cpu_usage;
+                                var processors = dataStats.result.cpu_stats.cpu_usage.percpu_usage.length;
+                                var percent = 0.0;
+
+                                if(lastTotalCPU > 0 && lastSystemCPU > 0) {
+                                    percent = calculateCPUPercent(lastTotalCPU, lastSystemCPU, totalCPU, systemCPU, processors);
+                                }
+
+                                _indicator.append(new Date().getTime(), percent);
+                                // var x = (new Date()).getTime();
+                                // var y = percent;
+                                // series.addPoint([x, y], true, true);
+
+                                lastTotalCPU = totalCPU;
+                                lastSystemCPU = systemCPU;
+
+                                // @TODO NETWORK
+                                // console.log('networks', dataStats.result.networks);
+
+                                if(K_GLOBAL.TIMER.CONTAINERSTATS) {
+                                    // K_GLOBAL.TIMER.CONTAINERSTATS();
+                                }
 
                             });
-                        });
+                        };
+                        K_GLOBAL.TIMER.CONTAINERSTATS();
+                        K_GLOBAL.TIMER.CONTAINERSTATSINTERVAL = setInterval(K_GLOBAL.TIMER.CONTAINERSTATS, 5000);
+
                         break;
                 }
 
@@ -732,6 +872,17 @@ $(document).ready(function() {
                 $('#modal-container-info').modal('show');
             }
         });
+    });
+
+    $('#modal-container-info').on('hide.bs.modal', function() {
+        // K_GLOBAL.TIMER.CONTAINERSTATS = false;
+        clearInterval(K_GLOBAL.TIMER.CONTAINERSTATSINTERVAL);
+    });
+
+    $('#btn-containers-stats').on('click', function() {
+        $('#modal-containers-stats').modal('show');
+
+        //@TODO containers stats
     });
 
     /**
