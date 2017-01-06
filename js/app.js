@@ -22,7 +22,10 @@ $(document).ready(function() {
         TIMER: {
             CONTAINERSTATS: false,
             CONTAINERSTATSINTERVAL: null,
-            CONTAINERSTATSCREATED: false
+            CONTAINERSTATSCREATED: false,
+            ALLCONTAINERSTATS: false,
+            ALLCONTAINERSTATSINTERVAL: null,
+            ALLCONTAINERSTATSCREATED: false
         }
     };
 
@@ -47,11 +50,22 @@ $(document).ready(function() {
     });
 
     $('.btn-open-server-info').on('click', function() {
+        var apiVersions = {
+            '1.12': '1.24',
+            '1.11': '1.23',
+            '1.10': '1.22',
+            '1.9': '1.21',
+            '1.8': '1.20',
+            '1.7': '1.19',
+            '1.6': '1.18'
+        };
         $.getJSON('/server-status', function(data, textStatus, event) {
             initialLoads.loaded();
             if(event.status == 200) {
                 $('#modal-server-info .modal-body ul').html('');
                 var html = '<li class="list-group-item">Name <span class="label label-right label-default">' + data.result.Name + '</span></li>';
+                html+= '<li class="list-group-item">Docker Version <span class="label label-right label-default">' + data.result.ServerVersion + '</span></li>';
+                html+= '<li class="list-group-item">Docker API Version <span class="label label-right label-default">' + apiVersions[data.result.ServerVersion.substr(0, 4)] + '</span></li>';
                 html+= '<li class="list-group-item">OS <span class="label label-right label-default">' + data.result.OperatingSystem + ' / ' + data.result.Architecture + '</span></li>';
                 html+= '<li class="list-group-item">MemTotal <span class="label label-right label-default">' + formatBytes(data.result.MemTotal) + '</span></li>';
                 html+= '<li class="list-group-item">CPUs <span class="label label-right label-default">' + data.result.NCPU + '</span></li>';
@@ -137,16 +151,22 @@ $(document).ready(function() {
                 if(data.result.length == 0) {
                     $('#containers-list-none').show();
                     $('#containers-list').hide();
+                    $('#btn-containers-stats').hide();
                     return;
                 }
 
                 $('#containers-list-none').hide();
                 $('#containers-list').show();
+                $('#btn-containers-stats').show();
 
                 for(var i=0,l=data.result.length;i<l;i++) {
                     var item = data.result[i];
+                    var haveWebPort = false
                     var ports = '';
                     for(var j=0,k=item.Ports.length;j<k;j++) {
+                        if(item.Ports[j].PrivatePort == 80) {
+                            haveWebPort = item.Ports[j].PublicPort;
+                        }
                         ports+= '<span class="label label-default">' + item.Ports[j].PrivatePort + ' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ' + item.Ports[j].PublicPort + '</span> ';
                     }
                     // Beginning all stopped
@@ -171,13 +191,17 @@ $(document).ready(function() {
                             break;
                     }
 
-                    var html =  '<tr class="container-item ' + statusBgClass + '" data-image-id="' + item.Id + '">' +
+                    var IPAddress = item.NetworkSettings.Networks.bridge.IPAddress;
+                    if(haveWebPort) {
+                        IPAddress = '<a title="Open URL in other tab" rel="tooltip" target="_blank" href="http://localhost:' + haveWebPort + '/">' + IPAddress + '</a>';
+                    }
+
+                    var html =  '<tr class="font-terminal container-item ' + statusBgClass + '" data-image-id="' + item.Id + '">' +
                                     '<td class="text-center">' + item.Id.substr(0, 12) + '</td>' +
                                     '<td class="text-center container-name"><strong>' + item.Names[0].substr(1) + '</strong></td>' +
                                     '<td>' + item.Image + '</td>' +
                                     '<td>' + ports + '</td>' +
-                                    '<td>' + item.Command + '</td>' +
-                                    '<td>' + statusString + '</td>' +
+                                    '<td class="text-center">' + IPAddress + '</td>' +
                                     '<td class="text-center">' +
                                         '<div class="btn-group">' +
                                             '<button rel="tooltip" title="Info" class="btn btn-xs btn-info btn-container-info"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span></button>' +
@@ -321,9 +345,6 @@ $(document).ready(function() {
                 '<button class="btn btn-sm btn-danger btn-remove-port"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>' +
             '</div>';
         $('#form-image-run .list-ports').append(html);
-        if($('#form-image-run .list-ports').next()[0].tagName == 'HR') {
-            $('#form-image-run .list-ports').after('<br clear="both" />');
-        }
     });
 
     $('#form-image-run .list-ports').on('click', '.btn-remove-port', function () {
@@ -349,9 +370,6 @@ $(document).ready(function() {
                 '<button class="btn btn-sm btn-danger btn-remove-volume"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>' +
             '</div>';
         $('#form-image-run .list-volumes').append(html);
-        if($('#form-image-run .list-volumes').next()[0].tagName == 'HR') {
-            $('#form-image-run .list-volumes').after('<br clear="both" />');
-        }
     });
 
     $('#form-image-run .list-volumes').on('click', '.btn-remove-volume', function () {
@@ -381,6 +399,28 @@ $(document).ready(function() {
     });
 
     /**
+     * Env
+     */
+    $('#form-image-run .btn-add-env').on('click', function () {
+        var html = '<div class="env">' +
+            '<div class="col-xs-5 text-center">' +
+                '<input type="text" class="form-control param" placeholder="param" name="env-param[]" />' +
+            '</div>' +
+            '<div class="col-xs-1 text-center divisor"><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span></div>' +
+            '<div class="col-xs-5 text-center">' +
+                '<input type="text" class="form-control value" placeholder="value" name="env-value[]" />' +
+            '</div>' +
+            '<div class="col-xs-1 text-center">' +
+                '<button class="btn btn-sm btn-danger btn-remove-env"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>' +
+            '</div>';
+        $('#form-image-run .list-envs').append(html);
+    });
+
+    $('#form-image-run .list-envs').on('click', '.btn-remove-env', function () {
+        $(this).closest('.env').remove();
+    });
+
+    /**
      * Open modal Run Image
      */
     var containerPresets = [];
@@ -390,11 +430,9 @@ $(document).ready(function() {
 
         $('#modal-run-image').modal('show');
         $('#form-image-run .list-ports .port').remove();
-        $('#form-image-run .list-ports').next()[0].tagName == 'BR' ? $('#form-image-run .list-ports').next().remove() : '';
         $('#form-image-run .list-volumes .volume').remove();
-        $('#form-image-run .list-volumes').next()[0].tagName == 'BR' ? $('#form-image-run .list-volumes').next().remove() : '';
         $('#form-image-run .list-links .link').remove();
-        $('#form-image-run .list-links').next() && [0].tagName == 'BR' ? $('#form-image-run .list-links').next().remove() : '';
+        $('#form-image-run .list-envs .env').remove();
 
         $('#form-image-run .image-id').val(imageId);
         $('#form-image-run .input-name').val('');
@@ -437,21 +475,13 @@ $(document).ready(function() {
             $('#form-image-run .list-ports .port[data-preset-name="' + name + '"]').remove();
             $('#form-image-run .list-volumes .volume[data-preset-name="' + name + '"]').remove();
             $('#form-image-run .list-links .link[data-preset-name="' + name + '"]').remove();
-
-            if($('#form-image-run .list-ports .port').length == 0) {
-                $('#form-image-run .list-ports').next()[0].tagName == 'BR' ? $('#form-image-run .list-ports').next().remove() : '';
-            }
-            if($('#form-image-run .list-volumes .volume').length == 0) {
-                $('#form-image-run .list-volumes').next()[0].tagName == 'BR' ? $('#form-image-run .list-volumes').next().remove() : '';
-            }
-            if($('#form-image-run .list-links .link').length == 0) {
-                $('#form-image-run .list-links').next()[0].tagName == 'BR' ? $('#form-image-run .list-links').next().remove() : '';
-            }
+            $('#form-image-run .list-envs .env[data-preset-name="' + name + '"]').remove();
         } else {
             $(this).addClass('bg-success');
             var name = $(this).data('container-preset-name');
             var preset = $(this).data('container-preset-data');
 
+            // SET CONTAINER-PRESETS.INI PARAMS
             if(preset.name) {
                 $('#form-image-run .input-name').val(preset.name);
             }
@@ -470,14 +500,20 @@ $(document).ready(function() {
             if(preset.interactive === false) {
                 $('#interactive').prop('checked', false);
             }
+            if(preset.background === true) {
+                $('#background').prop('checked', true);
+            }
+            if(preset.background === false) {
+                $('#background').prop('checked', false);
+            }
             for(ports in preset.ports) {
                 for(port in preset.ports[ports]) {
                     var _port = preset.ports[ports][port].split(':');
                     if($.trim(_port[0]).length > 0 && $.trim(_port[1]).length > 0) {
                         $('#form-image-run .btn-add-port').trigger('click');
                         $('#form-image-run .list-ports .port:last').attr('data-preset-name', name);
-                        $('#form-image-run .list-ports .port:last .local').val(_port[0]).attr('readonly', true);
-                        $('#form-image-run .list-ports .port:last .docker').val(_port[1]).attr('readonly', true);
+                        $('#form-image-run .list-ports .port:last .local').val(_port[0]);//.attr('readonly', true);
+                        $('#form-image-run .list-ports .port:last .docker').val(_port[1]);//.attr('readonly', true);
                     }
                 }
             }
@@ -487,8 +523,8 @@ $(document).ready(function() {
                     if($.trim(_volume[0]).length > 0 && $.trim(_volume[1]).length > 0) {
                         $('#form-image-run .btn-add-volume').trigger('click');
                         $('#form-image-run .list-volumes .volume:last').attr('data-preset-name', name);
-                        $('#form-image-run .list-volumes .volume:last .local').val(_volume[0]).attr('readonly', true);
-                        $('#form-image-run .list-volumes .volume:last .docker').val(_volume[1]).attr('readonly', true);
+                        $('#form-image-run .list-volumes .volume:last .local').val(_volume[0]);//.attr('readonly', true);
+                        $('#form-image-run .list-volumes .volume:last .docker').val(_volume[1]);//.attr('readonly', true);
                     }
                 }
             }
@@ -498,11 +534,24 @@ $(document).ready(function() {
                     if($.trim(_link[0]).length > 0 && $.trim(_link[1]).length > 0) {
                         $('#form-image-run .btn-add-link').trigger('click');
                         $('#form-image-run .list-links .link:last').attr('data-preset-name', name);
-                        $('#form-image-run .list-links .link:last .local').val(_link[0]).attr('readonly', true);
-                        $('#form-image-run .list-links .link:last .docker').val(_link[1]).attr('readonly', true);
+                        $('#form-image-run .list-links .link:last .local').val(_link[0]);//.attr('readonly', true);
+                        $('#form-image-run .list-links .link:last .docker').val(_link[1]);//.attr('readonly', true);
                     }
                 }
             }
+            for(envs in preset.envs) {
+                for(env in preset.envs[envs]) {
+                    var _env = preset.envs[envs][env].split(':');
+                    if($.trim(_env[0]).length > 0 && $.trim(_env[1]).length > 0) {
+                        $('#form-image-run .btn-add-env').trigger('click');
+                        $('#form-image-run .list-envs .env:last').attr('data-preset-name', name);
+                        $('#form-image-run .list-envs .env:last .param').val(_env[0]);//.attr('readonly', true);
+                        $('#form-image-run .list-envs .env:last .value').val(_env[1]);//.attr('readonly', true);
+                    }
+                }
+            }
+            // GO TO THE FIRST TAB
+            $('#form-image-run a[href="#run-image-ports"]').click();
         }
     });
 
@@ -514,6 +563,7 @@ $(document).ready(function() {
         $.post('/run-image', $('#form-image-run').serializeArray(), function(data, textStatus, event) {
             wdtLoading.done();
             if (event.status == 200) {
+                $('.btn-view-containers').click();
                 $('#btn-containers-refresh').trigger('click');
 
             }
@@ -662,23 +712,35 @@ $(document).ready(function() {
                         statusClass = 'label-warning';
                         statusBgClass = 'bg-warning';
                         statusString = 'Exited';
+                        $('#modal-container-info .modal-body .panel-stats').hide();
+                        $('#modal-container-info .modal-body .panel-top').hide();
+                        $('#modal-container-info .modal-body .panel-network').hide();
+                        $('#modal-container-info .modal-body .panel-stats .panel-body').html('');
+                        console.log("sumir");
                         break;
                     case 'created':
                         statusClass = 'label-info';
                         statusBgClass = 'bg-info';
                         statusString = 'Created';
+                        $('#modal-container-info .modal-body .panel-stats').hide();
+                        $('#modal-container-info .modal-body .panel-top').hide();
+                        $('#modal-container-info .modal-body .panel-network').hide();
+                        $('#modal-container-info .modal-body .panel-stats .panel-body').html('');
                         break;
                     case 'running':
                         statusClass = 'label-success';
                         statusBgClass = 'bg-success';
                         statusString = 'Running';
+                        $('#modal-container-info .modal-body .panel-stats').show();
+                        $('#modal-container-info .modal-body .panel-top').show();
+                        $('#modal-container-info .modal-body .panel-network').show();
+
                         wdtLoading.start({
                             'category': 'pulling-image'
                         });
-                        // $('#modal-container-info .modal-body table.tb-container-top').hide();
 
+                        // Top
                         $.post('/container-top',{'containerId':containerId}, function(dataTop, textStatus, event) {
-                            wdtLoading.done();
                             var html = '';
                             for(var i in dataTop.result.Processes) {
                                 var item = dataTop.result.Processes[i];
@@ -719,140 +781,224 @@ $(document).ready(function() {
                                 percent = cpuDelta / systemDelta * parseFloat(_processors) * 100.0;
                             }
 
-                            return percent;
+                            return percent / _processors;
                         };
 
+                        var bytesToSize = function(bytes) {
+                            var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                            if (bytes == 0) return [0, sizes[0]];
+                            var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+                            return [Math.round(bytes / Math.pow(1024, i), 2), sizes[i]];
+                        };
+
+                        var reloadTime = 3000;
                         var lastTotalCPU = 0;
                         var lastSystemCPU = 0;
-                        var chart;
-                        var _indicator = new TimeSeries();
-                        var series;
+                        var lastReceivedBytes = 0;
+                        var lastTransmitBytes = 0;
+                        var seriesProcessors, seriesNetworkReceived, seriesNetworkTransmit;
 
                         K_GLOBAL.TIMER.CONTAINERSTATS = function () {
                             $.post('/container-stats',{'containerId':containerId}, function(dataStats, textStatus, event) {
                                 if(!K_GLOBAL.TIMER.CONTAINERSTATSCREATED) {
-                                    $('#modal-container-info .modal-body .panel-stats .panel-body').html($('<canvas id="chart" width="400" height="160"></canvas>'))
-                                    $('#modal-container-info .modal-body .panel-stats .panel-body #chart').attr('width', $('#modal-container-info .modal-body .panel-stats .panel-body #chart').parent().width());
-                                    _indicator = new TimeSeries();
-                                    chart = new SmoothieChart({
-                                        millisPerPixel: 30,
-                                        grid: {
-                                            millisPerLine: 4000,
-                                            sharpLines:true,
-                                            borderVisible: false,
-                                            strokeStyle:'rgba(119,119,119,0.20)',
-                                            verticalSections: 8,
-                                            lineWidth: 1,
-                                            fillStyle:'#ffffff'
-                                        },
-                                        labels: {
-                                            fontSize: 14,
-                                            precision: 3,
-                                            fillStyle:'#000000'
-                                        },
-                                        timestampFormatter:SmoothieChart.timeFormatter
-                                        // minValue: 0
+                                    wdtLoading.done();
+                                    // Processors
+                                    $('#modal-container-info .modal-body .panel-stats .panel-body').html($('<div id="chart-processors" style="min-width: 310px;height: 190px; margin: 0 auto;"></div>'));
+                                    Highcharts.setOptions({
+                                        global: {
+                                            useUTC: false
+                                        }
                                     });
-                                    chart.addTimeSeries(_indicator, {lineWidth:4,strokeStyle: indicatorColors[6], fillStyle:'rgba(91,122,255,0.30)'});
-                                    chart.streamTo($('#modal-container-info .modal-body .panel-stats .panel-body #chart')[0], 4000);
+                                    Highcharts.chart('chart-processors', {
+                                        chart: {
+                                            type: 'spline',
+                                            animation: Highcharts.svg,
+                                            marginRight: 10,
+                                            events: {
+                                                load: function() {
+                                                    seriesProcessors = this.series[0];
+                                                }
+                                            }
+                                        },
+                                        title: {
+                                            text: 'CPU Stats'
+                                        },
+                                        xAxis: {
+                                            type: 'datetime',
+                                            tickPixelInterval: 150
+                                        },
+                                        yAxis: {
+                                            title: {
+                                                text: 'Percent'
+                                            },
+                                            plotLines: [{
+                                                value: 0,
+                                                width: 1,
+                                                color: '#808080'
+                                            }]
+                                        },
+                                        tooltip: {
+                                            formatter: function() {
+                                                return '<b>' + this.series.name + '</b><br />' + Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x) + '<br />' + Highcharts.numberFormat(this.y, 3) + '%';
+                                            }
+                                        },
+                                        plotOptions: {
+                                            spline: {
+                                                marker: {
+                                                    enabled: true
+                                                }
+                                            }
+                                        },
+                                        legend: {
+                                            enabled: true
+                                        },
+                                        exporting: {
+                                            enabled: false
+                                        },
+                                        series: [{
+                                            name: '% Used from CPU',
+                                            data: (function() {
+                                                var data = [];
+                                                var time = (new Date()).getTime();
+                                                var i;
+                                                for(i = -50; i<=0; i++) {
+                                                    data.push({
+                                                        x: time + i * 1000,
+                                                        y: 0
+                                                    });
+                                                }
+                                                return data;
+                                            }())
+                                        }]
+                                    });
 
-                                    // Highcharts.setOptions({
-                                    //     global: {
-                                    //         useUTC: false
-                                    //     }
-                                    // });
-                                    // Highcharts.chart('container', {
-                                    //     chart: {
-                                    //         type: 'spline',
-                                    //         animation: Highcharts.svg,
-                                    //         marginRight: 10,
-                                    //         events: {
-                                    //             load: function() {
-                                    //                 series = this.series[0];
-                                    //                 // setInterval(function () {
-                                    //                 //     var x = (new Date()).getTime();
-                                    //                 //     var y = Math.random();
-                                    //                 //     series.addPoint([x, y], true, true);
-                                    //                 // }, 1000);
-                                    //             }
-                                    //         }
-                                    //     },
-                                    //     title: {
-                                    //         text: 'Test e tals'
-                                    //     },
-                                    //     xAxis: {
-                                    //         type: 'datetime',
-                                    //         tickPixelInterval: 150
-                                    //     },
-                                    //     yAxis: {
-                                    //         title: {
-                                    //             text: 'Value'
-                                    //         },
-                                    //         plotLines: [{
-                                    //             value: 0,
-                                    //             width: 1,
-                                    //             color: '#808080'
-                                    //         }]
-                                    //     },
-                                    //     tooltip: {
-                                    //         formatter: function() {
-                                    //             return '<b>' + this.series.name + '</b><br />' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br />' + Highcharts.numberFormat(this.y, 2);
-                                    //         }
-                                    //     },
-                                    //     legend: {
-                                    //         enabled: false
-                                    //     },
-                                    //     exporting: {
-                                    //         enabled: false
-                                    //     },
-                                    //     series: [{
-                                    //         name: 'Randommm',
-                                    //         data: (function() {
-                                    //             var data = [];
-                                    //             var time = (new Date()).getTime();
-                                    //             var i;
-                                    //             for(i = -50; i<=0; i++) {
-                                    //                 data.push({
-                                    //                     x: time + i * 1000,
-                                    //                     y: 0
-                                    //                 });
-                                    //             }
-                                    //             return data;
-                                    //         }())
-                                    //     }]
-                                    // });
+                                    // Network
+                                    $('#modal-container-info .modal-body .panel-network .panel-body').html($('<div id="chart-network" style="min-width: 310px;height: 190px; margin: 0 auto;"></div>'));
+                                    Highcharts.setOptions({
+                                        global: {
+                                            useUTC: false
+                                        }
+                                    });
+                                    Highcharts.chart('chart-network', {
+                                        chart: {
+                                            type: 'spline',
+                                            animation: Highcharts.svg,
+                                            marginRight: 10,
+                                            events: {
+                                                load: function() {
+                                                    seriesNetworkReceived = this.series[0];
+                                                    seriesNetworkTransmit = this.series[1];
+                                                }
+                                            }
+                                        },
+                                        title: {
+                                            text: 'Network Stats'
+                                        },
+                                        xAxis: {
+                                            type: 'datetime',
+                                            tickPixelInterval: 150
+                                        },
+                                        yAxis: {
+                                            title: {
+                                                text: 'Bytes'
+                                            },
+                                            plotLines: [{
+                                                value: 0,
+                                                width: 1,
+                                                color: '#808080'
+                                            }]
+                                        },
+                                        tooltip: {
+                                            formatter: function() {
+                                                var y = bytesToSize(this.y);
+                                                return '<b>' + this.series.name + '</b><br />' + Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x) + '<br />' + y[0] + y[1];
+                                            }
+                                        },
+                                        plotOptions: {
+                                            spline: {
+                                                marker: {
+                                                    enabled: true
+                                                }
+                                            }
+                                        },
+                                        legend: {
+                                            enabled: true
+                                        },
+                                        exporting: {
+                                            enabled: false
+                                        },
+                                        series: [{
+                                            name: 'Received',
+                                            data: (function() {
+                                                var data = [];
+                                                var time = (new Date()).getTime();
+                                                var i;
+                                                for(i = -50; i<=0; i++) {
+                                                    data.push({
+                                                        x: time + i * 1000,
+                                                        y: 0
+                                                    });
+                                                }
+                                                return data;
+                                            }())
+                                        }, {
+                                            name: 'Transmit',
+                                            data: (function() {
+                                                var data = [];
+                                                var time = (new Date()).getTime();
+                                                var i;
+                                                for(i = -50; i<=0; i++) {
+                                                    data.push({
+                                                        x: time + i * 1000,
+                                                        y: 0
+                                                    });
+                                                }
+                                                return data;
+                                            }())
+                                        }]
+                                    });
+
                                     K_GLOBAL.TIMER.CONTAINERSTATSCREATED = true;
                                 }
 
+                                // Processors
                                 var totalCPU = dataStats.result.cpu_stats.cpu_usage.total_usage;
                                 var systemCPU = dataStats.result.cpu_stats.system_cpu_usage;
                                 var processors = dataStats.result.cpu_stats.cpu_usage.percpu_usage.length;
                                 var percent = 0.0;
-
                                 if(lastTotalCPU > 0 && lastSystemCPU > 0) {
                                     percent = calculateCPUPercent(lastTotalCPU, lastSystemCPU, totalCPU, systemCPU, processors);
                                 }
-
-                                _indicator.append(new Date().getTime(), percent);
-                                // var x = (new Date()).getTime();
-                                // var y = percent;
-                                // series.addPoint([x, y], true, true);
-
+                                var x = (new Date()).getTime();
+                                var y = percent;
+                                seriesProcessors.addPoint([x, y], true, true);
+                                $('#modal-container-info .modal-body .panel-stats .container-stats-cpu-realtime').text(Highcharts.numberFormat(percent, 3) + '%');
                                 lastTotalCPU = totalCPU;
                                 lastSystemCPU = systemCPU;
 
-                                // @TODO NETWORK
-                                // console.log('networks', dataStats.result.networks);
+                                // Network
+                                var receivedBytes = dataStats.result.networks['eth0'].rx_bytes;
+                                var transmitBytes = dataStats.result.networks['eth0'].tx_bytes;
+                                var totalBytesReceived = lastReceivedBytes == 0 ? 0 : receivedBytes - lastReceivedBytes;
+                                var totalBytesTransmit = lastTransmitBytes == 0 ? 0 : transmitBytes - lastTransmitBytes;
 
-                                if(K_GLOBAL.TIMER.CONTAINERSTATS) {
-                                    // K_GLOBAL.TIMER.CONTAINERSTATS();
-                                }
+                                var x = (new Date()).getTime();
+                                var y = totalBytesReceived;
+                                seriesNetworkReceived.addPoint([x, y], true, true);
+                                var size = bytesToSize(totalBytesReceived);
+                                $('#modal-container-info .modal-body .panel-network .container-stats-network-realtime').text(size[0] + ' ' + size[1]);
+                                var x = (new Date()).getTime();
+                                var y = totalBytesTransmit;
+                                seriesNetworkTransmit.addPoint([x, y], true, true);
+                                var size = bytesToSize(totalBytesTransmit);
+                                $('#modal-container-info .modal-body .panel-network .container-stats-network-realtime').append(' / ' + size[0] + ' ' + size[1]);
 
+                                lastReceivedBytes = receivedBytes;
+                                lastTransmitBytes = transmitBytes;
                             });
                         };
                         K_GLOBAL.TIMER.CONTAINERSTATS();
-                        K_GLOBAL.TIMER.CONTAINERSTATSINTERVAL = setInterval(K_GLOBAL.TIMER.CONTAINERSTATS, 4000);
-
+                        K_GLOBAL.TIMER.CONTAINERSTATSINTERVAL = setInterval(K_GLOBAL.TIMER.CONTAINERSTATS, reloadTime);
                         break;
                 }
 
@@ -889,14 +1035,304 @@ $(document).ready(function() {
     });
 
     $('#modal-container-info').on('hide.bs.modal', function() {
-        // K_GLOBAL.TIMER.CONTAINERSTATS = false;
         clearInterval(K_GLOBAL.TIMER.CONTAINERSTATSINTERVAL);
+        $('#modal-container-info .modal-body .panel-stats').hide();
+        $('#modal-container-info .modal-body .panel-top').hide();
+        $('#modal-container-info .modal-body .panel-network').hide();
+        $('#modal-container-info .modal-body .panel-stats .panel-body').html('');
     });
 
     $('#btn-containers-stats').on('click', function() {
         $('#modal-containers-stats').modal('show');
+        $.getJSON('/list-containers', function(data, textStatus, event) {
+            wdtLoading.start({
+                'category': 'pulling-image'
+            });
 
-        //@TODO containers stats
+            var ids = [];
+            for(var i = 0, l = data.result.length; i < l; i++) {
+                var item = data.result[i];
+                switch(item.State) {
+                    case 'running':
+                        ids.push(item.Id);
+                        break;
+                }
+            }
+
+            K_GLOBAL.TIMER.ALLCONTAINERSTATSCREATED = false;
+
+            var calculateCPUPercent = function(_lastCPU, _lastSystem, _cpu, _system, _processors) {
+                var percent = 0.0;
+                var cpuDelta = parseFloat(_cpu - _lastCPU);
+                var systemDelta = parseFloat(_system - _lastSystem);
+
+                if(cpuDelta > 0 && systemDelta > 0) {
+                    percent = cpuDelta / systemDelta * parseFloat(_processors) * 100.0;
+                }
+
+                return percent / _processors;
+            };
+
+            var bytesToSize = function(bytes) {
+                var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                if (bytes == 0) return [0, sizes[0]];
+                var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+                return [Math.round(bytes / Math.pow(1024, i), 2), sizes[i]];
+            };
+
+            var reloadTime = 4000;
+            var lastTotalCPU = {};
+            var lastSystemCPU = {};
+            var lastReceivedBytes = {};
+            var lastTransmitBytes = {};
+            var seriesProcessors = {}, seriesNetworkReceived = {}, seriesNetworkTransmit = {};
+            K_GLOBAL.TIMER.ALLCONTAINERSTATS = function () {
+                $.post('/container-stats-by-ids', {'ids': ids}, function (dataStats, textStatus, event) {
+                    if(!K_GLOBAL.TIMER.ALLCONTAINERSTATSCREATED) {
+                        wdtLoading.done();
+                        $('#modal-containers-stats .modal-body').html('');
+                        for(var i = 0, l = dataStats.length; i < l; i++) {
+                            var id = dataStats[i].id;
+                            var item = dataStats[i].data.result;
+                            var $tr = $('#containers-list tbody tr[data-image-id=' + id + ']');
+                            var name = $tr.find('.container-name').text();
+
+                            var panelContainer =
+                                '<div class="panel panel-success panel-container" data-container-id="'+ id +'">' +
+                                    '<div class="panel-heading">' + name + '' +
+                                        '<div class="pull-right">' +
+                                            '<span class="label label-default margin-right">Network: <span class="container-stats-network-realtime"></span></span>' +
+                                            '<span class="label label-info">CPU: <span class="container-stats-cpu-realtime"></span></span>' +
+                                        '</div>' +
+                                    '</div>' +
+                                    '<div class="panel-body">' +
+                                        '<div class="col-xs-6 stats">' +
+                                            '<div id="chart-processors-' + id + '" style="min-width: 310px;height: 180px; margin: 0 auto;"></div>' +
+                                        '</div>' +
+                                        '<div class="col-xs-6 network">' +
+                                            '<div id="chart-network-' + id + '" style="min-width: 310px;height: 180px; margin: 0 auto;"></div>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>';
+
+                            $('#modal-containers-stats .modal-body').append(panelContainer);
+
+                            // Processors
+                            Highcharts.setOptions({
+                                global: {
+                                    useUTC: false
+                                }
+                            });
+                            Highcharts.chart('chart-processors-' + id, {
+                                chart: {
+                                    type: 'spline',
+                                    animation: Highcharts.svg,
+                                    marginRight: 10,
+                                    events: {
+                                        load: function() {
+                                            seriesProcessors[id] = this.series[0];
+                                        }
+                                    }
+                                },
+                                title: {
+                                    text: 'CPU Stats'
+                                },
+                                xAxis: {
+                                    type: 'datetime',
+                                    tickPixelInterval: 150
+                                },
+                                yAxis: {
+                                    title: {
+                                        text: 'Percent'
+                                    },
+                                    plotLines: [{
+                                        value: 0,
+                                        width: 1,
+                                        color: '#808080'
+                                    }]
+                                },
+                                tooltip: {
+                                    formatter: function() {
+                                        return '<b>' + this.series.name + '</b><br />' + Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x) + '<br />' + Highcharts.numberFormat(this.y, 3) + '%';
+                                    }
+                                },
+                                plotOptions: {
+                                    spline: {
+                                        marker: {
+                                            enabled: true
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    enabled: true
+                                },
+                                exporting: {
+                                    enabled: false
+                                },
+                                series: [{
+                                    name: '% Used from CPU',
+                                    data: (function() {
+                                        var data = [];
+                                        var time = (new Date()).getTime();
+                                        var i;
+                                        for(i = -15; i<=0; i++) {
+                                            data.push({
+                                                x: time + i * 1000,
+                                                y: 0
+                                            });
+                                        }
+                                        return data;
+                                    }())
+                                }]
+                            });
+
+                            // Network
+                            Highcharts.chart('chart-network-' + id, {
+                                chart: {
+                                    type: 'spline',
+                                    animation: Highcharts.svg,
+                                    marginRight: 10,
+                                    events: {
+                                        load: function() {
+                                            seriesNetworkReceived[id] = this.series[0];
+                                            seriesNetworkTransmit[id] = this.series[1];
+                                        }
+                                    }
+                                },
+                                title: {
+                                    text: 'Network Stats'
+                                },
+                                xAxis: {
+                                    type: 'datetime',
+                                    tickPixelInterval: 100
+                                },
+                                yAxis: {
+                                    title: {
+                                        text: 'Bytes'
+                                    },
+                                    plotLines: [{
+                                        value: 0,
+                                        width: 1,
+                                        color: '#808080'
+                                    }]
+                                },
+                                tooltip: {
+                                    formatter: function() {
+                                        var y = bytesToSize(this.y);
+                                        return '<b>' + this.series.name + '</b><br />' + Highcharts.dateFormat('%d/%m/%Y %H:%M:%S', this.x) + '<br />' + y[0] + y[1];
+                                    }
+                                },
+                                plotOptions: {
+                                    spline: {
+                                        marker: {
+                                            enabled: true
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    enabled: true
+                                },
+                                exporting: {
+                                    enabled: false
+                                },
+                                series: [{
+                                    name: 'Received',
+                                    data: (function() {
+                                        var data = [];
+                                        var time = (new Date()).getTime();
+                                        var i;
+                                        for(i = -15; i<=0; i++) {
+                                            data.push({
+                                                x: time + i * 1000,
+                                                y: 0
+                                            });
+                                        }
+                                        return data;
+                                    }())
+                                }, {
+                                    name: 'Transmit',
+                                    data: (function() {
+                                        var data = [];
+                                        var time = (new Date()).getTime();
+                                        var i;
+                                        for(i = -15; i<=0; i++) {
+                                            data.push({
+                                                x: time + i * 1000,
+                                                y: 0
+                                            });
+                                        }
+                                        return data;
+                                    }())
+                                }]
+                            });
+                        }
+
+                        K_GLOBAL.TIMER.ALLCONTAINERSTATSCREATED = true;
+                    }
+
+                    for(var i = 0, l = dataStats.length; i < l; i++) {
+                        var id = dataStats[i].id;
+                        var item = dataStats[i].data.result;
+
+                        if(!lastTotalCPU[id]) {
+                            lastTotalCPU[id] = 0;
+                        }
+                        if(!lastSystemCPU[id]) {
+                            lastSystemCPU[id] = 0;
+                        }
+                        if(!lastReceivedBytes[id]) {
+                            lastReceivedBytes[id] = 0;
+                        }
+                        if(!lastTransmitBytes[id]) {
+                            lastTransmitBytes[id] = 0;
+                        }
+
+                        // CPU
+                        var totalCPU = item.cpu_stats.cpu_usage.total_usage;
+                        var systemCPU = item.cpu_stats.system_cpu_usage;
+                        var processors = item.cpu_stats.cpu_usage.percpu_usage.length;
+                        var percent = 0.0;
+                        if (lastTotalCPU[id] > 0 && lastSystemCPU[id] > 0) {
+                            percent = calculateCPUPercent(lastTotalCPU[id], lastSystemCPU[id], totalCPU, systemCPU, processors);
+                        }
+                        var x = (new Date()).getTime();
+                        var y = percent;
+                        seriesProcessors[id].addPoint([x, y], true, true);
+                        $('#modal-containers-stats .modal-body .panel[data-container-id="' + id + '"] .container-stats-cpu-realtime').text(Highcharts.numberFormat(percent, 3) + '%');
+                        // container-stats-cpu-realtime
+                        lastTotalCPU[id] = totalCPU;
+                        lastSystemCPU[id] = systemCPU;
+
+                        // Network
+                        var receivedBytes = item.networks['eth0'].rx_bytes;
+                        var transmitBytes = item.networks['eth0'].tx_bytes;
+                        var totalBytesReceived = (!lastReceivedBytes[id] || lastReceivedBytes[id] == 0) ? 0 : receivedBytes - lastReceivedBytes[id];
+                        var totalBytesTransmit = (!lastTransmitBytes[id] || lastTransmitBytes[id] == 0) ? 0 : transmitBytes - lastTransmitBytes[id];
+
+                        var x = (new Date()).getTime();
+                        var y = totalBytesReceived;
+                        seriesNetworkReceived[id].addPoint([x, y], true, true);
+                        var size = bytesToSize(totalBytesReceived);
+                        $('#modal-containers-stats .modal-body .panel[data-container-id="' + id + '"] .container-stats-network-realtime').text(size[0] + ' ' + size[1]);
+                        var x = (new Date()).getTime();
+                        var y = totalBytesTransmit;
+                        seriesNetworkTransmit[id].addPoint([x, y], true, true);
+                        var size = bytesToSize(totalBytesTransmit);
+                        $('#modal-containers-stats .modal-body .panel[data-container-id="' + id + '"] .container-stats-network-realtime').append(' / ' + size[0] + ' ' + size[1]);
+
+                        lastReceivedBytes[id] = receivedBytes;
+                        lastTransmitBytes[id] = transmitBytes;
+                    }
+                });
+            };
+            K_GLOBAL.TIMER.ALLCONTAINERSTATS();
+            K_GLOBAL.TIMER.ALLCONTAINERSTATSINTERVAL = setInterval(K_GLOBAL.TIMER.ALLCONTAINERSTATS, reloadTime);
+        });
+
+    });
+
+    $('#modal-containers-stats').on('hide.bs.modal', function() {
+        clearInterval(K_GLOBAL.TIMER.ALLCONTAINERSTATSINTERVAL);
     });
 
     /**

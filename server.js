@@ -219,10 +219,11 @@ try {
                     data = Buffer.concat(data).toString().trim();
                     data = decodeURIComponent(data).split('&');
 
-                    var imageId, name = '', initialCommand = '', ports = [], volumes = [], links = [], interactive = false, terminal = false;
+                    var imageId, name = '', initialCommand = '', ports = [], volumes = [], links = [], envs = [], interactive = false, terminal = false, background = false;
 
                     for(var i=0,l=data.length;i<l;i++) {
                         var param = data[i].split('=', 2);
+                        console.log(param[0], param[1]);
                         switch(param[0]) {
                             case 'image-id':
                                 imageId = param[1];
@@ -235,6 +236,9 @@ try {
                                 break;
                             case 'terminal':
                                 terminal = param[1] == 1 ? true : false;
+                                break;
+                            case 'background':
+                                background = param[1] == 1 ? true : false;
                                 break;
                             case 'interactive':
                                 interactive = param[1] == 1 ? true : false;
@@ -257,16 +261,26 @@ try {
                             case 'link-docker[]':
                                 links[links.length - 1].out = param[1];
                                 break;
+                            case 'env-param[]':
+                                envs.push({'param':param[1], 'value': null});
+                                break;
+                            case 'env-value[]':
+                                envs[envs.length - 1].value = param[1];
+                                break;
                         }
                     }
 
+                    console.log('BACKGROUND >> ', background);
+
                     var out = ' ';
                     if(imageId) {
-                        // var cmd = 'docker run -d --privileged -v /var/run/docker.sock:/var/run/docker.sock ';
-                        var cmd = 'docker run -d ';
+                        var cmd = 'docker run ';
 
                         if (terminal == true) {
                             cmd += '-t ';
+                        }
+                        if (background == true) {
+                            cmd += '-d ';
                         }
                         if (interactive == true) {
                             cmd += '-i ';
@@ -285,6 +299,10 @@ try {
 
                         for(var i=0,l=links.length;i<l;i++) {
                             cmd+= '--link ' + links[i].in + ':' + links[i].out + ' ';
+                        }
+
+                        for(var i=0,l=envs.length;i<l;i++) {
+                            cmd+= "-e " + envs[i].param + "='" + envs[i].value.split('+').join(' ') + "' ";
                         }
 
                         cmd+= imageId + ' ' + initialCommand.split('+').join(' ');
@@ -424,6 +442,29 @@ try {
                     response.writeHeader(200, HEADER.JSON);
                     // @TODO stream: true
                     response.write(API.run('containers/' + _data.containerId + '/stats', {'stream': false}, false, false, true));
+                    response.end();
+                });
+                break;
+
+            case pathname == '/container-stats-by-ids':
+                var data = [];
+                request.on('data', function(chunk) {
+                    data.push(chunk);
+                }).on('end', function() {
+                    data = Buffer.concat(data).toString().trim();
+                    data = decodeURIComponent(data).split('&');
+
+                    var ids = [];
+                    for(var i=0,l=data.length;i<l;i++) {
+                        var param = data[i].split('=', 2);
+                        switch(param[0]) {
+                            case 'ids[]':
+                                ids.push({id: param[1], data: JSON.parse(API.run('containers/' + param[1] + '/stats', {'stream': false}, false, false, true))});
+                                break;
+                        }
+                    }
+                    response.writeHeader(200, HEADER.JSON);
+                    response.write(JSON.stringify(ids));
                     response.end();
                 });
                 break;

@@ -10,114 +10,7 @@
     <link rel="stylesheet" type="text/css" href="./node_modules/animate.css/animate.css" />
     <link rel="stylesheet" type="text/css" href="./node_modules/jquery.terminal/css/jquery.terminal.css" />
     <link rel="stylesheet" type="text/css" href="./css/jquery.dockmodal.css" />
-    
-    <style>
-        body {
-            /*min-height: 600px;*/
-            padding-top: 20px;
-        }
-        #debug {
-            display: block;
-        }
-        #server-status li {
-            height: 32px;
-            padding: 7px 14px;
-        }
-        .loading {
-            background-image: url("img/loading.gif");
-            background-repeat: no-repeat;
-            background-size: 32px;
-            background-position: center;
-        }
-
-        #modal-add-image .modal-dialog,
-        #modal-add-image .modal-content {
-            height: 80%;
-        }
-
-        #modal-add-image .modal-body {
-            /* 100% = dialog height, 120px = header + footer */
-            height: 80%;
-            max-height: calc(100% - 120px);
-            overflow-y: auto;
-        }
-
-        .list-ports .divisor, .list-volumes .divisor {
-            font-size: 20px;
-            padding-top: 6px !important;
-        }
-
-        .list-ports .port > div, .list-volumes .volume > div, .list-links .link > div {
-            padding: 1px;
-        }
-
-        .terminal-input {
-            left: -10000px;
-            position: absolute;
-        }
-
-        .dockmodal-body {
-            padding: 0 !important;
-        }
-
-        .terminal-container, .terminal {
-            height: 100%;
-        }
-
-        .terminal {
-            overflow-x: hidden !important;
-        }
-
-        .terminal-size-indicator {
-            display: none !important;
-        }
-
-        .table {
-            table-layout:fixed;
-        }
-
-        .truncate {
-            width: 100px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .label-right {
-            float: right;
-            padding: 6px 14px;
-            margin-left: 3px;
-        }
-
-        .table-without-margin-bottom {
-            margin-bottom: 0;
-        }
-
-        .modal-lg {
-            width: 96%;
-        }
-        
-        /*#terminal-bar {*/
-            /*position: fixed;*/
-            /*background-color: gray;*/
-            /*height: 30px;*/
-            /*width: 100%;*/
-            /*bottom: 0;*/
-            /*opacity: 1.0;*/
-            /*padding: 2px;*/
-        /*}*/
-        /*#terminal-bar .terminal-bar-item {*/
-            /*display: inline-block;*/
-            /*min-width: 160px;*/
-            /*height: 26px;*/
-            /*background-color: #ffffff;*/
-            /*padding: 2px;*/
-        /*}*/
-        
-        .dockmodal {
-            /*top: 60px !important;*/
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="./css/app.css" />
     <script type="text/javascript" src="./node_modules/wdt-loading/wdtLoading.js"></script>
 </head>
 <body>
@@ -203,13 +96,12 @@
                 <table class="table table-bordered table-condensed table-hover table-striped table-responsive" id="containers-list">
                     <thead>
                         <tr>
-                            <th width="10%" class="text-center">ID</th>
-                            <th width="15%" class="text-center">Name</th>
-                            <th width="25%">Image</th>
-                            <th width="20%">Ports</th>
-                            <th width="15%">Command</th>
-                            <th width="10%">Status</th>
-                            <th style="width: 140px;" class="text-center">Actions</th>
+                            <th style="width: 120px;" class="text-center">ID</th>
+                            <th class="text-center">Name</th>
+                            <th style="width: 320px;">Image</th>
+                            <th >Ports</th>
+                            <th style="width: 110px;" class="text-center">Public IP</th>
+                            <th style="width: 130px;" class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -229,9 +121,9 @@
                     <button class="btn btn-xs pull-right" id="btn-images-refresh">
                         <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                     </button>
-                    <!--button class="btn btn-xs pull-right" id="btn-view-add-image" data-toggle="modal" data-target="#modal-add-image" style="margin-right: 5px;">
+                    <button class="btn btn-xs pull-right" id="btn-view-add-image" data-toggle="modal" data-target="#modal-add-image" style="margin-right: 5px;">
                         <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                    </button-->
+                    </button>
                 </div>
                 <div class="panel-body">
                     <div id="images-list"></div>
@@ -241,7 +133,7 @@
     </div>
 
     <div class="modal fade" tabindex="-1" role="dialog" id="modal-add-image" aria-labelledby="modal-add-imageLabel">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -273,7 +165,7 @@
     </div>
     
     <div class="modal fade" tabindex="-1" role="dialog" id="modal-rename-image" aria-labelledby="modal-rename-imageLabel">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -295,7 +187,7 @@
     </div>
     
     <div class="modal fade" tabindex="-1" role="dialog" id="modal-run-image" aria-labelledby="modal-run-imageLabel">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -337,14 +229,40 @@
 
                             <div class="text-center">
                                 <label class="checkbox-inline">
-                                    <input type="checkbox" name="terminal" checked="checked" id="terminal" value="1"> Terminal
+                                    <input type="checkbox" name="terminal" checked="checked" id="terminal" value="1" /> Terminal
                                 </label>
                                 <label class="checkbox-inline">
-                                    <input type="checkbox" name="interactive" checked="checked" id="interactive" value="1"> Interactive
+                                    <input type="checkbox" name="interactive" checked="checked" id="interactive" value="1" /> Interactive
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="background" checked="checked" id="background" value="1" /> Background
                                 </label>
                             </div>
-
                             <hr />
+
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#run-image-ports" aria-controls="run-image-ports" role="tab" data-toggle="tab">Ports <button class="btn btn-xs btn-primary btn-add-port"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button></a></li>
+                                <li role="presentation"><a href="#run-image-volumes" aria-controls="run-image-volumes" role="tab" data-toggle="tab">Volumes <button class="btn btn-xs btn-primary btn-add-volume"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button></a></li>
+                                <li role="presentation"><a href="#run-image-links" aria-controls="run-image-links" role="tab" data-toggle="tab">Links <button class="btn btn-xs btn-primary btn-add-link"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button></a></li>
+                                <li role="presentation"><a href="#run-image-envs" aria-controls="run-image-envs" role="tab" data-toggle="tab">Envs <button class="btn btn-xs btn-primary btn-add-env"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button></a></li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="run-image-ports">
+                                    <div class="list-ports" style="margin-top: 8px;"></div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="run-image-volumes">
+                                    <div class="list-volumes" style="margin-top: 8px;"></div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="run-image-links">
+                                    <div class="list-links" style="margin-top: 8px;"></div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="run-image-envs">
+                                    <div class="list-envs" style="margin-top: 8px;"></div>
+                                </div>
+                            </div>
+
+                            <!--hr />
 
                             <h4>Ports <button class="btn btn-xs btn-primary btn-add-port"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button></h4>
                             <div class="list-ports"></div>
@@ -357,7 +275,7 @@
                             <hr class="clearfix" />
 
                             <h4>Links <button class="btn btn-xs btn-primary btn-add-link"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></button></h4>
-                            <div class="list-links"></div>
+                            <div class="list-links"></div-->
 
                         </form>
                     </div>
@@ -402,17 +320,22 @@
                         </table>
                     </div>
                     <div class="panel panel-default panel-stats">
-                        <div class="panel-heading">Stats</div>
-                        <!--table class="tb-container-stats table table-bordered table-condensed table-hover table-striped table-without-margin-bottom" style="display: none;">
-                            <thead></thead>
-                            <tbody></tbody>
-                        </table-->
-                        <div class="panel-body">
-                            <!--<canvas id="chart" width="400" height="100"></canvas>-->
-                            <!--div id="container" style="min-width: 310px;height: 400px; margin: 0 auto;"></div-->
+                        <div class="panel-heading">Stats
+                            <div class="pull-right">
+                                <span class="label label-info"><span class="container-stats-cpu-realtime"></span></span>
+                            </div>
                         </div>
+                        <div class="panel-body"></div>
                     </div>
-                    <div class="panel panel-default">
+                    <div class="panel panel-default panel-network">
+                        <div class="panel-heading">Network
+                            <div class="pull-right">
+                                <span class="label label-default margin-right"><span class="container-stats-network-realtime"></span></span>
+                            </div>
+                        </div>
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="panel panel-default panel-top">
                         <div class="panel-heading">Top</div>
                         <table class="tb-container-top table table-bordered table-condensed table-hover table-striped table-without-margin-bottom">
                             <thead></thead>
@@ -453,17 +376,20 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Containers Stats</h4>
                 </div>
-                <div class="modal-body">
-                    <table class="table table-bordered table-condensed table-hover table-striped table-without-margin-bottom">
-                        <tbody></tbody>
-                    </table>
-                </div>
+                <div class="modal-body"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted pull-left"><a rel="tooltip" title="Github Open Source Project" href="https://github.com/fontenele/docker-manager" target="_blank">GitHub Open Source</a></p>
+            <p class="text-muted pull-right"><a rel="tooltip" title="Guilherme Fontenele" href="https://github.com/fontenele" target="_blank">Guilherme Fontenele</a></p>
+        </div>
+    </footer>
 
     <script type="text/javascript" src="./node_modules/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="./node_modules/noty/js/noty/packaged/jquery.noty.packaged.js"></script>
