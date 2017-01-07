@@ -29,7 +29,7 @@ Manage your docker images and containers
 
 ## Screenshots
 #### How to pull new image
-![How to pull new image](http://fontesolutions.com.br/docker-manager/imgs/images-list-how-pull-new.png)
+![How to pull new image](http://fontesolutions.com.br/docker-manager/imgs/images-list-how-pull-new-image.png)
 #### Search image
 ![Search image](http://fontesolutions.com.br/docker-manager/imgs/images-list-search.png)
 #### Select version
