@@ -38,6 +38,8 @@ Manage your docker images and containers
 ![Image pulled](http://fontesolutions.com.br/docker-manager/imgs/images-list-pulled.png)
 #### Run DB image selecting preset configurations
 ![Run image selecting preset configurations](http://fontesolutions.com.br/docker-manager/imgs/images-run-db-select-preset.png)
+#### Add/Remove Presets
+![Add/Remove Presets](http://fontesolutions.com.br/docker-manager/imgs/containers-presets-config.png)
 #### View volumes tab
 ![Volumes tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-db-volumes.png)
 #### Run HTTP image selecting preset configurations
