@@ -159,6 +159,8 @@ $(document).ready(function() {
                 $('#containers-list').show();
                 $('#btn-containers-stats').show();
 
+                var containersRunning = 0;
+
                 for(var i=0,l=data.result.length;i<l;i++) {
                     var item = data.result[i];
                     var haveWebPort = false
@@ -184,6 +186,7 @@ $(document).ready(function() {
                             statusString = 'Created';
                             break;
                         case 'running':
+                            containersRunning++;
                             showBtnPlay = false;
                             showBtnStop = true;
                             statusBgClass = 'success';
@@ -215,6 +218,10 @@ $(document).ready(function() {
                                 '</tr>';
                     $('#containers-list tbody').append(html);
                 }
+
+                if(containersRunning == 0) {
+                    $('#btn-containers-stats').hide();
+                }
             }
         });
     }).trigger('click');
@@ -241,7 +248,7 @@ $(document).ready(function() {
 
                 for (var i=0,l=data.result.length;i<l;i++) {
                     var item = data.result[i];
-                    var html =  '<a class="list-group-item" href="#">' +
+                    var html =  '<a title="View ' + item.name + ' versions" rel="tooltip" class="list-group-item" href="#">' +
                                     '<span class="badge" title="Downloads" rel="tooltip">' + item.star_count + '</span>' +
                                     '<h4 class="list-group-item-heading name">' + item.name + (item.is_official ? ' <span class="glyphicon glyphicon-star text-info" aria-hidden="true" style="font-size: 13px; color: gold;"></span>' : '') + '</h4>' +
                                     '<p class="list-group-item-text description">' + item.description + '</p>' +
@@ -277,7 +284,7 @@ $(document).ready(function() {
                 for(var i=0,l=data.result.length;i<l;i++) {
                     var item = data.result[i];
 
-                    var html =  '<a class="list-group-item" href="#">' +
+                    var html =  '<a title="Install ' + config.image + ':' + item.name + '" rel="tooltip" class="list-group-item" href="#">' +
                                     item.name +
                                 '</a>';
                     $('#tb-add-image-tag-list-search').append(html);
@@ -446,7 +453,7 @@ $(document).ready(function() {
             $('#container-preset-list').html('');
             for(i in containerPresets) {
                 total++;
-                var $li = $('<li class="container-preset-item"></li>');
+                var $li = $('<li title="Select ' + i + ' preset" rel="tooltip" class="container-preset-item"></li>');
                 $li.data('container-preset-data', containerPresets[i]);
                 $li.data('container-preset-name', i);
                 $('#container-preset-list').append($li.append($('<a href="javascript:void(0)">' + i + '</a>')));
