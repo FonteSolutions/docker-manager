@@ -7,7 +7,8 @@ Manage your docker images and containers
 ### Configure Docker Remote API
 #### Linux with systemd 
 * Create a new systemd config file called /etc/systemd/system/docker-tcp.socket to make docker available on a TCP socket on port 2375.
-`
+
+```
 [Unit]
 Description=Docker HTTP Socket for the API
 
@@ -18,7 +19,7 @@ Service=docker.service
 
 [Install]
 WantedBy=sockets.target
-`
+```
 
 * Register the new systemd http socket and restart docker
 `systemctl enable docker-tcp.socket
