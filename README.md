@@ -4,6 +4,9 @@ Manage your docker images and containers
 
 ## Requirements
 
+### NodeJS
+* Install nodejs: `apt-get install npm` or `yum install npm` or see here [https://nodejs.org/](https://nodejs.org/en/)
+
 ### Configure Docker Remote API
 #### Linux with systemd 
 * Create a new systemd config file called /etc/systemd/system/docker-tcp.socket to make docker available on a TCP socket on port 2375.
@@ -35,10 +38,6 @@ WantedBy=sockets.target
 * Add the line ```DOCKER_OPTS='-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock'```
 * Restart the Docker service using: ```service docker restart```
 * Verify is ok [http://localhost:2375/_ping](http://localhost:2375/_ping) 
-
-### NodeJS
-* Install nodejs: `apt-get install npm` or `yum install npm` or see here [https://nodejs.org/](https://nodejs.org/en/)
-
 
 ## Install
 
