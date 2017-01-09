@@ -5,6 +5,28 @@ Manage your docker images and containers
 ## Requirements
 
 ### Configure Docker Remote API
+#### Linux with systemd 
+* Create a new systemd config file called /etc/systemd/system/docker-tcp.socket to make docker available on a TCP socket on port 2375.
+`
+[Unit]
+Description=Docker HTTP Socket for the API
+
+[Socket]
+ListenStream=2375
+BindIPv6Only=both
+Service=docker.service
+
+[Install]
+WantedBy=sockets.target
+`
+
+* Register the new systemd http socket and restart docker
+`systemctl enable docker-tcp.socket
+systemctl stop docker
+systemctl start docker-tcp.socket`
+
+
+#### Linux without systemd
 * Edit to allow connections ```/etc/default/docker```
 * Add the line ```DOCKER_OPTS='-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock'```
 * Restart the Docker service using: ```service docker restart```
@@ -76,3 +98,4 @@ Manage your docker images and containers
 
 ## Thanks
 * [BrScan](http://www.brscan.com.br/)
+* [Felix Garcia Borrego](https://github.com/felixgborrego) for [Docker UI Chrome App](https://github.com/felixgborrego/docker-ui-chrome-app)
