@@ -22,9 +22,12 @@ WantedBy=sockets.target
 ```
 
 * Register the new systemd http socket and restart docker
-`systemctl enable docker-tcp.socket
-systemctl stop docker
-systemctl start docker-tcp.socket`
+
+`systemctl enable docker-tcp.socket`
+
+`systemctl stop docker`
+
+`systemctl start docker-tcp.socket`
 
 
 #### Linux without systemd
