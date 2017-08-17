@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="col s12 m10 l6 offset-m1 offset-l3">
+        <div class="card primary">
+            <div class="card-content center-align">
+                <h5 class="thin">Login</h5>
+                <div class="divider"></div>
+                <div class="section">
+                    <form class="">
+                        <div class="row">
+                            <div class="container">
+                                <div class="input-field">
+                                    <input id="email" type="text" class="validate tooltipped" data-position="right" data-tooltip="Informe o E-mail" name="email" [(ngModel)]="email" />
+                                    <label for="email">E-mail</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="container">
+                                <div class="input-field">
+                                    <input id="password" type="password" class="validate tooltipped" data-position="right" data-tooltip="Informe a Senha" name="password" [(ngModel)]="password" />
+                                    <label for="password">Senha</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn waves-effect waves-light" type="button" (click)="tryLogin()">Entrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

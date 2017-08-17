@@ -1,104 +1,33 @@
-# Docker Manager for Linux
+# Angular 2 Electron Brscan Starterkit
 
-Manage your docker images and containers
+Estrutura para apps [electron] com [angular] usando [Webpack], [ngrx] e [material2]
 
-## Requirements
+Para rodar em dev:
 
-### NodeJS
-* Install nodejs: `apt-get install npm` or `yum install npm` or see here [https://nodejs.org/](https://nodejs.org/en/)
+## Run the example
 
-### Configure Docker Remote API
-#### Linux with systemd 
-* Create a new systemd config file called /etc/systemd/system/docker-tcp.socket to make docker available on a TCP socket on port 2375.
-
-```
-[Unit]
-Description=Docker HTTP Socket for the API
-
-[Socket]
-ListenStream=2375
-BindIPv6Only=both
-Service=docker.service
-
-[Install]
-WantedBy=sockets.target
+```bash
+$ npm install
+$ npm run watch
+$ npm run electron
 ```
 
-* Register the new systemd http socket and restart docker
+## Packaging
 
-`systemctl enable docker-tcp.socket`
+Para gerar build
 
-`systemctl stop docker`
+```bash
+$ npm run build-package
+```
 
-`systemctl start docker-tcp.socket`
+## License
 
+[MIT]
 
-#### Linux without systemd
-* Edit to allow connections ```/etc/default/docker```
-* Add the line ```DOCKER_OPTS='-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock'```
-* Restart the Docker service using: ```service docker restart```
-* Verify is ok [http://localhost:2375/_ping](http://localhost:2375/_ping) 
-
-## Install
-
-* Create /Applications directory: `mkdir /Applications`
-* Enter directory: `cd /Applications`
-* Clone repository: `git clone https://github.com/fontenele/docker-manager.git`
-* Execute install script: `/Applications/docker-manager/install`
-* Remember to set Docker to starts when boot: `systemctl enable docker.service`
-* Enable DockerManager to starts when system boot: `systemctl enable docker-manager.service`
-
-## Test DockerManager
-* Start service: `service docker start` then `service docker-manager start`
-* Open app [http://localhost:31337](http://localhost:31337)
-
-## Screenshots
-#### How to pull new image
-![How to pull new image](http://fontesolutions.com.br/docker-manager/imgs/images-list-how-pull-new-image.png)
-#### Search image
-![Search image](http://fontesolutions.com.br/docker-manager/imgs/images-list-search.png)
-#### Select version
-![Select version to install](http://fontesolutions.com.br/docker-manager/imgs/images-list-pull.png)
-#### Image pulled with success
-![Image pulled](http://fontesolutions.com.br/docker-manager/imgs/images-list-pulled.png)
-#### Run DB image selecting preset configurations
-![Run image selecting preset configurations](http://fontesolutions.com.br/docker-manager/imgs/images-run-db-select-preset.png)
-#### Add/Remove Presets
-![Add/Remove Presets](http://fontesolutions.com.br/docker-manager/imgs/containers-presets-config.png)
-#### View volumes tab
-![Volumes tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-db-volumes.png)
-#### Run HTTP image selecting preset configurations
-![Run HTTP image selecting preset configuration](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-select-preset.png)
-#### View volumes tab
-![View volumes tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-volumes.png)
-#### View links tab
-![View links tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-links.png)
-#### View envs tab
-![View envs tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-envs.png)
-#### How to view All Containers Stats
-![How to view All Containers Stats](http://fontesolutions.com.br/docker-manager/imgs/containers-how-view-stats.png)
-#### View Container Stats
-![View Container Stats](http://fontesolutions.com.br/docker-manager/imgs/containers-view-stats.png)
-#### How to view Container Info
-![How to view Container Info](http://fontesolutions.com.br/docker-manager/imgs/containers-how-view-info.png)
-#### View Container Info
-![View Container Info](http://fontesolutions.com.br/docker-manager/imgs/containers-view-info.png)
-#### View Container Info CPU and Network Stats
-![View Container Info CPU and Network Stats](http://fontesolutions.com.br/docker-manager/imgs/containers-view-info-stats.png)
-#### View Container Top Process
-![View Container Top Process](http://fontesolutions.com.br/docker-manager/imgs/containers-view-info-top.png)
-#### View Container Logs
-![View Container Logs](http://fontesolutions.com.br/docker-manager/imgs/containers-view-logs.png)
-#### How to access Container Terminal
-![How to access Container Terminal](http://fontesolutions.com.br/docker-manager/imgs/containers-how-view-term.png)
-#### Verifying container and env params
-![Verifying container and env params](http://fontesolutions.com.br/docker-manager/imgs/containers-term.png)
-#### Multiple terminals of different containers with top running
-![Multiple terminals of different containers with top running](http://fontesolutions.com.br/docker-manager/imgs/containers-term-top-all.png)
-#### Server Info
-![Server Info](http://fontesolutions.com.br/docker-manager/imgs/server-info.png)
-
-
-## Thanks
-* [BrScan](http://www.brscan.com.br/)
-* [Felix Garcia Borrego](https://github.com/felixgborrego) for [Docker UI Chrome App](https://github.com/felixgborrego/docker-ui-chrome-app)
+[Webpack]: http://webpack.github.io
+[MIT]: http://markdalgleish.mit-license.org
+[angular]: http://angular.io
+[electron]: http://electron.atom.io/
+[ngrx]: https://github.com/ngrx/store
+[material2]: https://github.com/angular/material2
+[electron-packager]: https://github.com/electron-userland/electron-packager

@@ -1,0 +1,55 @@
+//$roboto-font-path: "../../node_modules/materialize-css/dist/fonts/roboto/";
+$roboto-font-path: "dist/fonts/roboto/";
+//$fa-font-path: "dist/fonts/fontawesome/";
+@import 'dist/fonts/fontawesome/font-awesome.css';
+@import '../../../node_modules/materialize-css/sass/components/_color';
+
+$color-theme: 'orange';
+$font-color: 'white';
+
+$primary-color: color($color-theme, "darken-3") !default;
+$primary-color-light: darken($primary-color, 25%) !default;
+$primary-color-dark: darken($primary-color, 45%) !default;
+$secondary-color: color($color-theme, "darken-1") !default;
+$highlight-color: color($color-theme, "lighten-5") !default;
+
+$font-color: color($font-color, "normal");
+$link-color: color($font-color, "normal") !default;
+
+$footer-font-color: $font-color !default;
+$footer-copyright-font-color: $font-color !default;
+
+$navbar-font-color: $font-color !default;
+
+$sidenav-font-size: 14px !default;
+$sidenav-font-color: $font-color !default;
+$sidenav-bg-color: $primary-color !default;
+$sidenav-padding: 16px !default;
+$sidenav-item-height: 48px !default;
+$sidenav-line-height: $sidenav-item-height !default;
+
+app-container {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+  padding-top: 15px;
+}
+
+a {
+  color: color($color-theme, 'lighten-3') !important;
+  font-weight: bold;
+}
+
+.page-footer {
+  padding-bottom: 10px;
+}
+.page-footer .logo {
+  max-height: 32px;
+  width: auto;
+}
+
+@import '../../../node_modules/materialize-css/sass/materialize';

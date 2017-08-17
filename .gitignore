@@ -1,8 +1,8 @@
-# ---> Node
+# @joaogarin
+
 # Logs
 logs
 *.log
-npm-debug.log*
 
 # Runtime data
 pids
@@ -18,14 +18,49 @@ coverage
 # Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
-# node-waf configuration
-.lock-wscript
-
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
-# Dependency directory
-# https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
-node_modules
+# Users Environment Variables
+.lock-wscript
 
-.idea
+# OS generated files #
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Node Files #
+/node_modules
+/bower_components
+
+# Typing #
+/src/typings/tsd/
+/typings/
+/tsd_typings/
+
+# Dist #
+/dist
+/public/__build__/
+/src/*/__build__/
+__build__/**
+.webpack.json
+
+#doc
+/doc
+
+# IDE #
+.idea/
+*.swp
+
+#releases
+release
+
+#dist folder in app
+src/app/dist
+
+#Remove configurations from version control
+config.json
+
+#Remove vscode files
+.vscode
