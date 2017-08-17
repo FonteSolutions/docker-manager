@@ -20,6 +20,18 @@ Para gerar build
 $ npm run build-package
 ```
 
+Para gerar .deb
+
+```bash
+electron-installer-debian --src release/linux-x64/docker-manager-linux-x64/ --dest release/linux-x64/installers/ --arch amd64 --description Teste --productDescription ProdutoTeste
+```
+
+Para gerar .exe
+
+```bash
+node winbuild.js
+```
+
 ## License
 
 [MIT]
