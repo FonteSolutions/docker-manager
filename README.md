@@ -1,7 +1,5 @@
 # DockerManager
 
-Estrutura para apps [electron] com [angular] usando [Webpack], [ngrx] e [material2]
-
 Para rodar em dev:
 
 ## Run the example
