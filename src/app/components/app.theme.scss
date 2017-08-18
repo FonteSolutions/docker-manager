@@ -4,6 +4,31 @@ $roboto-font-path: "dist/fonts/roboto/";
 @import 'dist/fonts/fontawesome/font-awesome.css';
 @import '../../../node_modules/materialize-css/sass/components/_color';
 
+/* fallback */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url('dist/fonts/material-icons.woff2') format('woff2');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -moz-font-feature-settings: 'liga';
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
 $color-theme: 'orange';
 $font-color: 'white';
 
