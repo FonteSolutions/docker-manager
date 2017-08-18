@@ -1,4 +1,4 @@
-# Angular 2 Electron Brscan Starterkit
+# DockerManager
 
 Estrutura para apps [electron] com [angular] usando [Webpack], [ngrx] e [material2]
 

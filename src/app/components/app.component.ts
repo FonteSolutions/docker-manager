@@ -1,9 +1,5 @@
 import {AppState} from './../store/appState.store';
-/**
- * Import decorators and services from angular
- */
 import {Component, OnInit, AfterViewInit, ViewEncapsulation} from '@angular/core';
-
 
 declare let $: any;
 declare let jQuery: any;
