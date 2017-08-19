@@ -1,8 +1,23 @@
 # DockerManager
 
-Para rodar em dev:
+## Pré requisitos
 
-## Run the example
+##### electron
+```bash
+$ sudo npm install -g electron --unsafe-perm=true
+```
+
+##### electron-packager
+```bash
+$ sudo npm install -g electron-packager
+```
+
+##### electron-installer-debian
+```bash
+$ sudo npm install -g electron-installer-debian
+```
+
+## Rodando em dev
 
 ```bash
 $ npm install
@@ -10,21 +25,21 @@ $ npm run watch
 $ npm run electron
 ```
 
-## Packaging
+## Gerando build
 
-Para gerar build
+##### Para gerar  build
 
 ```bash
 $ npm run build-package
 ```
 
-Para gerar .deb
+##### Para gerar .deb (debian)
 
 ```bash
 electron-installer-debian --src release/linux-x64/docker-manager-linux-x64/ --dest release/linux-x64/installers/ --arch amd64 --description Teste --productDescription ProdutoTeste
 ```
 
-Para gerar .exe
+##### Para gerar .exe (windows)
 
 ```bash
 node winbuild.js
