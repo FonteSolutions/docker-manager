@@ -71,10 +71,6 @@ export class ImagesComponent implements OnInit {
         });
 
         this.updateImages();
-
-        require('jsonparse');
-        // var Docker = require('dockerode');
-        // console.log(Docker);
     }
 
     info(image) {

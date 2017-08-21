@@ -11,8 +11,8 @@ const shouldUseAsar = argv.asar || false;
 const shouldBuildAll = argv.all || false;
 const arch = argv.arch || 'x64';
 // const arch = argv.arch || 'all';
-const platform = argv.platform || 'win32';
-// const platform = argv.platform || 'linux';
+// const platform = argv.platform || 'win32';
+const platform = argv.platform || 'linux';
 // const platform = argv.platform || 'darwin';
 var ncp = require('ncp').ncp;
 
@@ -20,8 +20,7 @@ const DEFAULT_OPTS = {
     dir: './src/app',
     name: appName,
     asar: shouldUseAsar,
-    ignore: [].concat(devDeps.map(name => `/node_modules/${name}($|/)`)
-)
+    ignore: [].concat(devDeps.map(name => `/node_modules/${name}($|/)`))
 }
 
 // const icon = './src/app/dist/assets/app-icon';
