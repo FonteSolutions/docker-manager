@@ -8,17 +8,17 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {StoreModule} from '@ngrx/store';
 import {authStore, authInitialState} from './store/auth.store';
+import 'materialize-css';
+import {MaterializeModule} from "angular2-materialize";
 
-import {LoginComponent} from './components/login/login.component';
 import {HomeComponent} from './components/home/home.component';
 import {AppComponent} from './components/app.component';
+import {ImagesComponent} from './components/images/images.component';
+import {ContainersComponent} from './components/containers/containers.component';
 
 import {routes} from './app.routes';
 
-import 'materialize-css';
-import {Authentication} from './services/authentication';
-import {MaterializeModule} from "angular2-materialize";
-import {PingService} from "./services/ping.service";
+import {DockerService} from "./services/docker.service";
 
 // declare var $: JQueryStatic;
 
@@ -37,10 +37,14 @@ import {PingService} from "./services/ping.service";
         StoreModule.provideStore({authStore}, {authStore: authInitialState})
     ],
     providers: [
-        Authentication,
-        PingService
+        DockerService
     ],
-    declarations: [AppComponent, HomeComponent, LoginComponent],
+    declarations: [
+        AppComponent,
+        HomeComponent,
+        ImagesComponent,
+        ContainersComponent
+    ],
     bootstrap: [AppComponent]
 })
 

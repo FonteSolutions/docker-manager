@@ -30,10 +30,11 @@ const createWindow = function () {
     // Initialize the window to our specified dimensions
     mainWindow = new BrowserWindow({
         // frame: false,
-        enableLargerThanScreen: true,
+        // enableLargerThanScreen: true,
         // x: 0,
         // y: 0,
         title: '',
+        titleBarStyle: 'hidden',
         // icon: __dirname + '/src/assets/camera-icon.png'
         icon: __dirname + path + '/dist/assets/docker-sm.png'
     });

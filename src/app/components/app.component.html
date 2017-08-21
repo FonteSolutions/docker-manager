@@ -5,14 +5,14 @@
                 <a href="#" data-activates="nav-mobile" class="button-collapse">
                     <i class="material-icons">menu</i>
                 </a>
-                <a id="logo-container" [routerLink]="['/']" class="brand-logo center">DOCKER MANAGER</a>
+                <a id="logo-container" [routerLink]="['/']" class="brand-logo center">DOCKER MANAGER <i [class]="dockerRemoteStatus"></i></a>
                 <ul class="left hide-on-med-and-down">
-                    <li [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active"><a [routerLink]="['/']">Home</a></li>
+                    <li [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active"><a [routerLink]="['/']">Painel</a></li>
                 </ul>
                 <ul class="right hide-on-med-and-down">
-                    <li routerLinkActive="active"><a [routerLink]="['/importar']">Importar</a></li>
-                    <li routerLinkActive="active"><a [routerLink]="['/selecionar-afd']">AFD</a></li>
-                    <li routerLinkActive="active"><a [routerLink]="['/funcionarios']">Funcionários</a></li>
+                    <li routerLinkActive="active"><a [routerLink]="['/images']">Images</a></li>
+                    <li routerLinkActive="active"><a [routerLink]="['/containers']">Containers</a></li>
+                    <!--<li routerLinkActive="active"><a [routerLink]="['/funcionarios']">Funcionários</a></li>-->
                     <!--<li routerLinkActive="active" [hidden]="profileService.user.id"><a [routerLink]="['/register']">Register</a></li>-->
                     <!--<li role="close"><a (click)="minimizeWindow()"><i class="fa fa-window-minimize"></i></a></li>-->
                     <!--<li role="close"><a (click)="restoreWindow()"><i class="fa fa-window-restore"></i></a></li>-->
@@ -26,12 +26,12 @@
     <ul id="nav-mobile" class="side-nav">
         <li [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active"><a [routerLink]="['/']">Home</a></li>
 
-        <li class="divider" [hidden]="!profileService.user.id"></li>
-        <li [hidden]="!profileService.user.id" routerLinkActive="active">
-            <a [routerLink]="['/profile']" style="height: 88px; padding: 15px 32px;">
-                {{profileService.user.name}}
-            </a>
-        </li>
+        <li class="divider"></li>
+        <!--<li routerLinkActive="active">-->
+            <!--<a [routerLink]="['/profile']" style="height: 88px; padding: 15px 32px;">-->
+                <!--{{profileService.user.name}}-->
+            <!--</a>-->
+        <!--</li>-->
 
         <!--<li class="divider"></li>-->
         <!--<li [hidden]="!profileService.user.id" routerLinkActive="active"><a [routerLink]="['/bonsai']">Bonsai</a></li>-->

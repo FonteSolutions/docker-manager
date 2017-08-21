@@ -1,0 +1,33 @@
+// Fix for warning with electron - see https://github.com/electron/electron/issues/4420
+::selection {
+  background: rgba(255, 255, 125, 0.99);
+}
+
+.card-content{
+  padding: 10px 15px;
+}
+.card-reveal {
+  padding: 0;
+}
+.card-reveal .card-title {
+  padding: 10px 15px;
+}
+.card-reveal table tr {
+  border-color: rgba(160, 160, 160, 0.2);
+}
+
+#modal-search .collection-item, #modal-confirm .collection-item {
+  color: rgba(0, 0, 0, 0.57) !important;
+  cursor: pointer;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.progress {
+  position: absolute;
+  margin-top: -15px;
+  left: 0;
+  width: 100%;
+}

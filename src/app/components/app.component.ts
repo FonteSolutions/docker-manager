@@ -1,33 +1,26 @@
-import {AppState} from './../store/appState.store';
+// import {AppState} from './../store/appState.store';
 import {Component, OnInit, AfterViewInit, ViewEncapsulation} from '@angular/core';
+import {DockerService} from "../services/docker.service";
 
 declare let $: any;
 declare let jQuery: any;
 
-/*
- * App Component
- * Top Level Component
- */
 @Component({
-    // The selector is what angular internally uses
-    selector: 'app-container', // <app></app>
+    selector: 'app-container',
     styleUrls: ['./app.theme.scss'],
     encapsulation: ViewEncapsulation.None,
     templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
-    //component initialization
     isDarkTheme: boolean = false;
-    public profileService: any;
-    
-    constructor() {
-        this.profileService = {
-            user: {}
-        };
+    dockerRemoteStatus: string;
+
+    constructor(private dockerService: DockerService) {
+        this.dockerRemoteStatus = 'fa fa-circle red-text';
     }
     
     ngOnInit() {
-        const mat = require('materialize-css')
+        require('materialize-css');
         $(function () {
             (<any>$('.button-collapse')).sideNav();
             (<any>$('.dropdown-button')).dropdown({
@@ -36,15 +29,23 @@ export class AppComponent implements OnInit {
                 belowOrigin: true
             });
         });
-    }
-    
-    checkAuthentication() {
+
+        this.dockerService.pingStream.subscribe(ping => {
+            if(ping == 1) {
+                this.dockerRemoteStatus = 'fa fa-circle green-text';
+            } else {
+                this.dockerRemoteStatus = 'fa fa-circle red-text';
+            }
+        });
     }
     
     closeWindow() {
-        const electron = require('electron');
-        const app = electron.remote.app;
-        app.quit();
+        let electron = require('electron');
+        // const app = electron.remote.app;
+        // app.quit();
+        const remote = electron.remote;
+        const focusedWindow = remote.getCurrentWindow();
+        focusedWindow.minimize();
     }
     
     restoreWindow() {
