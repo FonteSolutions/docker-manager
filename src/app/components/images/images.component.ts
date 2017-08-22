@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {DockerService} from "../../services/docker.service";
 import 'rxjs/Rx';
 import {toast} from "angular2-materialize";
@@ -12,16 +12,35 @@ declare let jQuery: any;
     styleUrls: ['./images.component.scss'],
 })
 export class ImagesComponent implements OnInit {
-
+    
+    inputs: any;
     images: any[];
     imagesResultedFromDockerHub: any[];
     imageToPull: string = '';
     tagsToPull: any[];
+    imageToRun: any;
 
     constructor(private dockerService: DockerService) {
         this.images = new Array();
         this.imagesResultedFromDockerHub = new Array();
         this.tagsToPull = new Array();
+        this.imageToRun = {
+            name: '',
+            image: '',
+            tty: false,
+            interactive: false,
+            ports: [],
+            volumes: [],
+            envs: []
+        };
+        this.inputs = {
+            portPublic: '',
+            portPrivate: '',
+            volumePublic: '',
+            volumePrivate: '',
+            envName: '',
+            envValue: ''
+        }
     }
 
     ngOnInit() {
@@ -83,9 +102,16 @@ export class ImagesComponent implements OnInit {
     askCreateContainer(image) {
         $('#name').focus();
         $('#modal-run-container').modal('open');
-        $('#image').val(image.RepoTags[0]);
-        $('select').material_select('destroy');
-        $('select').material_select();
+        this.imageToRun = {
+            name: '',
+            image: image.RepoTags[0],
+            tty: false,
+            interactive: false,
+            ports: [],
+            volumes: [],
+            envs: []
+        };
+        // this.imageToRun.image = image.RepoTags[0];
     }
 
     search() {
@@ -127,6 +153,41 @@ export class ImagesComponent implements OnInit {
             this.images = images;
             console.log(images);
         });
+    }
+    
+    addPort() {
+        if(!this.inputs.portPublic || !this.inputs.portPrivate) {
+            return;
+        }
+        this.imageToRun.ports.push({public: this.inputs.portPublic, private: this.inputs.portPrivate});
+        this.inputs.portPublic = '';
+        this.inputs.portPrivate = '';
+    }
+    
+    addVolume() {
+        if(!this.inputs.volumePublic || !this.inputs.volumePrivate) {
+            return;
+        }
+        this.imageToRun.volumes.push({public: this.inputs.volumePublic, private: this.inputs.volumePrivate});
+        this.inputs.volumePublic = '';
+        this.inputs.volumePrivate = '';
+    }
+
+    addEnv() {
+        if(!this.inputs.envName || !this.inputs.envValue) {
+            return;
+        }
+        this.imageToRun.envs.push({name: this.inputs.envName, value: this.inputs.envValue});
+        this.inputs.envName = '';
+        this.inputs.envValue = '';
+    }
+    
+    create() {
+        console.log(this.imageToRun);
+    }
+    
+    createAndRun() {
+        console.log(this.imageToRun);
     }
 
 }

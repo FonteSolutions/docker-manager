@@ -31,3 +31,10 @@
   left: 0;
   width: 100%;
 }
+
+#modal-run-container .card input {
+  //border-bottom-color: #fb8c00 !important;
+}
+#modal-run-container .card input::-webkit-input-placeholder {
+  //color: #fb8c00 !important;
+}
