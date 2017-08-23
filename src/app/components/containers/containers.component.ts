@@ -28,7 +28,7 @@ export class ContainersComponent implements OnInit {
                         this.updateContainers();
                     },
                     error => {
-                        toast(error.json().message, 3000);
+                        toast(error, 3000);
                     }
                 );
                 break;
@@ -38,7 +38,7 @@ export class ContainersComponent implements OnInit {
                         this.updateContainers();
                     },
                     error => {
-                        toast(error.json().message, 3000);
+                        toast(error, 3000);
                     }
                 );
                 break;
@@ -48,7 +48,8 @@ export class ContainersComponent implements OnInit {
                         this.updateContainers();
                     },
                     error => {
-                        toast(error.json().message, 3000);
+                        console.log(error);
+                        toast(error, 3000);
                     }
                 );
                 break;
@@ -80,7 +81,7 @@ export class ContainersComponent implements OnInit {
             for(let port in info.Config.ExposedPorts) {
                 ports.push(port);
             }
-            info.Config.ExposedPorts = ports;
+            info.Config['ports'] = ports;
             container.info = info;
         });
     }

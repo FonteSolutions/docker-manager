@@ -44,7 +44,7 @@
                             <td>Env</td>
                             <td>{{ env }}</td>
                         </tr>
-                        <tr *ngFor="let port of container.info.Config.ExposedPorts">
+                        <tr *ngFor="let port of container.info.Config.ports">
                             <td>Port Exposed</td>
                             <td>{{ port }}</td>
                         </tr>

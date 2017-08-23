@@ -16,11 +16,12 @@ export class ImagesComponent implements OnInit {
     
     inputs: any;
     images: any[];
+    imageSearchParams: any;
     imagesResultedFromDockerHub: any[];
     imageToPull: string = '';
     tagsToPull: any[];
     imageToRun: any;
-
+    
     constructor(private dockerService: DockerService) {
         this.images = new Array();
         this.imagesResultedFromDockerHub = new Array();
@@ -42,19 +43,10 @@ export class ImagesComponent implements OnInit {
             envName: '',
             envValue: ''
         };
-        // let dockerode = new Dockerode();
+        this.imageSearchParams = {term: '', limit: null};
     }
-
+    
     ngOnInit() {
-        // let electron = require('electron');
-        // const app = electron.remote.app;
-        // app.docker.listImages({all: true}).then(function(images) {
-        //     console.log('imagess', images);
-        // }).catch(function (err) {
-        //     console.log('errrrr',err);
-        // })
-        // console.log(app.docker);
-        // app.quit();
         var self = this;
         $(function () {
             $('#modal-search').modal({
@@ -99,17 +91,17 @@ export class ImagesComponent implements OnInit {
                 }
             );
         });
-
+        
         this.updateImages();
     }
-
+    
     info(image) {
         this.dockerService.imageInfo(image.Id).subscribe(info => {
             image.info = info;
             console.log('info', info);
         });
     }
-
+    
     askCreateContainer(image) {
         $('#name').focus();
         $('#modal-run-container').modal('open');
@@ -122,16 +114,14 @@ export class ImagesComponent implements OnInit {
             volumes: [],
             envs: []
         };
-        // this.imageToRun.image = image.RepoTags[0];
     }
-
+    
     search() {
-        let term = $('#term').val();
-        this.dockerService.imageSearch(term).subscribe(images => {
+        this.dockerService.imageSearch(this.imageSearchParams.term).subscribe(images => {
             this.imagesResultedFromDockerHub = images;
         });
     }
-
+    
     askPullFromSearch(image) {
         this.imageToPull = image;
         $('#modal-confirm').modal('open');
@@ -139,49 +129,31 @@ export class ImagesComponent implements OnInit {
             this.tagsToPull = tags;
         });
     }
-
+    
     pull(name, tag) {
         $('#modal-confirm').modal('close');
         $('#modal-search').modal('close');
         $('.progress').show();
-
-        this.dockerService.imageCreate(name, tag).subscribe(result => {
-            let _json = JSON.parse(('{"result":[' + result.text().replace(/(?:\r\n|\r|\n)/g, ',') + ']}').replace('},]', '}]'));
-            _json.result.reverse();
-            let html = '';
-            for(let i in _json.result) {
-                let log = _json.result[i];
-                html+= log.status + '<br />';
+        this.dockerService.imageCreate(name, tag,
+            (err, output) => {
+                this.updateImages();
+                toast(`Image ${name} pulled with success.`, 5000);
+                $('.progress').hide();
+            },
+            event => {
+                toast(event.status, 200);
             }
-            $('.progress').hide();
-            toast(html, 5000);
-            this.updateImages();
-        });
+        );
     }
-
+    
     updateImages() {
-        let electron = require('electron');
-        // console.log(electron);
-        const app = electron.remote.app;
-        var self = this;
-        // const Store = require('electron-store');
-        // const store = new Store();
-        app['docker'].listImages({all: true}).then(function(images) {
-            self.images = images;
-            console.log('imagess', images);
-        }).catch(function (err) {
-            console.log('errrrr',err);
+        this.dockerService.images().subscribe(images => {
+            this.images = images;
         });
-
-
-        // this.dockerService.images().subscribe(images => {
-        //     this.images = images;
-        //     console.log(images);
-        // });
     }
     
     addPort() {
-        if(!this.inputs.portPublic || !this.inputs.portPrivate) {
+        if (!this.inputs.portPublic || !this.inputs.portPrivate) {
             return;
         }
         this.imageToRun.ports.push({public: this.inputs.portPublic, private: this.inputs.portPrivate});
@@ -190,16 +162,16 @@ export class ImagesComponent implements OnInit {
     }
     
     addVolume() {
-        if(!this.inputs.volumePublic || !this.inputs.volumePrivate) {
+        if (!this.inputs.volumePublic || !this.inputs.volumePrivate) {
             return;
         }
         this.imageToRun.volumes.push({public: this.inputs.volumePublic, private: this.inputs.volumePrivate});
         this.inputs.volumePublic = '';
         this.inputs.volumePrivate = '';
     }
-
+    
     addEnv() {
-        if(!this.inputs.envName || !this.inputs.envValue) {
+        if (!this.inputs.envName || !this.inputs.envValue) {
             return;
         }
         this.imageToRun.envs.push({name: this.inputs.envName, value: this.inputs.envValue});
@@ -214,5 +186,5 @@ export class ImagesComponent implements OnInit {
     createAndRun() {
         console.log(this.imageToRun);
     }
-
+    
 }

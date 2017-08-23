@@ -5,18 +5,13 @@
                 <a href="#" data-activates="nav-mobile" class="button-collapse">
                     <i class="material-icons">menu</i>
                 </a>
-                <a id="logo-container" [routerLink]="['/']" class="brand-logo center">DOCKER MANAGER <i [class]="dockerRemoteStatus"></i></a>
+                <a id="logo-container" [routerLink]="['/']" class="brand-logo center">DOCKER MANAGER</a>
                 <ul class="left hide-on-med-and-down">
                     <li [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active"><a [routerLink]="['/']">Painel</a></li>
                 </ul>
                 <ul class="right hide-on-med-and-down">
                     <li routerLinkActive="active"><a [routerLink]="['/images']">Images</a></li>
                     <li routerLinkActive="active"><a [routerLink]="['/containers']">Containers</a></li>
-                    <!--<li routerLinkActive="active"><a [routerLink]="['/funcionarios']">Funcionários</a></li>-->
-                    <!--<li routerLinkActive="active" [hidden]="profileService.user.id"><a [routerLink]="['/register']">Register</a></li>-->
-                    <!--<li role="close"><a (click)="minimizeWindow()"><i class="fa fa-window-minimize"></i></a></li>-->
-                    <!--<li role="close"><a (click)="restoreWindow()"><i class="fa fa-window-restore"></i></a></li>-->
-                    <!--<li role="close"><a (click)="closeWindow()"><i class="fa fa-power-off"></i></a></li>-->
                 </ul>
             </div>
         </nav>

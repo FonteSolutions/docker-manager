@@ -170,6 +170,7 @@
             <a class="modal-action black-text waves-effect waves-green btn-flat" (click)="createAndRun()">Create and Run</a>
         </div>
     </div>
+
     <div id="modal-search" class="modal modal-fixed-footer">
         <div class="modal-content">
             <div class="row">
@@ -177,7 +178,7 @@
                     <div class="row">
                         <div class="input-field col s11">
                             <i class="material-icons prefix">search</i>
-                            <input id="term" type="text" class="" placeholder="Search in DockerHub" />
+                            <input id="term" type="text" class="" [(ngModel)]="imageSearchParams.term" [ngModelOptions]="{standalone: true}" placeholder="Search in DockerHub" />
                         </div>
                         <div class="input-field col s1">
                             <button class="btn waves-effect waves-light btn-floating green darken-3" (click)="search()">
