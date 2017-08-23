@@ -17,8 +17,8 @@ import {ImagesComponent} from './components/images/images.component';
 import {ContainersComponent} from './components/containers/containers.component';
 
 import {routes} from './app.routes';
-
 import {DockerService} from "./services/docker.service";
+// import * as Dockerode from "dockerode";
 
 // declare var $: JQueryStatic;
 

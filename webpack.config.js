@@ -23,7 +23,7 @@ var config = {
     entry: {
         'polyfills': './src/polyfills.ts',
         'vendor': './src/vendor.ts',
-        'app': './src/app/app',
+        'app': './src/app/app'
     },
 
     // Config for our build files
@@ -44,10 +44,10 @@ var config = {
          *
          * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
          */
-        extensions: ['.ts', '.js', '.json', '.css', '.html'],
+        extensions: ['.ts', '.js', '.json', '.css', '.html', '.node'],
 
         // An array of directory names to be resolved to the current directory
-        modules: [helpers.root('src'), 'node_modules'],
+        modules: [helpers.root('src'), 'node_modules']
 
     },
     /*
@@ -130,7 +130,7 @@ var config = {
                     emitErrors: false,
                     failOnHint: false,
                     resourcePath: 'src'
-                },
+                }
             }
         }),
 
@@ -147,7 +147,8 @@ var config = {
         module: false,
         clearImmediate: false,
         setImmediate: false
-    }
+    },
+    externals: ['config', Object.keys(config || {})]
 };
 
 /**

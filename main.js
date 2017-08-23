@@ -1,13 +1,23 @@
 const electron = require('electron');
+const Store = require('electron-store');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 // const windowStateKeeper = require('electron-window-state');
 const Menu = electron.Menu;
 const Tray = electron.Tray;
-
+const Docker = require('dockerode');
+var socket = '/var/run/docker.sock';
+var docker = new Docker({ socketPath: socket });
+// console.log(docker);
+// docker.listImages({all: true}).then(function(images) {
+//     console.log('imagess', images);
+// }).catch(function (err) {
+//     console.log('errrrr',err);
+// })
 
 // browser-window creates a native window
 var mainWindow = null;
+const store = new Store();
 
 const process = require('process');
 const path = process.argv[2] == 'dev' ? '/src/app' : '';
@@ -105,6 +115,9 @@ const createWindow = function () {
         app.quit();
         mainWindow = null
     });
+
+    store.set('app.docker', docker);
+    app.docker = docker;
 };
 
 app.on('ready', createWindow);

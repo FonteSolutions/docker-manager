@@ -1,7 +1,8 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {DockerService} from "../../services/docker.service";
-import 'rxjs/Rx';
 import {toast} from "angular2-materialize";
+import 'rxjs/Rx';
+import {DockerService} from "../../services/docker.service";
+// import * as Dockerode from "dockerode";
 
 declare let $: any;
 declare let jQuery: any;
@@ -40,10 +41,20 @@ export class ImagesComponent implements OnInit {
             volumePrivate: '',
             envName: '',
             envValue: ''
-        }
+        };
+        // let dockerode = new Dockerode();
     }
 
     ngOnInit() {
+        // let electron = require('electron');
+        // const app = electron.remote.app;
+        // app.docker.listImages({all: true}).then(function(images) {
+        //     console.log('imagess', images);
+        // }).catch(function (err) {
+        //     console.log('errrrr',err);
+        // })
+        // console.log(app.docker);
+        // app.quit();
         var self = this;
         $(function () {
             $('#modal-search').modal({
@@ -149,10 +160,24 @@ export class ImagesComponent implements OnInit {
     }
 
     updateImages() {
-        this.dockerService.images().subscribe(images => {
-            this.images = images;
-            console.log(images);
+        let electron = require('electron');
+        // console.log(electron);
+        const app = electron.remote.app;
+        var self = this;
+        // const Store = require('electron-store');
+        // const store = new Store();
+        app['docker'].listImages({all: true}).then(function(images) {
+            self.images = images;
+            console.log('imagess', images);
+        }).catch(function (err) {
+            console.log('errrrr',err);
         });
+
+
+        // this.dockerService.images().subscribe(images => {
+        //     this.images = images;
+        //     console.log(images);
+        // });
     }
     
     addPort() {
