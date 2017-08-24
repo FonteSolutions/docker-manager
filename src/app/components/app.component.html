@@ -12,6 +12,7 @@
                 <ul class="right hide-on-med-and-down">
                     <li routerLinkActive="active"><a [routerLink]="['/images']">Images</a></li>
                     <li routerLinkActive="active"><a [routerLink]="['/containers']">Containers</a></li>
+                    <li (click)="info()"><a><i class="fa fa-info"></i></a></li>
                 </ul>
             </div>
         </nav>
@@ -40,6 +41,114 @@
 <main>
     <div class="container" id="main">
         <router-outlet></router-outlet>
+    </div>
+    <div id="modal-info" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h6>Info</h6>
+
+            <div class="divider"></div>
+            <table class="bordered responsive-table">
+                <tr>
+                    <td>ApiVersion</td>
+                    <td>{{ data.version.ApiVersion }}</td>
+                </tr>
+                <tr>
+                    <td>Arch</td>
+                    <td>{{ data.version.Arch }}</td>
+                </tr>
+                <tr>
+                    <td>BuildTime</td>
+                    <td>{{ data.version.BuildTime }}</td>
+                </tr>
+                <tr>
+                    <td>GitCommit</td>
+                    <td>{{ data.version.GitCommit }}</td>
+                </tr>
+                <tr>
+                    <td>GoVersion</td>
+                    <td>{{ data.version.GoVersion }}</td>
+                </tr>
+                <tr>
+                    <td>KernelVersion</td>
+                    <td>{{ data.version.KernelVersion }}</td>
+                </tr>
+                <tr>
+                    <td>Os</td>
+                    <td>{{ data.version.Os }}</td>
+                </tr>
+                <tr>
+                    <td>Version</td>
+                    <td>{{ data.version.Version }}</td>
+                </tr>
+                <tr>
+                    <td>Architecture</td>
+                    <td>{{ data.info.Architecture }}</td>
+                </tr>
+                <tr>
+                    <td>Containers</td>
+                    <td>{{ data.info.Containers }}</td>
+                </tr>
+                <tr>
+                    <td>ContainersPaused</td>
+                    <td>{{ data.info.ContainersPaused }}</td>
+                </tr>
+                <tr>
+                    <td>ContainersRunning</td>
+                    <td>{{ data.info.ContainersRunning }}</td>
+                </tr>
+                <tr>
+                    <td>ContainersStopped</td>
+                    <td>{{ data.info.ContainersStopped }}</td>
+                </tr>
+                <tr>
+                    <td>DockerRootDir</td>
+                    <td>{{ data.info.DockerRootDir }}</td>
+                </tr>
+                <tr>
+                    <td>Images</td>
+                    <td>{{ data.info.Images }}</td>
+                </tr>
+                <tr>
+                    <td>KernelVersion</td>
+                    <td>{{ data.info.KernelVersion }}</td>
+                </tr>
+                <tr>
+                    <td>MemTotal</td>
+                    <td>{{ data.info.MemTotal }}</td>
+                </tr>
+                <tr>
+                    <td>NCPU</td>
+                    <td>{{ data.info.NCPU }}</td>
+                </tr>
+                <tr>
+                    <td>NEventsListener</td>
+                    <td>{{ data.info.NEventsListener }}</td>
+                </tr>
+                <tr>
+                    <td>NGoroutines</td>
+                    <td>{{ data.info.NGoroutines }}</td>
+                </tr>
+                <tr>
+                    <td>Name</td>
+                    <td>{{ data.info.Name }}</td>
+                </tr>
+                <tr>
+                    <td>OSType</td>
+                    <td>{{ data.info.OSType }}</td>
+                </tr>
+                <tr>
+                    <td>OperatingSystem</td>
+                    <td>{{ data.info.OperatingSystem }}</td>
+                </tr>
+                <tr>
+                    <td>SystemTime</td>
+                    <td>{{ data.info.SystemTime }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <a class="waves-effect waves-red btn-flat" onclick="$('#modal-info').modal('close'); return false;">Close</a>
+        </div>
     </div>
 </main>
 <footer class="page-footer white-text center-align">

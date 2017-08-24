@@ -98,7 +98,6 @@ export class ImagesComponent implements OnInit {
     info(image) {
         this.dockerService.imageInfo(image.Id).subscribe(info => {
             image.info = info;
-            console.log('info', info);
         });
     }
     
@@ -107,6 +106,7 @@ export class ImagesComponent implements OnInit {
         $('#modal-run-container').modal('open');
         this.imageToRun = {
             name: '',
+            cmd: ['/bin/bash'],
             image: image.RepoTags[0],
             tty: false,
             interactive: false,
@@ -184,7 +184,14 @@ export class ImagesComponent implements OnInit {
     }
     
     createAndRun() {
-        console.log(this.imageToRun);
+        this.dockerService.imageRun(this.imageToRun).subscribe(image => {
+            image.start().then(result => {
+                console.log('aeeee', result);
+                toast('Container created with success', 3000);
+                $('#modal-run-container').modal('close');
+
+            });
+        });
     }
     
 }

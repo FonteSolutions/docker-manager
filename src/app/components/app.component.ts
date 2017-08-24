@@ -1,4 +1,5 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {DockerService} from "../services/docker.service";
 
 declare let $: any;
 declare let jQuery: any;
@@ -10,9 +11,16 @@ declare let jQuery: any;
     templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
-    isDarkTheme: boolean = false;
 
-    constructor() { }
+    public isDarkTheme: boolean = false;
+    public data: any;
+
+    constructor(private dockerService: DockerService) {
+        this.data = {
+            info: {},
+            version: {}
+        }
+    }
     
     ngOnInit() {
         require('materialize-css');
@@ -23,6 +31,31 @@ export class AppComponent implements OnInit {
                 gutter: 0,
                 belowOrigin: true
             });
+            $('#modal-info').modal({
+                    dismissible: true,
+                    opacity: .3,
+                    inDuration: 300,
+                    outDuration: 200,
+                    startingTop: '4%',
+                    endingTop: '10%',
+                    ready: function (modal, trigger) {
+                    },
+                    complete: function () {
+                    }
+                }
+            );
+        });
+    }
+
+    info() {
+        this.dockerService.version().subscribe(version => {
+            this.data.version = version;
+        });
+        this.dockerService.info().subscribe(info => {
+            this.data.info = info;
+        });
+        $(function () {
+            $('#modal-info').modal('open');
         });
     }
     

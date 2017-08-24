@@ -19,6 +19,16 @@ export class DockerService {
         const app = electron.remote.app;
         this.docker = app['docker'];
     }
+
+    // System version
+    version() {
+        return Observable.fromPromise(this.docker.version());
+    }
+
+    // System info
+    info() {
+        return Observable.fromPromise(this.docker.info());
+    }
     
     // List all images
     images() {
@@ -48,7 +58,16 @@ export class DockerService {
             self.docker.modem.followProgress(stream, onSuccess, onProgress);
         });
     }
-    
+
+    // Image Create
+    imageRun(imageData) {
+        return Observable.fromPromise(this.docker.createContainer({
+            name: imageData.name,
+            Image: imageData.image,
+            Cmd: imageData.cmd
+        }));
+    }
+
     // List all containers
     containers() {
         return Observable.fromPromise(this.docker.listContainers({all: true}));
