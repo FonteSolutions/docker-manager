@@ -4,6 +4,7 @@
  * Helper: root(), and rootDir() are defined at the bottom
  */
 const webpack = require('webpack');
+const pkg = require('./package.json');
 const helpers = require('./helpers');
 const path = require('path');
 
@@ -64,6 +65,13 @@ var config = {
                 exclude: [/\.(spec|e2e)\.ts$/]
             },
 
+            // Support for .js files.
+            // {
+            //     test: /\.js$/,
+            //     loaders: ['commonjs'],
+            //     exclude: /node_modules/
+            // },
+
             // Support for *.json files.
             {
                 test: /\.json$/,
@@ -92,6 +100,11 @@ var config = {
             {
                 test: /\.svg/,
                 loader: 'svg-url-loader'
+            },
+
+            {
+                test: /\.node$/,
+                loader: 'node-loader'
             }
         ]
     },
@@ -136,7 +149,8 @@ var config = {
 
         new ProvidePlugin({
             "window.jQuery": "jquery",
-            Hammer: "hammerjs/hammer"
+            Hammer: "hammerjs/hammer",
+            "dockerode": "dockerode"
         })
     ],
     // we need this due to problems with es6-shim
@@ -148,8 +162,12 @@ var config = {
         clearImmediate: false,
         setImmediate: false
     },
-    externals: ['config', Object.keys(config || {})]
+    externals: [
+        'dockerode'
+    ]
 };
+
+console.log(pkg.dependencies);
 
 /**
  * Target Electron

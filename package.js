@@ -3,6 +3,8 @@
 var packager = require('electron-packager');
 var colors = require('colors');
 var fs = require('fs');
+var cp = require("child_process");
+const dockerode = require('dockerode');
 const pkg = require('./package.json');
 const argv = require('minimist')(process.argv.slice(2));
 const devDeps = Object.keys(pkg.devDependencies);
@@ -19,9 +21,9 @@ var ncp = require('ncp').ncp;
 const DEFAULT_OPTS = {
     dir: './src/app',
     name: appName,
-    asar: shouldUseAsar,
-    ignore: [].concat(devDeps.map(name => `/node_modules/${name}($|/)`))
-}
+    asar: shouldUseAsar
+    // ignore: [].concat(devDeps.map(name => `/node_modules/${name}($|/)`))
+};
 
 // const icon = './src/app/dist/assets/app-icon';
 const icon = './dist/assets/docker-sm.png';
@@ -75,6 +77,9 @@ pack(platform, arch, function (err, appPath) {
             }
             console.log('Fonts copiadas com sucesso!'.green);
         });
+
+        process.chdir(output + '/resources/app');
+        cp.exec('npm install');
     }
 });
 

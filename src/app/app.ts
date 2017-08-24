@@ -2,7 +2,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {enableProdMode, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
-// import {LocationStrategy, HashLocationStrategy} from '@angular/common';
 import {RouterModule, Router} from '@angular/router';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
@@ -18,9 +17,6 @@ import {ContainersComponent} from './components/containers/containers.component'
 
 import {routes} from './app.routes';
 import {DockerService} from "./services/docker.service";
-// import * as Dockerode from "dockerode";
-
-// declare var $: JQueryStatic;
 
 /*
  * provide('AppStore', { useValue: appStore }),
