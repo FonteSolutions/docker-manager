@@ -64,7 +64,8 @@ export class DockerService {
         return Observable.fromPromise(this.docker.createContainer({
             name: imageData.name,
             Image: imageData.image,
-            Cmd: imageData.cmd
+            Cmd: imageData.cmd,
+            Tty: imageData.tty
         }));
     }
 
