@@ -42,6 +42,7 @@ export class DockerService {
     
     // Search images on DockerHub
     imageSearch(term) {
+        console.log('search', term);
         return Observable.fromPromise(this.docker.searchImages({term: term}));
     }
     
@@ -61,12 +62,58 @@ export class DockerService {
 
     // Image Create
     imageRun(imageData) {
-        return Observable.fromPromise(this.docker.createContainer({
+        let hostConfig = {
+            // 'PublishAllPorts': true,
+            'PortBindings': {},
+            'Binds': []
+        };
+        let exposedPorts = {};
+        for(let i in imageData.ports) {
+            exposedPorts[imageData.ports[i].public + '/tcp'] = {};
+            hostConfig.PortBindings[imageData.ports[i].public + '/tcp'] = [{'HostPort': imageData.ports[i].private}];
+        }
+        let envs = [];
+        for(let i in imageData.envs) {
+            envs.push(imageData.envs[i].name + '=' + imageData.envs[i].value);
+        }
+        let volumes = {};
+        // let binds = [];
+        for(let i in imageData.volumes) {
+            hostConfig.Binds.push(imageData.volumes[i].private + ':' + imageData.volumes[i].public);
+            // volumes[imageData.volumes[i].private] = {};
+        }
+        
+        const opts = {
             name: imageData.name,
             Image: imageData.image,
             Cmd: imageData.cmd,
-            Tty: imageData.tty
-        }));
+            Tty: imageData.tty,
+            ExposedPorts: exposedPorts,
+            Env: envs,
+            // Binds: binds,
+            HostConfig: hostConfig,
+            Volumes: volumes
+        };
+    
+        console.log(opts);
+    
+        this.docker.createContainer(opts);
+        
+        // return Observable.fromPromise(this.docker.run(imageData.image, imageData.cmd, [process.stdout, process.stderr], {
+        //     Tty: imageData.tty,
+        //     name: imageData.name,
+        //     Ports: ports
+        // }));
+        // .on('container', function(container) {
+        //     console.log('teste container', container);
+        // });
+        
+        // return Observable.fromPromise(this.docker.createContainer({
+        //     name: imageData.name,
+        //     Image: imageData.image,
+        //     Cmd: imageData.cmd,
+        //     Tty: imageData.tty
+        // }));
     }
 
     // List all containers
@@ -97,6 +144,11 @@ export class DockerService {
     // Inspect container
     containerInfo(container) {
         return Observable.fromPromise(this.docker.getContainer(container).inspect());
+    }
+    
+    // Remove container
+    containerRemove(container) {
+        return Observable.fromPromise(this.docker.getContainer(container).remove());
     }
     
 }

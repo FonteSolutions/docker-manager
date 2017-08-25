@@ -63,11 +63,14 @@
                                 <option [value]="image.RepoTags[0]" *ngFor="let image of images">{{ image.RepoTags[0] }}</option>
                             </select>
                         </div>
+                        <div class="input-field col s12">
+                            <input id="cmd" type="text" class="" placeholder="Command" [(ngModel)]="imageToRun.cmd" [ngModelOptions]="{standalone: true}" />
+                        </div>
                         <div class="col s12">
                             <input type="checkbox" id="tty" checked="checked" [(ngModel)]="imageToRun.tty" [ngModelOptions]="{standalone: true}" />
                             <label for="tty" style="margin-right: 30px;">Terminal</label>
-                            <input type="checkbox" id="interactive" checked="checked" [(ngModel)]="imageToRun.interactive" [ngModelOptions]="{standalone: true}" />
-                            <label for="interactive">Interactive</label>
+                            <!--<input type="checkbox" id="interactive" checked="checked" [(ngModel)]="imageToRun.interactive" [ngModelOptions]="{standalone: true}" />-->
+                            <!--<label for="interactive">Interactive</label>-->
                         </div>
 
                         <div class="col s12">

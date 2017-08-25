@@ -13,13 +13,8 @@ declare let jQuery: any;
 export class AppComponent implements OnInit {
 
     public isDarkTheme: boolean = false;
-    public data: any;
 
-    constructor(private dockerService: DockerService) {
-        this.data = {
-            info: {},
-            version: {}
-        }
+    constructor() {
     }
     
     ngOnInit() {
@@ -47,18 +42,6 @@ export class AppComponent implements OnInit {
         });
     }
 
-    info() {
-        this.dockerService.version().subscribe(version => {
-            this.data.version = version;
-        });
-        this.dockerService.info().subscribe(info => {
-            this.data.info = info;
-        });
-        $(function () {
-            $('#modal-info').modal('open');
-        });
-    }
-    
     closeWindow() {
         let electron = require('electron');
         // const app = electron.remote.app;

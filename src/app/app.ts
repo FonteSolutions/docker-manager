@@ -10,10 +10,11 @@ import {authStore, authInitialState} from './store/auth.store';
 import 'materialize-css';
 import {MaterializeModule} from "angular2-materialize";
 
-import {HomeComponent} from './components/home/home.component';
 import {AppComponent} from './components/app.component';
+import {HomeComponent} from './components/home/home.component';
 import {ImagesComponent} from './components/images/images.component';
 import {ContainersComponent} from './components/containers/containers.component';
+import {InfoComponent} from "./components/info/info.component";
 
 import {routes} from './app.routes';
 import {DockerService} from "./services/docker.service";
@@ -39,6 +40,7 @@ import {DockerService} from "./services/docker.service";
         AppComponent,
         HomeComponent,
         ImagesComponent,
+        InfoComponent,
         ContainersComponent
     ],
     bootstrap: [AppComponent]

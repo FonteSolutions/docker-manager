@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {toast} from "angular2-materialize";
 import 'rxjs/Rx';
 import {DockerService} from "../../services/docker.service";
@@ -9,6 +9,7 @@ declare let jQuery: any;
 
 @Component({
     selector: 'dm-images',
+    // changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './images.component.html',
     styleUrls: ['./images.component.scss'],
 })
@@ -22,13 +23,14 @@ export class ImagesComponent implements OnInit {
     tagsToPull: any[];
     imageToRun: any;
     
-    constructor(private dockerService: DockerService) {
+    constructor(private dockerService: DockerService, private ref: ChangeDetectorRef) {
         this.images = new Array();
         this.imagesResultedFromDockerHub = new Array();
         this.tagsToPull = new Array();
         this.imageToRun = {
             name: '',
             image: '',
+            cmd: '',
             tty: false,
             interactive: false,
             ports: [],
@@ -106,12 +108,11 @@ export class ImagesComponent implements OnInit {
         $('#modal-run-container').modal('open');
         this.imageToRun = {
             name: '',
-            cmd: ['/bin/bash'],
+            cmd: '/bin/bash',
             image: image.RepoTags[0],
-            tty: false,
-            interactive: false,
-            ports: [],
-            volumes: [],
+            tty: true,
+            ports: [{private: '80', public: '80'}, {private: '443', public: '443'}],
+            volumes: [{private: '/home/fontenele/Documents/www/', public: '/var/www/htdocs/'}],
             envs: []
         };
     }
@@ -149,6 +150,8 @@ export class ImagesComponent implements OnInit {
     updateImages() {
         this.dockerService.images().subscribe(images => {
             this.images = images;
+            // this.ref.detach();
+            this.ref.detectChanges();
         });
     }
     
@@ -184,14 +187,21 @@ export class ImagesComponent implements OnInit {
     }
     
     createAndRun() {
-        this.dockerService.imageRun(this.imageToRun).subscribe(image => {
-            image.start().then(result => {
-                console.log('aeeee', result);
-                toast('Container created with success', 3000);
-                $('#modal-run-container').modal('close');
-
-            });
-        });
+        this.dockerService.imageRun(this.imageToRun);
+        // this.dockerService.imageRun(this.imageToRun).subscribe(container => {
+        //     console.log('runn', container);
+        //     this.dockerService.containerStart(container.id).subscribe(result => {
+        //         console.log('started', result);
+        //     });
+        //     // image.start().then(result => {
+        //     //     console.log('aeeee', result);
+        //     //     toast('Container created with success', 3000);
+        //     //     $('#modal-run-container').modal('close');
+        //     //
+        //     // });
+        // }, error => {
+        //     console.log('ERRORRR', error);
+        // });
     }
     
 }

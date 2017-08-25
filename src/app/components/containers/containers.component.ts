@@ -77,6 +77,7 @@ export class ContainersComponent implements OnInit {
 
     info(container) {
         this.dockerService.containerInfo(container.Id).subscribe(info => {
+            console.log('info', info);
             let ports = new Array();
             for(let port in info.Config.ExposedPorts) {
                 ports.push(port);
@@ -87,7 +88,9 @@ export class ContainersComponent implements OnInit {
     }
 
     remove(container) {
-        console.log('remove', container);
+        this.dockerService.containerRemove(container.Id).subscribe(result => {
+            this.updateContainers();
+        });
     }
 
     updateContainers() {

@@ -1,6 +1,6 @@
 <div>
     <div class="row">
-        <div class="col s12 m12 l12" *ngFor="let container of containers">
+        <div class="col s12 m6 l6" *ngFor="let container of containers">
             <div class="card hoverable {{ container.State == 'running' ? 'white-text green darken-3' : '' }} {{ container.State == 'paused' ? 'white-text orange darken-3' : '' }} {{ container.State == 'exited' ? 'orange lighten-5' : '' }}">
 
                 <div class="card-content">
