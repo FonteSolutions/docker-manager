@@ -96,6 +96,7 @@ export class ContainersComponent implements OnInit {
     updateContainers() {
         this.dockerService.containers().subscribe(containers => {
             this.containers = containers;
+            console.log(containers);
         });
     }
 

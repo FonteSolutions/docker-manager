@@ -29,6 +29,15 @@ export class DockerService {
     info() {
         return Observable.fromPromise(this.docker.info());
     }
+
+    // Painel test
+    pteste() {
+
+        // Tentar pegar processamento de alguma forma
+        this.docker.getEvents().then(teste => {
+            console.log('pteste', teste);
+        });
+    }
     
     // List all images
     images() {

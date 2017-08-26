@@ -186,17 +186,21 @@ export class ImagesComponent implements OnInit {
     }
     
     create() {
-        console.log(this.imageToRun);
+        this.dockerService.imageRun(this.imageToRun).subscribe(container => {
+            $('#modal-run-container').modal('close');
+            toast('Container created with success', 3000);
+            this.router.navigate(['/containers']);
+        }, error => {
+            toast(error);
+        });
     }
     
     createAndRun() {
-        // this.dockerService.imageRun(this.imageToRun);
         this.dockerService.imageRun(this.imageToRun).subscribe(container => {
-            console.log('runn', container);
-            // this.dockerService.containerStart(container.id)
+            toast('Container created with success', 3000);
             this.dockerService.containerStart(container.id).subscribe(container => {
                 $('#modal-run-container').modal('close');
-                toast('Container created with success', 3000);
+                toast('Container started with success', 3000);
                 this.router.navigate(['/containers']);
             });
         }, error => {
