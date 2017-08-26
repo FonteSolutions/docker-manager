@@ -63,7 +63,6 @@ export class DockerService {
     // Image Create
     imageRun(imageData) {
         let hostConfig = {
-            // 'PublishAllPorts': true,
             'PortBindings': {},
             'Binds': []
         };
@@ -80,7 +79,6 @@ export class DockerService {
         // let binds = [];
         for(let i in imageData.volumes) {
             hostConfig.Binds.push(imageData.volumes[i].private + ':' + imageData.volumes[i].public);
-            // volumes[imageData.volumes[i].private] = {};
         }
         
         const opts = {
@@ -96,24 +94,8 @@ export class DockerService {
         };
     
         console.log(opts);
-    
-        this.docker.createContainer(opts);
-        
-        // return Observable.fromPromise(this.docker.run(imageData.image, imageData.cmd, [process.stdout, process.stderr], {
-        //     Tty: imageData.tty,
-        //     name: imageData.name,
-        //     Ports: ports
-        // }));
-        // .on('container', function(container) {
-        //     console.log('teste container', container);
-        // });
-        
-        // return Observable.fromPromise(this.docker.createContainer({
-        //     name: imageData.name,
-        //     Image: imageData.image,
-        //     Cmd: imageData.cmd,
-        //     Tty: imageData.tty
-        // }));
+
+        return Observable.fromPromise(this.docker.createContainer(opts));
     }
 
     // List all containers

@@ -2,6 +2,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild
 import {toast} from "angular2-materialize";
 import 'rxjs/Rx';
 import {DockerService} from "../../services/docker.service";
+import {Router} from "@angular/router";
 // import * as Dockerode from "dockerode";
 
 declare let $: any;
@@ -23,7 +24,9 @@ export class ImagesComponent implements OnInit {
     tagsToPull: any[];
     imageToRun: any;
     
-    constructor(private dockerService: DockerService, private ref: ChangeDetectorRef) {
+    constructor(private dockerService: DockerService,
+                private ref: ChangeDetectorRef,
+                private router: Router) {
         this.images = new Array();
         this.imagesResultedFromDockerHub = new Array();
         this.tagsToPull = new Array();
@@ -112,7 +115,7 @@ export class ImagesComponent implements OnInit {
             image: image.RepoTags[0],
             tty: true,
             ports: [{private: '80', public: '80'}, {private: '443', public: '443'}],
-            volumes: [{private: '/home/fontenele/Documents/www/', public: '/var/www/htdocs/'}],
+            volumes: [{private: '/home/fontenele/Documents/www/', public: '/var/www/html/'}],
             envs: []
         };
     }
@@ -187,21 +190,18 @@ export class ImagesComponent implements OnInit {
     }
     
     createAndRun() {
-        this.dockerService.imageRun(this.imageToRun);
-        // this.dockerService.imageRun(this.imageToRun).subscribe(container => {
-        //     console.log('runn', container);
-        //     this.dockerService.containerStart(container.id).subscribe(result => {
-        //         console.log('started', result);
-        //     });
-        //     // image.start().then(result => {
-        //     //     console.log('aeeee', result);
-        //     //     toast('Container created with success', 3000);
-        //     //     $('#modal-run-container').modal('close');
-        //     //
-        //     // });
-        // }, error => {
-        //     console.log('ERRORRR', error);
-        // });
+        // this.dockerService.imageRun(this.imageToRun);
+        this.dockerService.imageRun(this.imageToRun).subscribe(container => {
+            console.log('runn', container);
+            // this.dockerService.containerStart(container.id)
+            this.dockerService.containerStart(container.id).subscribe(container => {
+                $('#modal-run-container').modal('close');
+                toast('Container created with success', 3000);
+                this.router.navigate(['/containers']);
+            });
+        }, error => {
+            toast(error);
+        });
     }
     
 }
