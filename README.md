@@ -54,49 +54,49 @@ WantedBy=sockets.target
 
 ## Screenshots
 #### How to pull new image
-![How to pull new image](http://fontesolutions.com.br/docker-manager/imgs/images-list-how-pull-new-image1.png)
+![How to pull new image](http://fontesolutions.com.br/docker-manager/imgs/images-list-how-pull-new-image.png)
 #### Search image
-![Search image](http://fontesolutions.com.br/docker-manager/imgs/images-list-search1.png)
+![Search image](http://fontesolutions.com.br/docker-manager/imgs/images-list-search.png)
 #### Select version
-![Select version to install](http://fontesolutions.com.br/docker-manager/imgs/images-list-pull1.png)
+![Select version to install](http://fontesolutions.com.br/docker-manager/imgs/images-list-pull.png)
 #### Image pulled with success
-![Image pulled](http://fontesolutions.com.br/docker-manager/imgs/images-list-pulled1.png)
+![Image pulled](http://fontesolutions.com.br/docker-manager/imgs/images-list-pulled.png)
 #### Run DB image selecting preset configurations
-![Run image selecting preset configurations](http://fontesolutions.com.br/docker-manager/imgs/images-run-db-select-preset1.png)
+![Run image selecting preset configurations](http://fontesolutions.com.br/docker-manager/imgs/images-run-db-select-preset.png)
 #### Add/Remove Presets
-![Add/Remove Presets](http://fontesolutions.com.br/docker-manager/imgs/containers-presets-config1.png)
+![Add/Remove Presets](http://fontesolutions.com.br/docker-manager/imgs/containers-presets-config.png)
 #### View volumes tab
-![Volumes tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-db-volumes1.png)
+![Volumes tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-db-volumes.png)
 #### Run HTTP image selecting preset configurations
-![Run HTTP image selecting preset configuration](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-select-preset1.png)
+![Run HTTP image selecting preset configuration](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-select-preset.png)
 #### View volumes tab
-![View volumes tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-volumes1.png)
+![View volumes tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-volumes.png)
 #### View links tab
-![View links tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-links1.png)
+![View links tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-links.png)
 #### View envs tab
-![View envs tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-envs1.png)
+![View envs tab](http://fontesolutions.com.br/docker-manager/imgs/images-run-web-envs.png)
 #### How to view All Containers Stats
-![How to view All Containers Stats](http://fontesolutions.com.br/docker-manager/imgs/containers-how-view-stats1.png)
+![How to view All Containers Stats](http://fontesolutions.com.br/docker-manager/imgs/containers-how-view-stats.png)
 #### View Container Stats
-![View Container Stats](http://fontesolutions.com.br/docker-manager/imgs/containers-view-stats1.png)
+![View Container Stats](http://fontesolutions.com.br/docker-manager/imgs/containers-view-stats.png)
 #### How to view Container Info
-![How to view Container Info](http://fontesolutions.com.br/docker-manager/imgs/containers-how-view-info1.png)
+![How to view Container Info](http://fontesolutions.com.br/docker-manager/imgs/containers-how-view-info.png)
 #### View Container Info
-![View Container Info](http://fontesolutions.com.br/docker-manager/imgs/containers-view-info1.png)
+![View Container Info](http://fontesolutions.com.br/docker-manager/imgs/containers-view-info.png)
 #### View Container Info CPU and Network Stats
-![View Container Info CPU and Network Stats](http://fontesolutions.com.br/docker-manager/imgs/containers-view-info-stats1.png)
+![View Container Info CPU and Network Stats](http://fontesolutions.com.br/docker-manager/imgs/containers-view-info-stats.png)
 #### View Container Top Process
-![View Container Top Process](http://fontesolutions.com.br/docker-manager/imgs/containers-view-info-top1.png)
+![View Container Top Process](http://fontesolutions.com.br/docker-manager/imgs/containers-view-info-top.png)
 #### View Container Logs
-![View Container Logs](http://fontesolutions.com.br/docker-manager/imgs/containers-view-logs1.png)
+![View Container Logs](http://fontesolutions.com.br/docker-manager/imgs/containers-view-logs.png)
 #### How to access Container Terminal
-![How to access Container Terminal](http://fontesolutions.com.br/docker-manager/imgs/containers-how-view-term1.png)
+![How to access Container Terminal](http://fontesolutions.com.br/docker-manager/imgs/containers-how-view-term.png)
 #### Verifying container and env params
-![Verifying container and env params](http://fontesolutions.com.br/docker-manager/imgs/containers-term1.png)
+![Verifying container and env params](http://fontesolutions.com.br/docker-manager/imgs/containers-term.png)
 #### Multiple terminals of different containers with top running
-![Multiple terminals of different containers with top running](http://fontesolutions.com.br/docker-manager/imgs/containers-term-top-all1.png)
+![Multiple terminals of different containers with top running](http://fontesolutions.com.br/docker-manager/imgs/containers-term-top-all.png)
 #### Server Info
-![Server Info](http://fontesolutions.com.br/docker-manager/imgs/server-info1.png)
+![Server Info](http://fontesolutions.com.br/docker-manager/imgs/server-info.png)
 
 
 ## Thanks
