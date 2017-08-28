@@ -54,7 +54,7 @@ WantedBy=sockets.target
 
 ## Screenshots
 #### How to pull new image
-![How to pull new image](http://fontesolutions.com.br/docker-manager/imgs/images-list-how-pull-new-image.png)
+![How to pull new image](http://fontesolutions.com.br/docker-manager/imgs/images-list-how-pull-new-image.png?t=1)
 #### Search image
 ![Search image](http://fontesolutions.com.br/docker-manager/imgs/images-list-search.png)
 #### Select version
