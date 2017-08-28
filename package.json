@@ -10,9 +10,9 @@
     "build:dev": "webpack --progress --profile",
     "package": "node package.js",
     "package-all": "npm run package -- --all",
-    "build-package": "npm run build && npm run package",
-    "build-deb": "npm run build-package && electron-installer-debian --src release/linux-x64/docker-manager-linux-x64/ --dest release/linux-x64/installers/ --arch amd64 --description DockerManager --productDescription DockerManager",
-    "build-win": "node winbuild.js",
+    "build:package": "npm run build && npm run package",
+    "build:deb": "npm run build:package && electron-installer-debian --src release/linux-x64/docker-manager-linux-x64/ --dest release/linux-x64/installers/ --arch amd64 --description DockerManager --productDescription DockerManager",
+    "build:win": "node winbuild.js",
     "electron": "electron . dev",
     "webpack-test": "webpack --config webpack.test.js --progress --profile",
     "test": "karma start"
