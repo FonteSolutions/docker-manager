@@ -55,7 +55,7 @@ export class ContainersComponent implements OnInit {
 
             (function ($) {
                 var defaults = {
-                    width: 400,
+                    width: 900,
                     height: "65%",
                     minimizedWidth: 200,
                     gutter: 10,
@@ -563,42 +563,70 @@ export class ContainersComponent implements OnInit {
     }
 
     openTerminal(container) {
-        $('#modal-terminal').modal('open');
-        function stripData(data) {
-            data = data.replace(/+/g, '');
-            data = data.replace(/+/g, '');
-            data = data.replace(/H        +/g, '');
-            data = data.replace(/H+/g, '');
-            data = data.replace(/\[3g        +/g, '');
-            data = data.replace(/c\[!p\[\?3;4l\[4l>+/g, '');
-            return data.trim();
+        // $('#modal-terminal').modal('open');
+        // function stripData(data) {
+        //     data = data.replace(/+/g, '');
+        //     data = data.replace(/+/g, '');
+        //     data = data.replace(/H        +/g, '');
+        //     data = data.replace(/H+/g, '');
+        //     data = data.replace(/\[3g        +/g, '');
+        //     data = data.replace(/c\[!p\[\?3;4l\[4l>+/g, '');
+        //     return data.trim();
+        // }
+        if($('#terminal_' + container.Id).length == 1) {
+            $('#terminal_' + container.Id).dockmodal('restore');
+            return;
         }
+        
         this.dockerService.containerAttach(container).subscribe((stream) => {
-
+            
             var $terminal = $('<div class="terminal-item" id="terminal_' + container.Id + '" data-container-id="' + container.Id + '" style="height:100%;"></div>');
             $('#modal-terminal .modal-content').append($terminal);
 
             var Terminal = require('sh.js/build/sh');
-            var terminal = new Terminal;
-            terminal.open($('#modal-terminal .modal-content .terminal-item')[0]);
-
-            var urlSocket = 'ws://localhost:2375/containers/' + container.Id + '/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1';
-            var socket = new WebSocket(urlSocket);
-
-            terminal.on('data', function (data) {
-                socket.send(data);
+            var terminal = new Terminal();
+            
+            $terminal.dockmodal({
+                title: container.Id,
+                open: function ($content) {
+                    terminal.open($content[0]);
+    
+                    var urlSocket = 'ws://localhost:2375/containers/' + container.Id + '/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1';
+                    var socket = new WebSocket(urlSocket);
+    
+                    terminal.on('data', function (data) {
+                        socket.send(data);
+                    });
+                    socket.onmessage = function (e) {
+                        terminal.write(e.data);
+                    };
+    
+                    setTimeout(function () {
+                        terminal.sizeToFit();
+                        terminal.focus();
+                        socket.send('\r');
+                    }, 1000);
+                },
+                close: function ($term) {
+                    $('#terminal_' + container.Id).remove();
+                },
+                popout: function ($term) {
+                    setTimeout(function () {
+                        terminal.sizeToFit();
+                        terminal.focus();
+                    }, 1000);
+                    // terminal.sizeToFit();
+                    // terminal.focus();
+                },
+                restore: function ($term) {
+                    // terminal.sizeToFit();
+                    // terminal.focus();
+                    setTimeout(function () {
+                        terminal.sizeToFit();
+                        terminal.focus();
+                    }, 1000);
+                }
             });
-            socket.onmessage = function (e) {
-                terminal.write(e.data);
-            };
-
-            terminal.sizeToFit();
-            terminal.focus();
-
-            setTimeout(function () {
-                socket.send('\r');
-            }, 1000);
-
         });
     }
 
