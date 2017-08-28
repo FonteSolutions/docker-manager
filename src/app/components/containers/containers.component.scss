@@ -15,6 +15,9 @@
 .card-reveal table tr {
   border-color: rgba(160, 160, 160, 0.2);
 }
+.card-reveal table tr td:first-child {
+  padding-left: 15px;
+}
 .card-action .btn-floating {
 
 }

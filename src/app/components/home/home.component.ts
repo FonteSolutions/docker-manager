@@ -16,7 +16,6 @@ export class HomeComponent implements OnInit {
         this.dockerService.info().subscribe(result => {
             console.log(result);
         });
-        this.dockerService.pteste();
     }
     
 }

@@ -15,6 +15,9 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/mergeMap';
 
 // Hammer
+// import 'jquery';
+import 'jquery.terminal';
 import 'hammerjs';
 import $ from 'jquery';
+// import 'jquery.terminal';
 

@@ -1,16 +1,14 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {toast} from "angular2-materialize";
 import 'rxjs/Rx';
 import {DockerService} from "../../services/docker.service";
 import {Router} from "@angular/router";
-// import * as Dockerode from "dockerode";
 
 declare let $: any;
 declare let jQuery: any;
 
 @Component({
     selector: 'dm-images',
-    // changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './images.component.html',
     styleUrls: ['./images.component.scss'],
 })
@@ -153,7 +151,6 @@ export class ImagesComponent implements OnInit {
     updateImages() {
         this.dockerService.images().subscribe(images => {
             this.images = images;
-            // this.ref.detach();
             this.ref.detectChanges();
         });
     }

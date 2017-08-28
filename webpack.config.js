@@ -68,8 +68,8 @@ var config = {
             // Support for .js files.
             // {
             //     test: /\.js$/,
-            //     loaders: ['commonjs'],
-            //     exclude: /node_modules/
+            //     loaders: ['babel-loader'],
+            //     // exclude: /node_modules/
             // },
 
             // Support for *.json files.
@@ -150,6 +150,7 @@ var config = {
         new ProvidePlugin({
             "window.jQuery": "jquery",
             Hammer: "hammerjs/hammer",
+            "window.jQuery.terminal": "jquery.terminal",
             "dockerode": "dockerode"
         })
     ],
@@ -166,8 +167,6 @@ var config = {
         'dockerode'
     ]
 };
-
-console.log(pkg.dependencies);
 
 /**
  * Target Electron

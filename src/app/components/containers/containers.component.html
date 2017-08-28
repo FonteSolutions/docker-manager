@@ -1,6 +1,6 @@
 <div>
     <div class="row">
-        <div class="col s12 m12 l12" *ngFor="let container of containers">
+        <div class="col s12" *ngFor="let container of containers">
             <div class="card hoverable {{ container.State == 'running' ? 'white-text green darken-3' : '' }} {{ container.State == 'paused' ? 'white-text orange darken-3' : '' }} {{ container.State == 'exited' ? 'orange lighten-5' : '' }}">
 
                 <div class="card-content">
@@ -34,7 +34,10 @@
                     <a *ngIf="container.State == 'running' || container.State == 'paused'" (click)="stop(container)" class="btn-floating waves-effect waves-light red darken-3">
                         <i class="fa fa-stop" aria-hidden="true" style="font-size: 16px;"></i>
                     </a>
-                    <a class="btn-floating waves-effect waves-light red darken-3 right" (click)="remove(container)">
+                    <a *ngIf="container.State == 'running' || container.State == 'paused'" (click)="openTerminal(container)" class="btn-floating waves-effect waves-light black">
+                        <i class="fa fa-terminal" aria-hidden="true" style="font-size: 16px;"></i>
+                    </a>
+                    <a class="btn-floating waves-effect waves-light red darken-3 right {{ container.State == 'running' || container.State == 'paused' ? 'disabled' : '' }}" (click)="remove(container)">
                         <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
                     </a>
                 </div>
@@ -43,24 +46,28 @@
                     <span class="card-title text-darken-4"><strong>{{ container.Names[0] | slice:1 }}</strong> <small>Info</small><i class="material-icons right">close</i></span>
                     <table class="bordered responsive-table" *ngIf="container.info">
                         <tr>
-                            <td>State</td>
-                            <td><strong>{{ container.info.State.Status }}</strong></td>
+                            <td>Image</td>
+                            <td><strong>{{ container.info.Config.Image }} <small>{{ container.info.State.Status }}</small></strong></td>
                         </tr>
                         <tr>
                             <td>Command</td>
                             <td>{{ container.info.Config.Cmd }}</td>
                         </tr>
-                        <tr *ngFor="let env of container.info.Config.Env">
-                            <td>Env</td>
-                            <td>{{ env }}</td>
-                        </tr>
                         <tr *ngFor="let port of container.info.Config.ports">
                             <td>Port Exposed</td>
                             <td>{{ port }}</td>
                         </tr>
+                        <tr *ngFor="let volume of container.info.Mounts">
+                            <td>Volume</td>
+                            <td>{{ volume.Source }} <i class="fa fa-arrows-h"></i> {{ volume.Destination }}</td>
+                        </tr>
+                        <tr *ngFor="let env of container.info.Config.Env">
+                            <td>Env</td>
+                            <td>{{ env }}</td>
+                        </tr>
                         <tr>
-                            <td>Image</td>
-                            <td>{{ container.info.Config.Image }}</td>
+                            <td>IP / Gateway</td>
+                            <td><strong>{{ container.info.NetworkSettings.IPAddress }}</strong> / {{ container.info.NetworkSettings.Gateway }}</td>
                         </tr>
                         <tr>
                             <td>Terminal</td>
@@ -70,18 +77,6 @@
                             <td>Created</td>
                             <td>{{ container.info.Created }}</td>
                         </tr>
-                        <tr *ngFor="let volume of container.info.Mounts">
-                            <td>Volume</td>
-                            <td>{{ volume.Source }} <-> {{ volume.Destination }}</td>
-                        </tr>
-                        <tr>
-                            <td>IP</td>
-                            <td><strong>{{ container.info.NetworkSettings.IPAddress }}</strong></td>
-                        </tr>
-                        <tr>
-                            <td>Gateway</td>
-                            <td>{{ container.info.NetworkSettings.Gateway }}</td>
-                        </tr>
                         <tr>
                             <td>MacAddress</td>
                             <td>{{ container.info.NetworkSettings.MacAddress }}</td>
@@ -90,6 +85,14 @@
                 </div>
 
             </div>
+        </div>
+    </div>
+    <div id="modal-terminal" class="modal modal-fixed-footer">
+        <div class="modal-content black white-text" style="height: 100%; width: 100%;">
+            <!--<pre>{{ terminalOut }}</pre>-->
+        </div>
+        <div class="modal-footer">
+            <a class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
         </div>
     </div>
 </div>

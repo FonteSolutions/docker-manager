@@ -30,15 +30,6 @@ export class DockerService {
         return Observable.fromPromise(this.docker.info());
     }
 
-    // Painel test
-    pteste() {
-
-        // Tentar pegar processamento de alguma forma
-        this.docker.getEvents().then(teste => {
-            console.log('pteste', teste);
-        });
-    }
-    
     // List all images
     images() {
         return Observable.fromPromise(this.docker.listImages({all: true}));
@@ -51,7 +42,6 @@ export class DockerService {
     
     // Search images on DockerHub
     imageSearch(term) {
-        console.log('search', term);
         return Observable.fromPromise(this.docker.searchImages({term: term}));
     }
     
@@ -140,6 +130,38 @@ export class DockerService {
     // Remove container
     containerRemove(container) {
         return Observable.fromPromise(this.docker.getContainer(container).remove());
+    }
+
+    // Container attach
+    containerAttach(container) {
+        console.log('container',container);
+        return Observable.fromPromise(this.docker.getContainer(container.Id).attach({logs: false, stream: true, stdin: true, stdout: true, stderr: false}));
+        // let container = this.docker.getContainer('26f4fbf99dbd1777df373c5004be6b7f621482e8d426b07fbabd7df90ae3dc2e');
+        //
+        // container.attach({logs: false, stream: true, stdin: true, stdout: true, stderr: false}, function (err, stream) {
+        //     var output = '';
+        //     stream.on('data', function (data) {
+        //         output += data.toString();
+        //         console.log('data', output);
+        //     });
+        //     // var _output = '';
+        //     stream.on('end', function (data) {
+        //         //     _output += data.toString();
+        //         console.log('end', data);
+        //     });
+        //     // var __output = '';
+        //     // stream.on('readable', function (data) {
+        //     //     __output += data.toString();
+        //     //     console.log('readable', __output);
+        //     // });
+        //     // stream.pipe(process.stdout);
+        //     // stream.write('echo 123' + '\n\x04');
+        //     // container.modem.demuxStream(stream, process.stdout, process.stderr);
+        //     // stream.write("say Broadcast on chat testing");
+        //     console.log('stream', stream);
+        //
+        // });
+
     }
     
 }
