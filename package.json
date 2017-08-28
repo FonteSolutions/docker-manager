@@ -13,7 +13,7 @@
     "bootstrap": "latest",
     "shelljs": "latest",
     "wdt-loading": "latest",
-    "noty": "latest",
+    "noty": "^2.4.1",
     "animate.css": "latest",
     "jquery.terminal": "latest",
     "web-terminal": "latest",
