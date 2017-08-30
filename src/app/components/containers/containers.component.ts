@@ -2,6 +2,7 @@ import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {DockerService} from "../../services/docker.service";
 import 'rxjs/Rx';
 import {toast} from "angular2-materialize";
+import {Transform, Writable} from "stream";
 
 declare let $: any;
 declare let jQuery: any;
@@ -569,6 +570,24 @@ export class ContainersComponent implements OnInit {
         }
         
         this.dockerService.containerAttach(container).subscribe((stream) => {
+            // stream.pipe(process.stdout);
+            
+            
+            var WriteStream = require('stream').Writable;
+            var TransformStream = require('stream').Transform;
+            // console.log(stream);
+            // stream.write = function(chunk, encoding, callback) {
+            //     console.log('write: ' + JSON.stringify(chunk));
+            //     console.log('waiting 2 seconds');
+            //     setTimeout(function() {
+            //         console.log('finished waiting');
+            //         callback();
+            //     },2000);
+            // };
+            
+            // var ws = new WriteStream();
+            // var ts = new TransformStream();
+            // stream = stream.pipe(ts).pipe(ws);
             $('.terminal-item, .dockmodal').remove();
             var $terminal = $('<div class="terminal-item" id="terminal_' + container.Id + '" data-container-id="' + container.Id + '" style="height:100%;"></div>');
             $('#modal-terminal .modal-content').append($terminal);

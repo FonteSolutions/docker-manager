@@ -55,7 +55,7 @@
     "fontawesome": "^4.7.2",
     "hammerjs": "^2.0.8",
     "jquery": "^2.2.4",
-    "jquery.terminal": "^1.6.2",
+    "jquery.terminal": "^1.6.3",
     "materialize-css": "^0.100.2",
     "ncp": "^2.0.0",
     "rxjs": "^5.4.3",
@@ -67,7 +67,7 @@
     "zone.js": "^0.8.17"
   },
   "devDependencies": {
-    "@types/dockerode": "^2.4.5",
+    "@types/dockerode": "latest",
     "@types/hammerjs": "^2.0.35",
     "@types/jasmine": "^2.5.54",
     "@types/jquery": "^3.2.12",
