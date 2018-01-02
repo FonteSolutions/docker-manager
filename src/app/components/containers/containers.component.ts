@@ -568,11 +568,11 @@ export class ContainersComponent implements OnInit {
             $('#terminal_' + container.Id).dockmodal('restore');
             return;
         }
-        
-        this.dockerService.containerAttach(container).subscribe((stream) => {
+
+        this.dockerService.containerAttach(container).subscribe((stream: any) => {
             // stream.pipe(process.stdout);
-            
-            
+
+
             var WriteStream = require('stream').Writable;
             var TransformStream = require('stream').Transform;
             // console.log(stream);
@@ -584,7 +584,7 @@ export class ContainersComponent implements OnInit {
             //         callback();
             //     },2000);
             // };
-            
+
             // var ws = new WriteStream();
             // var ts = new TransformStream();
             // stream = stream.pipe(ts).pipe(ws);
@@ -594,22 +594,22 @@ export class ContainersComponent implements OnInit {
 
             var Terminal = require('sh.js/build/sh');
             var terminal = new Terminal();
-            
+
             $terminal.dockmodal({
                 title: container.Id,
                 open: function ($content) {
                     terminal.open($content[0]);
-                    
+
                     stream.on('data', function (e) {
                         if(!terminal.write(e.toString())) {
                             terminal.write('');
                         }
                     });
-                    
+
                     terminal.on('data', function (data) {
                         stream.write(data);
                     });
-    
+
                     setTimeout(function () {
                         terminal.sizeToFit();
                         terminal.focus();
