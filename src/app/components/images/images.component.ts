@@ -1,8 +1,9 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {toast} from "angular2-materialize";
+import {AfterViewInit, ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {toast} from 'angular2-materialize';
 import 'rxjs/Rx';
-import {DockerService} from "../../services/docker.service";
-import {Router} from "@angular/router";
+import {Router} from '@angular/router';
+import {DockerService} from '../../services/docker.service';
+import {PresetService} from '../../services/preset.service';
 
 declare let $: any;
 declare let jQuery: any;
@@ -12,8 +13,8 @@ declare let jQuery: any;
     templateUrl: './images.component.html',
     styleUrls: ['./images.component.scss'],
 })
-export class ImagesComponent implements OnInit {
-    
+export class ImagesComponent implements OnInit, AfterViewInit {
+
     inputs: any;
     images: any[];
     imageSearchParams: any;
@@ -21,10 +22,13 @@ export class ImagesComponent implements OnInit {
     imageToPull: string = '';
     tagsToPull: any[];
     imageToRun: any;
-    
+    presets: any[];
+
     constructor(private dockerService: DockerService,
+                private presetService: PresetService,
                 private ref: ChangeDetectorRef,
                 private router: Router) {
+        this.presets = new Array();
         this.images = new Array();
         this.imagesResultedFromDockerHub = new Array();
         this.tagsToPull = new Array();
@@ -48,62 +52,81 @@ export class ImagesComponent implements OnInit {
         };
         this.imageSearchParams = {term: '', limit: null};
     }
-    
+
+    ngAfterViewInit() {
+        console.log('all', this.presetService.all());
+    }
+
     ngOnInit() {
         var self = this;
-        $(function () {
+        $(function() {
             $('#modal-search').modal({
-                    dismissible: true,
-                    opacity: .3,
-                    inDuration: 300,
-                    outDuration: 200,
-                    startingTop: '4%',
-                    endingTop: '10%',
-                    ready: function (modal, trigger) {
-                        $('#term').focus();
-                    },
-                    complete: function () {
-                        self.imagesResultedFromDockerHub = new Array();
-                    }
+                dismissible: true,
+                opacity: .3,
+                inDuration: 300,
+                outDuration: 200,
+                startingTop: '4%',
+                endingTop: '10%',
+                ready: function(modal, trigger) {
+                    $('#term').focus();
+                },
+                complete: function() {
+                    self.imagesResultedFromDockerHub = new Array();
                 }
-            );
+            });
             $('#modal-confirm').modal({
-                    dismissible: true,
-                    opacity: .3,
-                    inDuration: 300,
-                    outDuration: 200,
-                    startingTop: '4%',
-                    endingTop: '10%',
-                    ready: function (modal, trigger) {
-                    },
-                    complete: function () {
-                    }
+                dismissible: true,
+                opacity: .3,
+                inDuration: 300,
+                outDuration: 200,
+                startingTop: '4%',
+                endingTop: '10%',
+                ready: function(modal, trigger) {
+                },
+                complete: function() {
                 }
-            );
+            });
             $('#modal-run-container').modal({
-                    dismissible: true,
-                    opacity: .3,
-                    inDuration: 300,
-                    outDuration: 200,
-                    startingTop: '4%',
-                    endingTop: '10%',
-                    ready: function (modal, trigger) {
-                    },
-                    complete: function () {
-                    }
+                dismissible: true,
+                opacity: .3,
+                inDuration: 300,
+                outDuration: 200,
+                endingTop: '10%',
+                ready: function(modal, trigger) {
+                    // $('#modal-run-container .port-remove').on('click', (item) => {
+                    //     $(item.target).closest('.port-item').remove();
+                    // });
+                    // $('#modal-run-container .volume-remove').on('click', (item) => {
+                    //     $(item.target).closest('.volume-item').remove();
+                    // });
+                    // $('#modal-run-container .env-remove').on('click', (item) => {
+                    //     $(item.target).closest('.env-item').remove();
+                    $('ul.tabs').tabs('select_tab', 'new-image-tab-general');
+                    $('#name').focus();
+                    // });
+                },
+                complete: function() {
                 }
+            });
+            $('ul.tabs').tabs(
+                // swipeable: true
+                // responsiveThreshold : 1920
             );
+            // setTimeout(function() {
+            //     console.log('setou');
+            //     $('ul.tabs').tabs('select_tab', 'new-image-tab-general');
+            // }, 5000);
         });
-        
+
         this.updateImages();
     }
-    
+
     info(image) {
         this.dockerService.imageInfo(image.Id).subscribe(info => {
             image.info = info;
         });
     }
-    
+
     askCreateContainer(image) {
         $('#name').focus();
         $('#modal-run-container').modal('open');
@@ -112,18 +135,18 @@ export class ImagesComponent implements OnInit {
             cmd: '/bin/bash',
             image: image.RepoTags[0],
             tty: true,
-            ports: [{private: '80', public: '80'}, {private: '443', public: '443'}],
-            volumes: [{private: '/home/fontenele/Documents/www/', public: '/var/www/html/'}],
+            ports: [{private: '80', public: '80'}, {private: '443', public: '443'}, {private: '9200', public: '9200'}, {private: '5601', public: '5601'}],
+            volumes: [{private: '/home/basistecnologia/Documentos/www/', public: '/var/www/html/'}],
             envs: []
         };
     }
-    
+
     search() {
         this.dockerService.imageSearch(this.imageSearchParams.term).subscribe(images => {
             this.imagesResultedFromDockerHub = images;
         });
     }
-    
+
     askPullFromSearch(image) {
         this.imageToPull = image;
         $('#modal-confirm').modal('open');
@@ -131,7 +154,7 @@ export class ImagesComponent implements OnInit {
             this.tagsToPull = tags;
         });
     }
-    
+
     pull(name, tag) {
         $('#modal-confirm').modal('close');
         $('#modal-search').modal('close');
@@ -147,14 +170,15 @@ export class ImagesComponent implements OnInit {
             }
         );
     }
-    
+
     updateImages() {
         this.dockerService.images().subscribe(images => {
             this.images = images;
+            console.log(images);
             this.ref.detectChanges();
         });
     }
-    
+
     addPort() {
         if (!this.inputs.portPublic || !this.inputs.portPrivate) {
             return;
@@ -163,7 +187,7 @@ export class ImagesComponent implements OnInit {
         this.inputs.portPublic = '';
         this.inputs.portPrivate = '';
     }
-    
+
     addVolume() {
         if (!this.inputs.volumePublic || !this.inputs.volumePrivate) {
             return;
@@ -172,7 +196,7 @@ export class ImagesComponent implements OnInit {
         this.inputs.volumePublic = '';
         this.inputs.volumePrivate = '';
     }
-    
+
     addEnv() {
         if (!this.inputs.envName || !this.inputs.envValue) {
             return;
@@ -181,7 +205,20 @@ export class ImagesComponent implements OnInit {
         this.inputs.envName = '';
         this.inputs.envValue = '';
     }
-    
+
+    removePort(portPublic, portPrivate) {
+        this.imageToRun.ports = this.imageToRun.ports.filter(item => item.public != portPublic && item.private != portPrivate);
+    }
+
+    removeVolume(volumePublic, volumePrivate) {
+        // some bug here
+        this.imageToRun.volumes = this.imageToRun.volumes.filter(item => item.public != volumePublic && item.private != volumePrivate);
+    }
+
+    removeEnv(envName, envValue) {
+        this.imageToRun.envs = this.imageToRun.envs.filter(item => item.name != envName && item.value != envValue);
+    }
+
     create() {
         this.dockerService.imageRun(this.imageToRun).subscribe(container => {
             $('#modal-run-container').modal('close');
@@ -191,7 +228,7 @@ export class ImagesComponent implements OnInit {
             toast(error);
         });
     }
-    
+
     createAndRun() {
         this.dockerService.imageRun(this.imageToRun).subscribe(container => {
             toast('Container created with success', 3000);
@@ -204,5 +241,5 @@ export class ImagesComponent implements OnInit {
             toast(error);
         });
     }
-    
+
 }

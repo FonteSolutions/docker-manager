@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {DockerService} from "../services/docker.service";
+import {DbService} from '../services/db.service';
 
 declare let $: any;
 declare let jQuery: any;
@@ -14,9 +14,9 @@ export class AppComponent implements OnInit {
 
     public isDarkTheme: boolean = false;
 
-    constructor() {
+    constructor(public dbService: DbService) {
     }
-    
+
     ngOnInit() {
         require('materialize-css');
         $(function () {
@@ -50,14 +50,14 @@ export class AppComponent implements OnInit {
         const focusedWindow = remote.getCurrentWindow();
         focusedWindow.minimize();
     }
-    
+
     restoreWindow() {
         const electron = require('electron');
         const remote = electron.remote;
         const focusedWindow = remote.getCurrentWindow();
         focusedWindow.restore();
     }
-    
+
     minimizeWindow() {
         let electron = require('electron');
         const remote = electron.remote;

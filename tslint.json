@@ -43,7 +43,7 @@
     ],
     "component-class-suffix": true,
     "directive-class-suffix": true,
-    "import-destructuring-spacing": true,
+    "import-destructuring-spacing": false,
     "class-name": true,
     "curly": false,
     "eofline": true,

@@ -4,6 +4,7 @@ const BrowserWindow = electron.BrowserWindow;
 // const windowStateKeeper = require('electron-window-state');
 const Menu = electron.Menu;
 const Tray = electron.Tray;
+const sqlite3 = require('sqlite3').verbose();
 const Docker = require('dockerode');
 var socket = '/var/run/docker.sock';
 var docker = new Docker({ socketPath: socket });
@@ -13,6 +14,8 @@ var mainWindow = null;
 
 const process = require('process');
 const path = process.argv[2] == 'dev' ? '/src/app' : '';
+
+const db = new sqlite3.Database(__dirname + path + '/dkm.db');
 
 if(path) {
     require('electron-reload')(__dirname, {
@@ -88,7 +91,7 @@ const createWindow = function () {
             }
         }
     ]);
-    appIcon.setToolTip('BrScan <NomeDoApp>');
+    appIcon.setToolTip('FonteSolutions <NomeDoApp>');
     appIcon.setContextMenu(contextMenu);
 
     // App menu
@@ -109,6 +112,7 @@ const createWindow = function () {
     });
 
     app.docker = docker;
+    app.db = db;
 };
 
 app.on('ready', createWindow);

@@ -8,16 +8,19 @@ import {HttpModule} from '@angular/http';
 import {StoreModule} from '@ngrx/store';
 import {authStore, authInitialState} from './store/auth.store';
 import 'materialize-css';
-import {MaterializeModule} from "angular2-materialize";
+import {MaterializeModule} from 'angular2-materialize';
 
 import {AppComponent} from './components/app.component';
 import {HomeComponent} from './components/home/home.component';
 import {ImagesComponent} from './components/images/images.component';
 import {ContainersComponent} from './components/containers/containers.component';
-import {InfoComponent} from "./components/info/info.component";
+import {InfoComponent} from './components/info/info.component';
 
 import {routes} from './app.routes';
-import {DockerService} from "./services/docker.service";
+import {DockerService} from './services/docker.service';
+import {DbService} from './services/db.service';
+import {PresetService} from './services/preset.service';
+import {SettingsComponent} from './components/settings/settings.component';
 
 /*
  * provide('AppStore', { useValue: appStore }),
@@ -34,13 +37,16 @@ import {DockerService} from "./services/docker.service";
         StoreModule.provideStore({authStore}, {authStore: authInitialState})
     ],
     providers: [
-        DockerService
+        DockerService,
+        PresetService,
+        DbService
     ],
     declarations: [
         AppComponent,
         HomeComponent,
         ImagesComponent,
         InfoComponent,
+        SettingsComponent,
         ContainersComponent
     ],
     bootstrap: [AppComponent]
