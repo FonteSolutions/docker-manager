@@ -151,7 +151,8 @@ var config = {
             "window.jQuery": "jquery",
             Hammer: "hammerjs/hammer",
             "window.jQuery.terminal": "jquery.terminal",
-            "dockerode": "dockerode"
+            "dockerode": "dockerode",
+            "sql.js": "sql.js"
         })
     ],
     // we need this due to problems with es6-shim
@@ -164,7 +165,8 @@ var config = {
         setImmediate: false
     },
     externals: [
-        'dockerode'
+        'dockerode',
+        'sql.js'
     ]
 };
 

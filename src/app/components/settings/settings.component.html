@@ -1,3 +1,130 @@
-<div>
-    setttingsss
+<h4>Presets <a class="btn-floating waves-effect waves-light blue" (click)="addNewPreset()"><i
+    class="material-icons">add</i></a></h4>
+<table class="bordered highlight responsive-table" id="tb-presets">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Cmd</th>
+        <th>Ports</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let preset of presets" (click)="selectPresetToEdit(preset)" (dblclick)="editPreset(preset)" [ngClass]="preset.selected ? 'selected' : ''" >
+            <td>{{preset.name}}</td>
+            <td>{{preset.cmd}}</td>
+            <td>
+                <div class="chip" *ngFor="let port of preset.ports">
+                    {{port.public}} <i class="fa fa-arrows-h" aria-hidden="true"></i> {{port.private}}
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div id="modal-add-edit-preset" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <div class="row">
+            <form class="col s12">
+                <ul class="tabs">
+                    <li class="tab col s3"><a href="#edit-preset-tab-general">General</a></li>
+                    <li class="tab col s3"><a href="#edit-preset-tab-ports">Ports</a></li>
+                    <li class="tab col s3"><a href="#edit-preset-tab-volumes">Volumes</a></li>
+                    <li class="tab col s3"><a href="#edit-preset-tab-envs">Envs</a></li>
+                </ul>
+
+                <div id="edit-preset-tab-general" class="col s12">
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input id="name" [(ngModel)]="preset.name" [ngModelOptions]="{standalone: true}" />
+                            <label class="active" for="name">Name</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="cmd" [(ngModel)]="preset.cmd" [ngModelOptions]="{standalone: true}" />
+                            <label class="active" for="name">Cmd</label>
+                        </div>
+                    </div>
+                </div>
+                <div id="edit-preset-tab-ports" class="col s12">
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="input-field col s5" style="margin-top: 0;">
+                            <input type="text" [(ngModel)]="inputs.portPublic" [ngModelOptions]="{standalone: true}" placeholder="Public Port" />
+                        </div>
+                        <div class="col s1 center" style="margin-top: 15px;"><i class="fa fa-arrows-h" aria-hidden="true"></i></div>
+                        <div class="input-field col s5" style="margin-top: 0;">
+                            <input type="text" [(ngModel)]="inputs.portPrivate" [ngModelOptions]="{standalone: true}" placeholder="Private Port" />
+                        </div>
+                        <a class="btn-floating green" style="top: 10px;" (click)="addPort()">
+                            <i class="fa fa-plus" aria-hidden="true" style="font-size: 16px;"></i>
+                        </a>
+
+                        <div class="col s12" *ngIf="preset.ports?.length > 0">
+                            <div class="collection">
+                                <div class="collection-item port-item" *ngFor="let port of preset.ports">
+                                    <span>{{ port.public }} <i class="fa fa-arrows-h" aria-hidden="true"></i> {{ port.private }}</span>
+                                    <a class="waves-effect waves-light red-text text-darken-3 right port-remove" (click)="removePort(port.public, port.private)">
+                                        <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="edit-preset-tab-volumes" class="col s12">
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="input-field col s5" style="margin-top: 0;">
+                            <input type="text" [(ngModel)]="inputs.volumePublic" [ngModelOptions]="{standalone: true}" placeholder="Public Volume" />
+                        </div>
+                        <div class="col s1 center" style="margin-top: 15px;"><i class="fa fa-arrows-h" aria-hidden="true"></i></div>
+                        <div class="input-field col s5" style="margin-top: 0;">
+                            <input  type="text" [(ngModel)]="inputs.volumePrivate" [ngModelOptions]="{standalone: true}" placeholder="Private Volume" />
+                        </div>
+                        <a class="btn-floating green" style="top: 10px;" (click)="addVolume()">
+                            <i class="fa fa-plus" aria-hidden="true" style="font-size: 16px;"></i>
+                        </a>
+
+                        <div class="col s12" *ngIf="preset.volumes?.length > 0">
+                            <div class="collection">
+                                <div class="collection-item volume-item" *ngFor="let volume of preset.volumes">
+                                    <span>{{ volume.public }} <i class="fa fa-arrows-h" aria-hidden="true"></i> {{ volume.private }}</span>
+                                    <a class="waves-effect waves-light red-text text-darken-3 right volume-remove" (click)="removeVolume(volume.public, volume.private)">
+                                        <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="edit-preset-tab-envs" class="col s12">
+                    <div class="row" style="margin-bottom: 0;">
+                        <div class="input-field col s5" style="margin-top: 0;">
+                            <input type="text" [(ngModel)]="inputs.envName" [ngModelOptions]="{standalone: true}" placeholder="Env Param" />
+                        </div>
+                        <div class="col s1 center" style="margin-top: 15px;"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></div>
+                        <div class="input-field col s5" style="margin-top: 0;">
+                            <input type="text" [(ngModel)]="inputs.envValue" [ngModelOptions]="{standalone: true}" placeholder="Env Value" />
+                        </div>
+                        <a class="btn-floating green" style="top: 10px;" (click)="addEnv()">
+                            <i class="fa fa-plus" aria-hidden="true" style="font-size: 16px;"></i>
+                        </a>
+
+                        <div class="col s12" *ngIf="preset.envs?.length > 0">
+                            <div class="collection">
+                                <div class="collection-item env-item" *ngFor="let env of preset.envs">
+                                    <span>{{ env.name }} <i class="fa fa-long-arrow-right" aria-hidden="true"></i> {{ env.value }}</span>
+                                    <a class="waves-effect waves-light red-text text-darken-3 right env-remove" (click)="removeEnv(env.name, env.value)">
+                                        <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a class="modal-action red-text modal-close waves-effect waves-red btn-flat">Cancel</a>
+        <a class="modal-action black-text waves-effect waves-green btn-flat" (click)="savePreset()">Save</a>
+    </div>
 </div>

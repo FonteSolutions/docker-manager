@@ -93,29 +93,16 @@ export class ImagesComponent implements OnInit, AfterViewInit {
                 outDuration: 200,
                 endingTop: '10%',
                 ready: function(modal, trigger) {
-                    // $('#modal-run-container .port-remove').on('click', (item) => {
-                    //     $(item.target).closest('.port-item').remove();
-                    // });
-                    // $('#modal-run-container .volume-remove').on('click', (item) => {
-                    //     $(item.target).closest('.volume-item').remove();
-                    // });
-                    // $('#modal-run-container .env-remove').on('click', (item) => {
-                    //     $(item.target).closest('.env-item').remove();
-                    $('ul.tabs').tabs('select_tab', 'new-image-tab-general');
+                    $('#modal-run-container ul.tabs').tabs('select_tab', 'new-image-tab-general');
                     $('#name').focus();
-                    // });
                 },
                 complete: function() {
                 }
             });
-            $('ul.tabs').tabs(
+            $('#modal-run-container ul.tabs').tabs(
                 // swipeable: true
                 // responsiveThreshold : 1920
             );
-            // setTimeout(function() {
-            //     console.log('setou');
-            //     $('ul.tabs').tabs('select_tab', 'new-image-tab-general');
-            // }, 5000);
         });
 
         this.updateImages();
@@ -174,7 +161,6 @@ export class ImagesComponent implements OnInit, AfterViewInit {
     updateImages() {
         this.dockerService.images().subscribe(images => {
             this.images = images;
-            console.log(images);
             this.ref.detectChanges();
         });
     }

@@ -15,6 +15,30 @@
     <app-container>Loading...</app-container>
     <script src="dist/polyfills.js"></script>
     <script src="dist/vendor.js"></script>
+    <script>
+        var electron = require('electron');
+        var fs = require('fs');
+        var SQL = require('sql.js');
+        var process = require('process');
+
+        var path = process.argv[2] == 'dev' ? '/src/app' : '';
+        var dbPath = __dirname + path + '/dkm.db';
+        var db = __dirname + path + '/dkm.db';
+
+        if (!fs.existsSync(dbPath)) {
+            fs.writeFileSync(dbPath, '');
+        }
+        var filebuffer = fs.readFileSync(dbPath);
+        if (filebuffer) {
+            db = new SQL.Database(filebuffer);
+        }
+
+        // electron.remote.ipcMain.on('save-db', function(event, arg) {
+        //     // event.sender.send('blablabla', [arguments])
+        //     console.log('save-dbbb', arg, db);
+        //     // saveDb();
+        // });
+    </script>
     <script src="dist/app.js"></script>
 </body>
 

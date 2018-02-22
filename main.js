@@ -1,53 +1,65 @@
 const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
+const ipcMain = electron.ipcMain;
 // const windowStateKeeper = require('electron-window-state');
 const Menu = electron.Menu;
 const Tray = electron.Tray;
-const sqlite3 = require('sqlite3').verbose();
 const Docker = require('dockerode');
 var socket = '/var/run/docker.sock';
-var docker = new Docker({ socketPath: socket });
-
-// browser-window creates a native window
+var docker = new Docker({socketPath: socket});
+var fs = require('fs');
+// var SQL = require('sql.js');
+var remote = electron.remote;
 var mainWindow = null;
 
 const process = require('process');
 const path = process.argv[2] == 'dev' ? '/src/app' : '';
+// const dbPath = __dirname + path + '/dkm.db';
+//
+// if (!fs.existsSync(dbPath)) {
+//     fs.writeFileSync(dbPath, '');
+// }
+// var filebuffer = fs.readFileSync(dbPath);
+// if (filebuffer) {
+//     db = new SQL.Database(filebuffer);
+// }
 
-const db = new sqlite3.Database(__dirname + path + '/dkm.db');
-
-if(path) {
-    require('electron-reload')(__dirname, {
-        electron: require('electron')
-    });
+if (path) {
+    // require('electron-reload')(__dirname, {
+    //     electron: require('electron')
+    // });
 }
 
-app.on('window-all-closed', function () {
-    // On macOS it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
-});
+const saveDb = function() {
+    // setTimeout(function () {
+    //     try {
+    //         fs.unlinkSync(dbPath);
+    //     } catch (e) {
+    //         console.log("Unable to delete file; Exception: " + e);
+    //     }
+    fs.writeFileSync(dbPath, new Buffer(db.export()));
+    // }, 10);
+};
 
 const createWindow = function () {
-    // Initialize the window to our specified dimensions
     mainWindow = new BrowserWindow({
         // frame: false,
         // enableLargerThanScreen: true,
         // x: 0,
         // y: 0,
+        // show: false,
         title: '',
         titleBarStyle: 'hidden',
         // icon: __dirname + '/src/assets/camera-icon.png'
-        icon: __dirname + path + '/dist/assets/docker-sm.png'
+        icon: __dirname + path + '/dist/assets/docker-sm.png',
+        webPreferences: {
+            nodeIntegration: true,
+            defaultEncoding: 'UTF-8'
+        }
     });
 
-    // Tell Electron where to load the entry point from
     mainWindow.loadURL('file://' + __dirname + path + '/index.html');
-
-    // console.log('dirname', __dirname);
 
     const screenElectron = electron.screen;
     const allScreens = screenElectron.getAllDisplays();
@@ -56,7 +68,6 @@ const createWindow = function () {
     var y = 0;
     var width = 0;
     var height = 0;
-    // Select biggest screen monitor to open app
     for (var screen in allScreens) {
         if (allScreens[screen].workArea.width > width) {
             x = allScreens[screen].bounds.x;
@@ -66,9 +77,7 @@ const createWindow = function () {
         }
     }
 
-    // Set Screen Position
     mainWindow.setPosition(x, y, true);
-    // Set Screen Size
     mainWindow.setSize(width, height, true);
 
     // var mainWindowState = windowStateKeeper({
@@ -76,28 +85,19 @@ const createWindow = function () {
     //     defaultHeight: height
     // });
 
-    // App icon tray
     appIcon = new Tray(__dirname + path + '/dist/assets/docker-xs.png');
     var contextMenu = Menu.buildFromTemplate([
-        {
-            label: 'Abrir',
-            click: mainWindow.show()
-        },
-        {
-            label: 'Fechar',
-            click: function () {
-                app._events['will-quit']();
-                app.quit();
-            }
-        }
+        {label: 'Abrir', click: mainWindow.show()},
+        {label: 'Fechar', click: function () {
+            app._events['will-quit']();
+            app.quit();
+        }}
     ]);
-    appIcon.setToolTip('FonteSolutions <NomeDoApp>');
+    appIcon.setToolTip('DockerManager');
     appIcon.setContextMenu(contextMenu);
 
-    // App menu
     mainWindow.setMenuBarVisibility(false);
 
-    // Open the DevTools.
     if (path) {
         mainWindow.webContents.openDevTools();
     }
@@ -112,12 +112,35 @@ const createWindow = function () {
     });
 
     app.docker = docker;
-    app.db = db;
+    // app.db = db;
+    // app.dbPath = dbPath + '_';
+    // window.electron = electron;
+    // window.db = db;
+    // window.fs = fs;
+    // app.saveDb = saveDb;
+
+    // ipcMain.removeAllListeners('refresh');
+
+    // console.log(remote, mainWindow.getCurrentWindow());
 };
 
+// ipcMain.on('save-db', function(event, arg) {
+//     // event.sender.send('blablabla', [arguments])
+//     console.log('save-dbbb', arg);
+//     saveDb();
+// });
+
 app.on('ready', createWindow);
-app.on('show', function (event) {
-    mainWindow.setHighlightMode('always');
+// app.on('show', function (event) {
+//     mainWindow.setHighlightMode('always');
+// });
+
+app.on('window-all-closed', function () {
+    // On macOS it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 });
 
 app.on('activate', function () {
@@ -126,4 +149,8 @@ app.on('activate', function () {
     if (mainWindow === null) {
         createWindow()
     }
+});
+
+process.on('uncaughtException', function (err) {
+    console.log(err);
 });

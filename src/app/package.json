@@ -1,8 +1,9 @@
 {
-  "name": "docker-manager",
-  "version": "2.0.0",
-  "main": "main.js",
-  "dependencies": {
-    "dockerode": "^2.5.0"
-  }
+    "name": "docker-manager",
+    "version": "2.0.0",
+    "main": "main.js",
+    "dependencies": {
+        "dockerode": "^2.5.0",
+        "sql.js": "^0.5.0"
+    }
 }

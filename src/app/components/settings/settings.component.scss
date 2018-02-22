@@ -1,4 +1,13 @@
 // Fix for warning with electron - see https://github.com/electron/electron/issues/4420
 ::selection {
-  background: rgba(255, 255, 125, 0.99);
+    background: rgba(0, 0, 0, 0.90);
+    color: #fff;
+}
+
+#tb-presets tbody tr {
+    cursor: pointer;
+}
+
+#tb-presets tbody tr.selected {
+    background-color: #ef6c00;
 }
