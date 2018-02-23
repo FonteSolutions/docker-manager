@@ -25,11 +25,11 @@ const path = process.argv[2] == 'dev' ? '/src/app' : '';
 //     db = new SQL.Database(filebuffer);
 // }
 
-if (path) {
-    // require('electron-reload')(__dirname, {
-    //     electron: require('electron')
-    // });
-}
+// if (path) {
+//     require('electron-reload')(__dirname, {
+//         electron: require('electron')
+//     });
+// }
 
 const saveDb = function() {
     // setTimeout(function () {

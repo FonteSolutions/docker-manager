@@ -76,6 +76,10 @@ export class SettingsComponent implements OnInit {
                 toast('Error when get presets.', 5000);
             });
 
+            this.presetService.findByName('tesste3').subscribe(preset => {
+                console.log('1asdf', preset);
+            });
+
             // let preset = new Preset();
             // preset.name = 'sapiens';
             // preset.cmd = '/bin/bash';
@@ -107,7 +111,6 @@ export class SettingsComponent implements OnInit {
             this.presets[_preset].selected = false;
         }
         preset.selected = true;
-
     }
 
     editPreset(preset: Preset) {
@@ -121,16 +124,18 @@ export class SettingsComponent implements OnInit {
     }
 
     savePreset() {
-        console.log('save');
-
         this.presetService.save(this.preset).subscribe(preset => {
-        //     // toast(`Preset ${this.preset.name} saved with success.`, 5000);
-        //     // this.preset = new Preset();
-        //     // $('#modal-add-edit-preset').modal('close');
-        //     // this.loadAllPresets();
-        // }, err => {
-        //     console.log('deu erro', err);
+            toast(`Preset ${this.preset.name} saved with success.`, 5000);
+            this.preset = new Preset();
+            $('#modal-add-edit-preset').modal('close');
+            this.loadAllPresets();
+        }, err => {
+            console.log('deu erro', err);
         });
+    }
+
+    removePreset(preset: Preset) {
+        console.log('remove', preset);
     }
 
     addPort() {

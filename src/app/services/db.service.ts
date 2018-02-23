@@ -8,6 +8,7 @@ import * as fs from 'fs';
 // import * as Knex from 'knex';
 import {Database} from 'sql.js';
 import {Observer} from 'rxjs/Observer';
+
 declare var electron: any;
 declare var db: Database;
 declare var dbPath: any;
@@ -32,7 +33,7 @@ export class DbService {
             ', ports TEXT' +
             ', volumes TEXT' +
             ', envs TEXT' +
-        ')');
+            ')');
 
         // const dbData = this.db.export();
         // const dbBuffer = new Buffer(dbData);
@@ -103,47 +104,50 @@ export class DbService {
         // this.db.serialize(() => {
         //     this.db.run('CREATE TABLE IF NOT EXISTS preset (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE, cmd TEXT, ports TEXT, volumes TEXT, envs TEXT)');
 
-            // banco de talento
-            // let preset = new Preset();
-            // preset.name = 'angular-app';
-            // preset.cmd = '/bin/bash';
-            // preset.addPort(80, 80);
-            // preset.addPort(443, 443);
-            // preset.addPort(4200, 4200);
-            // preset.addVolume('/home/basistecnologia/Documentos/www/', '/var/www/html/');
-            // preset.addEnv('path_www', '/var/www/html/');
+        // banco de talento
+        // let preset = new Preset();
+        // preset.name = 'angular-app';
+        // preset.cmd = '/bin/bash';
+        // preset.addPort(80, 80);
+        // preset.addPort(443, 443);
+        // preset.addPort(4200, 4200);
+        // preset.addVolume('/home/basistecnologia/Documentos/www/', '/var/www/html/');
+        // preset.addEnv('path_www', '/var/www/html/');
 
-            // let stmt = this.db.prepare('INSERT INTO preset (name, cmd, ports, volumes, envs) VALUES (?, ?, ?, ?, ?)');
-            // stmt.run(preset.prepare());
-            // stmt.finalize();
+        // let stmt = this.db.prepare('INSERT INTO preset (name, cmd, ports, volumes, envs) VALUES (?, ?, ?, ?, ?)');
+        // stmt.run(preset.prepare());
+        // stmt.finalize();
 
-            // sapiens
-            // preset = new Preset();
-            // preset.name = 'sapiens';
-            // preset.cmd = '/bin/bash';
-            // preset.addPort(80, 80);
-            // preset.addPort(443, 443);
-            // preset.addPort(5601, 5601);
-            // preset.addPort(9200, 9200);
-            // preset.addVolume('/home/basistecnologia/Documentos/www/', '/var/www/html/');
-            // preset.addEnv('path_www', '/var/www/html/');
-            // preset.addEnv('path_sapiens', '/var/www/html/sapiens/');
+        // sapiens
+        // preset = new Preset();
+        // preset.name = 'sapiens';
+        // preset.cmd = '/bin/bash';
+        // preset.addPort(80, 80);
+        // preset.addPort(443, 443);
+        // preset.addPort(5601, 5601);
+        // preset.addPort(9200, 9200);
+        // preset.addVolume('/home/basistecnologia/Documentos/www/', '/var/www/html/');
+        // preset.addEnv('path_www', '/var/www/html/');
+        // preset.addEnv('path_sapiens', '/var/www/html/sapiens/');
 
-            // let stmt = this.db.prepare('INSERT INTO preset (name, cmd, ports, volumes, envs) VALUES (?, ?, ?, ?, ?)');
-            // stmt.run(preset.prepare());
-            // stmt.finalize();
+        // let stmt = this.db.prepare('INSERT INTO preset (name, cmd, ports, volumes, envs) VALUES (?, ?, ?, ?, ?)');
+        // stmt.run(preset.prepare());
+        // stmt.finalize();
         // });
         // this.db.close();
     }
 
     saveDb() {
         fs.writeFileSync(dbPath, new Buffer(db.export()));
+        return true;
     }
 
     save(sql: string, params?: any[]): Observable<any[]> {
         return Observable.create((observer: Observer<boolean>) => {
             try {
                 this.db.run(sql, params);
+                const saved = this.saveDb();
+                observer.next(saved);
             } catch (err) {
                 switch (true) {
                     case err.message.indexOf('UNIQUE constraint failed') >= 0:
@@ -153,13 +157,11 @@ export class DbService {
                         console.log('ERROR', err.message);
                 }
             }
-            this.saveDb();
-            observer.next(true);
         });
     }
 
     all(sql: string, filters?: any, returnClass?: any): Observable<any[]> {
-        return Observable.create((observer: Observer<Preset[]>) => {
+        return Observable.create((observer: Observer<any[]>) => {
             try {
                 let result = [];
                 this.db.each(sql, filters, (row) => {
@@ -173,6 +175,29 @@ export class DbService {
                     observer.next(result);
                 });
                 return result;
+            } catch (err) {
+                switch (true) {
+                    case err.message.indexOf('UNIQUE constraint failed') >= 0:
+                        console.log('ERROR', err.message.split(':')[1]);
+                        break;
+                    default:
+                        console.log('ERROR', err.message);
+                }
+            }
+        });
+    }
+
+    one(sql: string, filters?: any, returnClass?: any): Observable<any> {
+        return Observable.create((observer: Observer<any>) => {
+            try {
+                const stmt = this.db.prepare(sql);
+                var obj = stmt.getAsObject(filters);
+                if (returnClass) {
+                    var _obj = Object.create(returnClass);
+                    observer.next(_obj.parse(obj));
+                } else {
+                    observer.next(obj);
+                }
             } catch (err) {
                 switch (true) {
                     case err.message.indexOf('UNIQUE constraint failed') >= 0:
