@@ -29,10 +29,11 @@ $roboto-font-path: "dist/fonts/roboto/";
   -moz-osx-font-smoothing: grayscale;
 }
 
-$color-theme: 'orange';
-$font-color: 'white';
+$color-theme: 'green';
+$color-theme-hex: '#68cd6a';
+$font-color: 'black';
 
-$primary-color: color($color-theme, "darken-3") !default;
+$primary-color: color($color-theme, "lighten-1") !default;
 $primary-color-light: darken($primary-color, 25%) !default;
 $primary-color-dark: darken($primary-color, 45%) !default;
 $secondary-color: color($color-theme, "darken-1") !default;
@@ -65,8 +66,16 @@ main {
 }
 
 a {
-  color: color($color-theme, 'lighten-3') !important;
+  color: color($color-theme, 'darken-3') !important;
   font-weight: bold;
+}
+
+header nav ul li a {
+    color: color($font-color, 'darken-5') !important;
+}
+
+.bold {
+    font-weight: bold;
 }
 
 .page-footer {

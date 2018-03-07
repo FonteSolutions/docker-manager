@@ -22,26 +22,24 @@ export class PresetService {
     save(preset: Preset): Observable<Preset> {
         return Observable.create((observer: Observer<Preset>) => {
             if (preset.id) {
-                console.log(preset.prepare());
-                // let stmt = this.dbService.db.prepare('UPDATE preset SET name = ?, cmd = ?, ports = ?, volumes = ?, envs = ? WHERE id = ?');
-                // stmt.run(preset.prepare());
-                // stmt.finalize(() => {
-                // });
+                this.dbService.save('UPDATE presets SET name=?, cmd=?, ports=?, volumes=?, envs=? WHERE id=?', preset.prepare()).subscribe(status => {
+                    if (!status) {
+                        observer.error('');
+                    }
+                });
                 observer.next(preset);
             } else {
                 this.dbService.save('INSERT INTO presets (name, cmd, ports, volumes, envs) VALUES (?, ?, ?, ?, ?)', preset.prepare()).subscribe(status => {
                     if (!status) {
-                        return false;
+                        observer.error('');
                     }
-                    console.log('SELECT id, name, cmd, ports, volumes, envs FROM presets WHERE name = :name', {':name': preset.name});
-                    this.dbService.all('SELECT id, name, cmd, ports, volumes, envs FROM presets WHERE name = :name', {':name': preset.name}).subscribe(res => {
-                        console.log('aaaaaa', res);
-                        observer.next(preset);
-                    });
-                    // stmt.run(preset.prepare());
-                    // stmt.finalize(() => {
+                    observer.next(preset);
+                    // this.dbService.all('SELECT id, name, cmd, ports, volumes, envs FROM presets WHERE name = :name', {':name': preset.name}).subscribe(res => {
+                    //     console.log('aaaaaa', res[0]);
+                    //
+                    //     observer.next(res[0]);
+                    // });
                 });
-                // });
             }
         });
     }

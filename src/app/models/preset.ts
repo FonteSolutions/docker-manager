@@ -67,12 +67,12 @@ export class Preset {
     prepare(): any[] {
         if (this.id) {
             return [
-                this.id,
                 this.name,
                 this.cmd || '',
                 JSON.stringify(this.ports),
                 JSON.stringify(this.volumes),
-                JSON.stringify(this.envs)
+                JSON.stringify(this.envs),
+                this.id
             ];
         }
         return [
@@ -88,12 +88,13 @@ export class Preset {
         this.id = row.id || null;
         this.name = row.name;
         this.cmd = row.cmd || '';
-        // this.ports = (row.ports);
-        // this.volumes = (row.volumes);
-        // this.envs = (row.envs);
         this.ports = JSON.parse(row.ports);
         this.volumes = JSON.parse(row.volumes);
         this.envs = JSON.parse(row.envs);
         return this;
+    }
+
+    clone(): any {
+        return Object.create(this);
     }
 }

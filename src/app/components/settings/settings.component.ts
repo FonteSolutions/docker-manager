@@ -68,17 +68,16 @@ export class SettingsComponent implements OnInit {
         this.zone.run(() => {
             this.presetService.all().subscribe((presets: any[]) => {
                 this.presets = presets;
-                console.log(this.presets);
                 setTimeout(() => {
                     this.ref.detectChanges();
                 }, 0);
             }, err => {
                 toast('Error when get presets.', 5000);
             });
-
-            this.presetService.findByName('tesste3').subscribe(preset => {
-                console.log('1asdf', preset);
-            });
+            //
+            // this.presetService.findByName('tesste3').subscribe(preset => {
+            //     console.log('1asdf', preset);
+            // });
 
             // let preset = new Preset();
             // preset.name = 'sapiens';
@@ -115,7 +114,7 @@ export class SettingsComponent implements OnInit {
 
     editPreset(preset: Preset) {
         $('#modal-add-edit-preset').modal('open');
-        this.preset = preset;
+        this.preset = preset.clone();
     }
 
     addNewPreset() {
@@ -135,7 +134,8 @@ export class SettingsComponent implements OnInit {
     }
 
     removePreset(preset: Preset) {
-        console.log('remove', preset);
+        console.log('ask if user wants to remove this preset', preset);
+
     }
 
     addPort() {
