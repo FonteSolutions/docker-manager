@@ -1,13 +1,19 @@
+<nav>
+    <div class="nav-wrapper">
+        <ul id="nav-mobile" class="left hide-on-med-and-down">
+            <li>
+                <a class="modal-trigger" href="#modal-search"><i class="material-icons">add</i></a>
+            </li>
+        </ul>
+    </div>
+</nav>
 <div>
     <div class="progress" style="display: none;">
         <div class="indeterminate"></div>
     </div>
-    <a class="btn-floating waves-effect waves-light green darken-3 btn modal-trigger" href="#modal-search">
-        <i class="material-icons">add</i>
-    </a>
     <div class="row">
-        <div class="col s6" *ngFor="let image of images">
-            <div class="card hoverable orange lighten-5">
+        <div class="col s4" *ngFor="let image of images">
+            <div class="card orange lighten-5">
                 <div class="card-content">
                     <span class="card-title">{{ image.RepoTags[0] }}</span>
                 </div>
@@ -32,8 +38,7 @@
                     </span>
                     <table class="bordered responsive-table" *ngIf="image.info">
                         <tr>
-                            <td>aa</td>
-                            <td>bb</td>
+                            <td></td>
                         </tr>
                     </table>
                 </div>
@@ -41,170 +46,179 @@
         </div>
     </div>
 
-    <div id="modal-run-container" class="modal modal-fixed-footer">
-        <div class="modal-content">
-            <div class="row">
-                <div class="col s12">
-                    <form class="col s12">
-                        <ul class="tabs">
-                            <li class="tab col s3"><a href="#new-image-tab-general">General</a></li>
-                            <li class="tab col s3"><a href="#new-image-tab-ports">Ports</a></li>
-                            <li class="tab col s3"><a href="#new-image-tab-volumes">Volumes</a></li>
-                            <li class="tab col s3"><a href="#new-image-tab-envs">Envs</a></li>
-                        </ul>
-
-                        <div id="new-image-tab-general" class="col s12">
-                            <div class="row">
-                                <div class="input-field col s6">
-                                    <input id="name" type="text" class="" placeholder="Name" [(ngModel)]="imageToRun.name" [ngModelOptions]="{standalone: true}" />
-                                </div>
-                                <div class="input-field col s6">
-                                    <select id="image" materialize="material_select" [materializeSelectOptions]="images" class="" [(ngModel)]="imageToRun.image" [ngModelOptions]="{standalone: true}">
-                                        <option value="" selected>Select</option>
-                                        <option [value]="image.RepoTags[0]" *ngFor="let image of images">{{ image.RepoTags[0] }}</option>
-                                    </select>
-                                </div>
-                                <div class="input-field col s12">
-                                    <input id="cmd" type="text" class="" placeholder="Command" [(ngModel)]="imageToRun.cmd" [ngModelOptions]="{standalone: true}" />
-                                </div>
-                                <div class="col s12">
-                                    <input type="checkbox" id="tty" checked="checked" [(ngModel)]="imageToRun.tty" [ngModelOptions]="{standalone: true}" />
-                                    <label for="tty" style="margin-right: 30px;">Terminal</label>
-                                    <!--<input type="checkbox" id="interactive" checked="checked" [(ngModel)]="imageToRun.interactive" [ngModelOptions]="{standalone: true}" />-->
-                                    <!--<label for="interactive">Interactive</label>-->
-                                </div>
-                            </div>
-                        </div>
-                        <div id="new-image-tab-ports" class="col s12">
-                            <div class="row" style="margin-bottom: 0;">
-                                <div class="input-field col s5" style="margin-top: 0;">
-                                    <input type="text" [(ngModel)]="inputs.portPublic" [ngModelOptions]="{standalone: true}" placeholder="Public Port" />
-                                </div>
-                                <div class="col s1 center" style="margin-top: 15px;"><i class="fa fa-arrows-h" aria-hidden="true"></i></div>
-                                <div class="input-field col s5" style="margin-top: 0;">
-                                    <input type="text" [(ngModel)]="inputs.portPrivate" [ngModelOptions]="{standalone: true}" placeholder="Private Port" />
-                                </div>
-                                <a class="btn-floating green" style="top: 10px;" (click)="addPort()">
-                                    <i class="fa fa-plus" aria-hidden="true" style="font-size: 16px;"></i>
-                                </a>
-
-                                <div class="col s12" *ngIf="imageToRun.ports?.length > 0">
-                                    <div class="collection">
-                                        <div class="collection-item port-item" *ngFor="let port of imageToRun.ports">
-                                            <span>{{ port.public }} <i class="fa fa-arrows-h" aria-hidden="true"></i> {{ port.private }}</span>
-                                            <a class="waves-effect waves-light red-text text-darken-3 right port-remove" (click)="removePort(port.public, port.private)">
-                                                <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="new-image-tab-volumes" class="col s12">
-                            <div class="row" style="margin-bottom: 0;">
-                                <div class="input-field col s5" style="margin-top: 0;">
-                                    <input type="text" [(ngModel)]="inputs.volumePublic" [ngModelOptions]="{standalone: true}" placeholder="Public Volume" />
-                                </div>
-                                <div class="col s1 center" style="margin-top: 15px;"><i class="fa fa-arrows-h" aria-hidden="true"></i></div>
-                                <div class="input-field col s5" style="margin-top: 0;">
-                                    <input  type="text" [(ngModel)]="inputs.volumePrivate" [ngModelOptions]="{standalone: true}" placeholder="Private Volume" />
-                                </div>
-                                <a class="btn-floating green" style="top: 10px;" (click)="addVolume()">
-                                    <i class="fa fa-plus" aria-hidden="true" style="font-size: 16px;"></i>
-                                </a>
-
-                                <div class="col s12" *ngIf="imageToRun.volumes?.length > 0">
-                                    <div class="collection">
-                                        <div class="collection-item volume-item" *ngFor="let volume of imageToRun.volumes">
-                                            <span>{{ volume.public }} <i class="fa fa-arrows-h" aria-hidden="true"></i> {{ volume.private }}</span>
-                                            <a class="waves-effect waves-light red-text text-darken-3 right volume-remove" (click)="removeVolume(volume.public, volume.private)">
-                                                <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="new-image-tab-envs" class="col s12">
-                            <div class="row" style="margin-bottom: 0;">
-                                <div class="input-field col s5" style="margin-top: 0;">
-                                    <input type="text" [(ngModel)]="inputs.envName" [ngModelOptions]="{standalone: true}" placeholder="Env Param" />
-                                </div>
-                                <div class="col s1 center" style="margin-top: 15px;"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></div>
-                                <div class="input-field col s5" style="margin-top: 0;">
-                                    <input type="text" [(ngModel)]="inputs.envValue" [ngModelOptions]="{standalone: true}" placeholder="Env Value" />
-                                </div>
-                                <a class="btn-floating green" style="top: 10px;" (click)="addEnv()">
-                                    <i class="fa fa-plus" aria-hidden="true" style="font-size: 16px;"></i>
-                                </a>
-
-                                <div class="col s12" *ngIf="imageToRun.envs?.length > 0">
-                                    <div class="collection">
-                                        <div class="collection-item env-item" *ngFor="let env of imageToRun.envs">
-                                            <span>{{ env.name }} <i class="fa fa-long-arrow-right" aria-hidden="true"></i> {{ env.value }}</span>
-                                            <a class="waves-effect waves-light red-text text-darken-3 right env-remove" (click)="removeEnv(env.name, env.value)">
-                                                <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <a class="modal-action red-text modal-close waves-effect waves-red btn-flat">Cancel</a>
-            <a class="modal-action black-text waves-effect waves-green btn-flat" (click)="create()">Create</a>
-            <a class="modal-action black-text waves-effect waves-green btn-flat" (click)="createAndRun()">Create and Run</a>
-        </div>
-    </div>
-
-    <div id="modal-search" class="modal modal-fixed-footer">
-        <div class="modal-content">
-            <div class="row">
+</div>
+<div id="modal-run-container" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
                 <form class="col s12">
-                    <div class="row">
-                        <div class="input-field col s11">
-                            <i class="material-icons prefix">search</i>
-                            <input id="term" type="text" class="" [(ngModel)]="imageSearchParams.term" [ngModelOptions]="{standalone: true}" placeholder="Search in DockerHub" />
-                        </div>
-                        <div class="input-field col s1">
-                            <button class="btn waves-effect waves-light btn-floating green darken-3" (click)="search()">
-                                <i class="material-icons">search</i>
-                            </button>
+                    <ul class="tabs">
+                        <li class="tab col s3"><a href="#new-image-tab-general">General</a></li>
+                        <li class="tab col s3"><a href="#new-image-tab-ports">Ports</a></li>
+                        <li class="tab col s3"><a href="#new-image-tab-volumes">Volumes</a></li>
+                        <li class="tab col s3"><a href="#new-image-tab-envs">Envs</a></li>
+                    </ul>
+
+                    <div id="new-image-tab-general" class="col s12">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="name" type="text" class="" placeholder="Name" [(ngModel)]="imageToRun.name" [ngModelOptions]="{standalone: true}" />
+                            </div>
+                            <div class="input-field col s6">
+                                <select id="image" materialize="material_select" [materializeSelectOptions]="images" class="" [(ngModel)]="imageToRun.image" [ngModelOptions]="{standalone: true}">
+                                    <option value="" selected>Select</option>
+                                    <option [value]="image.RepoTags[0]" *ngFor="let image of images">{{ image.RepoTags[0] }}</option>
+                                </select>
+                            </div>
+                            <div class="input-field col s12">
+                                <input id="cmd" type="text" class="" placeholder="Command" [(ngModel)]="imageToRun.cmd" [ngModelOptions]="{standalone: true}" />
+                            </div>
+                            <div class="col s12">
+                                <input type="checkbox" id="tty" checked="checked" [(ngModel)]="imageToRun.tty" [ngModelOptions]="{standalone: true}" />
+                                <label for="tty" style="margin-right: 30px;">Terminal</label>
+                                <!--<input type="checkbox" id="interactive" checked="checked" [(ngModel)]="imageToRun.interactive" [ngModelOptions]="{standalone: true}" />-->
+                                <!--<label for="interactive">Interactive</label>-->
+                            </div>
                         </div>
                     </div>
-                    <div class="row" *ngIf="imagesResultedFromDockerHub[0]">
-                        <div class="collection">
-                            <a class="collection-item" *ngFor="let image of imagesResultedFromDockerHub" (click)="askPullFromSearch(image)">
-                                <strong style="font-size: 20px;padding-bottom: 5px;">
-                                    {{ image.name }}
-                                </strong>
-                                <i *ngIf="image.is_official" class="material-icons pull-right blue-text text-darken-3">public</i>
-                                <i class="material-icons yellow-text text-darken-3 pull-right">stars</i>
-                                <span style="font-size: 30px;" class="pull-right">{{ image.star_count }}</span><br />
-                                {{ image.description }}
+                    <div id="new-image-tab-ports" class="col s12">
+                        <div class="row" style="margin-bottom: 0;">
+                            <div class="input-field col s5" style="margin-top: 0;">
+                                <input type="text" [(ngModel)]="inputs.portPublic" [ngModelOptions]="{standalone: true}" placeholder="Public Port" />
+                            </div>
+                            <div class="col s1 center" style="margin-top: 15px;"><i class="fa fa-arrows-h" aria-hidden="true"></i></div>
+                            <div class="input-field col s5" style="margin-top: 0;">
+                                <input type="text" [(ngModel)]="inputs.portPrivate" [ngModelOptions]="{standalone: true}" placeholder="Private Port" />
+                            </div>
+                            <a class="btn-floating green" style="top: 10px;" (click)="addPort()">
+                                <i class="fa fa-plus" aria-hidden="true" style="font-size: 16px;"></i>
                             </a>
+
+                            <div class="col s12" *ngIf="imageToRun.ports?.length > 0">
+                                <div class="collection">
+                                    <div class="collection-item port-item" *ngFor="let port of imageToRun.ports">
+                                        <span>{{ port.public }} <i class="fa fa-arrows-h" aria-hidden="true"></i> {{ port.private }}</span>
+                                        <a class="waves-effect waves-light red-text text-darken-3 right port-remove" (click)="removePort(port.public, port.private)">
+                                            <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="new-image-tab-volumes" class="col s12">
+                        <div class="row" style="margin-bottom: 0;">
+                            <div class="input-field col s5" style="margin-top: 0;">
+                                <input type="text" [(ngModel)]="inputs.volumePublic" [ngModelOptions]="{standalone: true}" placeholder="Public Volume" />
+                            </div>
+                            <div class="col s1 center" style="margin-top: 15px;"><i class="fa fa-arrows-h" aria-hidden="true"></i></div>
+                            <div class="input-field col s5" style="margin-top: 0;">
+                                <input  type="text" [(ngModel)]="inputs.volumePrivate" [ngModelOptions]="{standalone: true}" placeholder="Private Volume" />
+                            </div>
+                            <a class="btn-floating green" style="top: 10px;" (click)="addVolume()">
+                                <i class="fa fa-plus" aria-hidden="true" style="font-size: 16px;"></i>
+                            </a>
+
+                            <div class="col s12" *ngIf="imageToRun.volumes?.length > 0">
+                                <div class="collection">
+                                    <div class="collection-item volume-item" *ngFor="let volume of imageToRun.volumes">
+                                        <span>{{ volume.public }} <i class="fa fa-arrows-h" aria-hidden="true"></i> {{ volume.private }}</span>
+                                        <a class="waves-effect waves-light red-text text-darken-3 right volume-remove" (click)="removeVolume(volume.public, volume.private)">
+                                            <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="new-image-tab-envs" class="col s12">
+                        <div class="row" style="margin-bottom: 0;">
+                            <div class="input-field col s5" style="margin-top: 0;">
+                                <input type="text" [(ngModel)]="inputs.envName" [ngModelOptions]="{standalone: true}" placeholder="Env Param" />
+                            </div>
+                            <div class="col s1 center" style="margin-top: 15px;"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></div>
+                            <div class="input-field col s5" style="margin-top: 0;">
+                                <input type="text" [(ngModel)]="inputs.envValue" [ngModelOptions]="{standalone: true}" placeholder="Env Value" />
+                            </div>
+                            <a class="btn-floating green" style="top: 10px;" (click)="addEnv()">
+                                <i class="fa fa-plus" aria-hidden="true" style="font-size: 16px;"></i>
+                            </a>
+
+                            <div class="col s12" *ngIf="imageToRun.envs?.length > 0">
+                                <div class="collection">
+                                    <div class="collection-item env-item" *ngFor="let env of imageToRun.envs">
+                                        <span>{{ env.name }} <i class="fa fa-long-arrow-right" aria-hidden="true"></i> {{ env.value }}</span>
+                                        <a class="waves-effect waves-light red-text text-darken-3 right env-remove" (click)="removeEnv(env.name, env.value)">
+                                            <i class="fa fa-remove" aria-hidden="true" style="font-size: 16px;"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
-        <div class="modal-footer">
-            <a class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+    </div>
+    <div class="modal-footer">
+        <div class="modal-action left">
+            <!--<select id="image" materialize="material_select" [materializeSelectOptions]="images" class="" [(ngModel)]="imageToRun.image" [ngModelOptions]="{standalone: true}">-->
+
+            <select id="presets" materialize="material_select" class="" [materializeSelectOptions]="presets" (change)="selectPreset($event)">
+                <option>Select a Preset</option>
+                <option *ngFor="let preset of presets" [value]="preset.id">{{preset.name}}</option>
+                <!--<option [value]="image.RepoTags[0]" *ngFor="let image of images">{{ image.RepoTags[0] }}</option>-->
+            </select>
+        </div>
+        <a class="modal-action red-text modal-close waves-effect waves-red btn-flat">Cancel</a>
+        <a class="modal-action black-text waves-effect waves-green btn-flat" (click)="create()">Create</a>
+        <a class="modal-action black-text waves-effect waves-green btn-flat" (click)="createAndRun()">Create and Run</a>
+    </div>
+</div>
+
+<div id="modal-search" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <div class="row">
+            <form class="col s12">
+                <div class="row">
+                    <div class="input-field col s11">
+                        <i class="material-icons prefix">search</i>
+                        <input id="term" type="text" class="" [(ngModel)]="imageSearchParams.term" [ngModelOptions]="{standalone: true}" placeholder="Search in DockerHub" />
+                    </div>
+                    <div class="input-field col s1">
+                        <button class="btn waves-effect waves-light btn-floating green darken-3" (click)="search()">
+                            <i class="material-icons">search</i>
+                        </button>
+                    </div>
+                </div>
+                <div class="row" *ngIf="imagesResultedFromDockerHub[0]">
+                    <div class="collection">
+                        <a class="collection-item" *ngFor="let image of imagesResultedFromDockerHub" (click)="askPullFromSearch(image)">
+                            <strong style="font-size: 20px;padding-bottom: 5px;">
+                                {{ image.name }}
+                            </strong>
+                            <i *ngIf="image.is_official" class="material-icons pull-right blue-text text-darken-3">public</i>
+                            <i class="material-icons yellow-text text-darken-3 pull-right">stars</i>
+                            <span style="font-size: 30px;" class="pull-right">{{ image.star_count }}</span><br />
+                            {{ image.description }}
+                        </a>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-    <div id="modal-confirm" class="modal modal-fixed-footer">
-        <div class="modal-content">
-            <h5>Select a Tag</h5>
-            <div class="collection">
-                <a class="collection-item" *ngFor="let tag of tagsToPull" (click)="pull(imageToPull.name, tag.name)">{{ imageToPull.name }} : {{ tag.name }}</a>
-            </div>
+    <div class="modal-footer">
+        <a class="modal-action modal-close waves-effect waves-green btn-flat ">Cancel</a>
+    </div>
+</div>
+<div id="modal-confirm" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <h5>Select a Tag</h5>
+        <div class="collection">
+            <a class="collection-item" *ngFor="let tag of tagsToPull" (click)="pull(imageToPull.name, tag.name)">{{ imageToPull.name }} : {{ tag.name }}</a>
         </div>
-        <div class="modal-footer">
-            <a class="waves-effect waves-red btn-flat" onclick="$('#modal-confirm').modal('close'); return false;">Cancel</a>
-        </div>
+    </div>
+    <div class="modal-footer">
+        <a class="waves-effect waves-red btn-flat" onclick="$('#modal-confirm').modal('close'); return false;">Cancel</a>
     </div>
 </div>

@@ -54,7 +54,9 @@ export class ImagesComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        console.log('all', this.presetService.all());
+        this.presetService.all().subscribe(presets => {
+            this.presets = presets;
+        });
     }
 
     ngOnInit() {
@@ -103,6 +105,7 @@ export class ImagesComponent implements OnInit, AfterViewInit {
                 // swipeable: true
                 // responsiveThreshold : 1920
             );
+            $('select').material_select({dropdownOptions: {container: $('dm-images'), constrainWidth: false}});
         });
 
         this.updateImages();
@@ -122,8 +125,8 @@ export class ImagesComponent implements OnInit, AfterViewInit {
             cmd: '/bin/bash',
             image: image.RepoTags[0],
             tty: true,
-            ports: [{private: '80', public: '80'}, {private: '443', public: '443'}, {private: '9200', public: '9200'}, {private: '5601', public: '5601'}],
-            volumes: [{private: '/home/basistecnologia/Documentos/www/', public: '/var/www/html/'}],
+            ports: [],
+            volumes: [],
             envs: []
         };
     }
@@ -226,6 +229,20 @@ export class ImagesComponent implements OnInit, AfterViewInit {
         }, error => {
             toast(error);
         });
+    }
+
+    selectPreset(event) {
+        let preset = null;
+        const id = event.target.value * 1;
+        for (const _preset of this.presets) {
+            if (_preset.id === id) {
+                preset = _preset;
+            }
+        }
+        this.imageToRun.cmd = preset.cmd;
+        this.imageToRun.ports = preset.ports;
+        this.imageToRun.volumes = preset.volumes;
+        this.imageToRun.envs = preset.envs;
     }
 
 }
